@@ -7,11 +7,11 @@ import {
   type FC,
   type ReactNode,
 } from 'react';
-import { hintReducer, type HintState, type HintPayload } from './state';
+import { hintReducer, type HintState, type HintAction } from './state';
 
 type HintContextType = {
   state: HintState;
-  dispatch: ActionDispatch<[action: HintPayload]>;
+  dispatch: ActionDispatch<[action: HintAction]>;
 };
 
 const HintContext = createContext<HintContextType | undefined>(undefined);

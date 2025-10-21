@@ -1,65 +1,49 @@
-import type { AvatarData } from '../components/common/avatar';
+import type { AvatarCharacterPath, AvatarData } from '../common/avatar';
 
-type EventCallback<T = unknown> = (data: T) => void;
+type EventCallback<T> = (data: T) => void;
 
 type EventCallbacks<Events extends Record<string, unknown>> = {
   [K in keyof Events]: Set<EventCallback<Events[K]>>;
 };
 
 class PubSub<Events extends Record<string, unknown>> {
-  private events: Partial<EventCallbacks<Events>>;
-
-  constructor() {
-    this.events = {};
-  }
+  private events: Partial<EventCallbacks<Events>> = {};
 
   subscribe<K extends keyof Events>(
     event: K,
     callback: EventCallback<Events[K]>
   ): void {
-    if (!this.events[event]) {
-      this.events[event] = new Set();
-    }
-    const eventSet = this.events[event];
-    if (eventSet) {
-      eventSet.add(callback);
-    }
+    (this.events[event] ??= new Set()).add(callback);
   }
 
   unsubscribe<K extends keyof Events>(
     event: K,
     callback: EventCallback<Events[K]>
   ): void {
-    const eventSet = this.events[event];
-    if (eventSet) {
-      eventSet.delete(callback);
-      if (eventSet.size === 0) {
-        delete this.events[event];
-      }
-    }
+    const set = this.events[event];
+    if (!set) return;
+    set.delete(callback);
+    if (set.size === 0) delete this.events[event];
   }
 
+  // ✅ Conditionally require data argument only if the event type’s payload isn’t undefined
   publish<K extends keyof Events>(
-    event: K,
-    data?: Events[K],
-    postCb?: () => void
+    ...args: Events[K] extends void | undefined
+      ? [event: K, data?: Events[K], postCb?: () => void]
+      : [event: K, data: Events[K], postCb?: () => void]
   ): void {
+    const [event, data, postCb] = args;
     const callbacks = this.events[event];
-    if (callbacks) {
-      for (const callback of callbacks) {
-        callback(data!);
-      }
-      if (postCb) {
-        postCb();
-      }
-    }
+    if (!callbacks) return;
+    for (const cb of callbacks) cb(data as Events[K]);
+    postCb?.();
   }
 }
 
+// ✅ Explicit event map
 export type NativeEvents = {
   Avatar: AvatarData;
+  'Avatar:ChangeCharacter': AvatarCharacterPath;
 };
 
-const pubSub = new PubSub<NativeEvents>();
-
-export { pubSub };
+export const pubSub = new PubSub<NativeEvents>();

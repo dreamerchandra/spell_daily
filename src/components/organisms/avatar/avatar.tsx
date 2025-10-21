@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FC } from 'react';
 import styles from './avatar.module.css';
 import { pubSub } from '../../../util/pub-sub';
-import type { AvatarData } from '../../common/avatar';
+import type { AvatarCharacterPath, AvatarData } from '../../../common/avatar';
 import { SpeechBubble } from './speech-bubble';
 import { randomImageByPath } from '../../../config/emoji-manager';
 import { useNextHint } from '../../../context/hint-context';
 import { useShortcut } from '../../../hooks/use-shortcut';
+import { useSubscribe } from '../../../hooks/usePubSub';
 
 const RandomHintMessages = [
   'Want some help?',
@@ -18,19 +19,17 @@ export const AvatarComponent: FC = () => {
   const [show, setShow] = useState(false);
   const [data, setData] = useState<AvatarData | null>(null);
   const body = useRef(document.body);
-  const img = randomImageByPath('by_rating/2');
+  const [character, setCharacter] = useState(randomImageByPath('by_rating/2'));
   const showNextHint = useNextHint();
 
-  useEffect(() => {
-    const showData = (data: AvatarData) => {
-      setShow(true);
-      setData(data);
-    };
-    pubSub.subscribe('Avatar', showData);
-    return () => {
-      pubSub.unsubscribe('Avatar', showData);
-    };
-  }, [setShow]);
+  useSubscribe('Avatar', data => {
+    setShow(true);
+    setData(data);
+  });
+
+  useSubscribe('Avatar:ChangeCharacter', imagePath => {
+    setCharacter(randomImageByPath(imagePath));
+  });
 
   useEffect(() => {
     body.current.classList.toggle(styles.overdrop, show);
@@ -42,11 +41,13 @@ export const AvatarComponent: FC = () => {
       showNextHint();
     }
     data?.onYes?.();
+    setData(null);
     setShow(false);
   };
 
   const onNo = () => {
     data?.onNo?.();
+    setData(null);
     setShow(false);
   };
 
@@ -56,14 +57,15 @@ export const AvatarComponent: FC = () => {
     RandomHintMessages[Math.floor(Math.random() * RandomHintMessages.length)];
 
   return (
-    <div
-      className="relative"
-      onClick={() => {
-        setShow(!show);
-      }}
-    >
-      <div className="right-0 top-0 h-14 w-14 text-2xl">
-        <img src={`public/emoji/${img}`} alt="reaction" />
+    <div className="relative">
+      <div
+        className="right-0 top-0 h-14 w-14 text-2xl"
+        tabIndex={-1}
+        onClick={() => {
+          setShow(true);
+        }}
+      >
+        <img src={`public/emoji/${character}`} alt="reaction" />
       </div>
       <SpeechBubble
         show={show}
@@ -80,5 +82,8 @@ export const AvatarComponent: FC = () => {
 export const Avatar = {
   show: (data: AvatarData) => {
     pubSub.publish('Avatar', data);
+  },
+  changeCharacter: (imagePath: AvatarCharacterPath) => {
+    pubSub.publish('Avatar:ChangeCharacter', imagePath);
   },
 };

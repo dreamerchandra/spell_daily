@@ -1,19 +1,22 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { Button } from './components/atoms/Button';
 import { Footer } from './components/atoms/footer';
 import { Progress } from './components/atoms/Progress';
-import type { GameRef } from './components/common/game-ref';
+import type { GameRef } from './common/game-ref';
 import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
 import { FullWordGame } from './game/full-word';
 import { sampleWords } from './words';
 import { useShortcut } from './hooks/use-shortcut';
+import { Avatar } from './components/organisms/avatar/avatar';
 
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [words] = useState(sampleWords);
   const [disableChecking, setDisableChecking] = useState(true);
+
+  const [start, setStart] = useState(false);
 
   const onCheckAnswer = useCallback(() => {
     if (gameRef.current?.isCorrect()) {
@@ -26,6 +29,16 @@ export const App = () => {
       onCheckAnswer();
     }
   });
+
+  useEffect(() => {
+    Avatar.show({
+      text: 'Hiii! I can guide you through learning spelling!',
+      yesText: "🎉 Let's go!",
+      onYes: () => {
+        setStart(true);
+      },
+    });
+  }, []);
 
   return (
     <Layout
@@ -51,11 +64,13 @@ export const App = () => {
         </Footer>
       }
     >
-      <FullWordGame
-        ref={gameRef}
-        wordDef={sampleWords[currentWordIndex]}
-        setDisableChecking={setDisableChecking}
-      />
+      {start ? (
+        <FullWordGame
+          ref={gameRef}
+          wordDef={sampleWords[currentWordIndex]}
+          setDisableChecking={setDisableChecking}
+        />
+      ) : null}
     </Layout>
   );
 };

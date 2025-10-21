@@ -1,3 +1,4 @@
+import type { ActionPayload } from '../../common/payload-creeator';
 type NewWord = {
   maxHint: number;
 };
@@ -7,21 +8,15 @@ export type HintState = {
   currentHint: number;
 };
 
-export type HintAction = NewWord;
+// Define the payloads
+type NewWordPayload = ActionPayload<'NEW_WORD', NewWord>;
+type UseHintPayload = ActionPayload<'USE_HINT'>;
 
-type Payload<Type = string, Action = HintAction> = {
-  type: Type;
-  action: Action;
-};
-
-type NewWordPayload = Payload<'NEW_WORD', NewWord>;
-type UseHintPayload = Omit<Payload<'USE_HINT', undefined>, 'action'>;
-
-export type HintPayload = NewWordPayload | UseHintPayload;
+export type HintAction = NewWordPayload | UseHintPayload;
 
 export const hintReducer = (
   state: HintState,
-  action: HintPayload
+  action: HintAction
 ): HintState => {
   switch (action.type) {
     case 'NEW_WORD':

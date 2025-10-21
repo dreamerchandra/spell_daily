@@ -98,7 +98,7 @@ export const useSpeech = (
   );
 
   const stop = useCallback(() => {
-    if (isSupported) {
+    if (isSupported && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
       setIsPlaying(false);
     }
@@ -110,6 +110,13 @@ export const useSpeech = (
         console.warn('Speech synthesis not supported');
         return;
       }
+      if (!voicesLoaded || voices.length === 0) {
+        console.warn('Voices not loaded yet, skipping speech');
+        return;
+      }
+
+      // Cancel in the same tick as new utterance setup
+      window.speechSynthesis.cancel();
 
       // Stop any existing speech
       stop();
@@ -145,8 +152,13 @@ export const useSpeech = (
       };
 
       // Start speaking
-      window.speechSynthesis.speak(utterance);
+      setTimeout(() => {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(utterance);
+      }, 150);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [config, findBestVoice, isSupported, stop]
   );
 

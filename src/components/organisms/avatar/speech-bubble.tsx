@@ -13,7 +13,7 @@ type SpeechBubbleProps = {
 export const SpeechBubble: FC<SpeechBubbleProps> = ({
   show,
   yesText = 'Yes, Please!',
-  noText = 'No, Thanks!',
+  noText,
   text,
   onYes,
   onNo,
@@ -26,9 +26,11 @@ export const SpeechBubble: FC<SpeechBubbleProps> = ({
         <button className={`${styles.btn} ${styles.yes}`} onClick={onYes}>
           {yesText}
         </button>
-        <button className={`${styles.btn} ${styles.no}`} onClick={onNo}>
-          {noText}
-        </button>
+        {noText && (
+          <button className={`${styles.btn} ${styles.no}`} onClick={onNo}>
+            {noText}
+          </button>
+        )}
       </div>
     </dialog>
   );

@@ -1,3 +1,4 @@
+import type { AvatarCharacterPath } from '../common/avatar';
 import emojiConfig from './emoji-config.json';
 
 interface EmojiFile {
@@ -31,7 +32,7 @@ export function exactImageByPath(originalPath: string): string | null {
   return null;
 }
 
-export function randomImageByPath(dirPath: string): string | null {
+export function randomImageByPath(dirPath: AvatarCharacterPath): string | null {
   const config = emojiConfig as EmojiConfig;
   const matches: string[] = [];
 

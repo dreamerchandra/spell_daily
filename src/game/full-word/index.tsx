@@ -1,39 +1,50 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { useSpellingSpeech } from '../../hooks';
+import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import type { GameRef } from '../../common/game-ref';
 import { Button } from '../../components/atoms/Button';
 import { Keyboard } from '../../components/atoms/Keyboard';
 import { WordInput } from '../../components/atoms/WordInput';
-import { Syllable } from '../../components/atoms/hints/syllable';
-import type { WordDef } from '../../words';
-import type { GameRef } from '../../components/common/game-ref';
 import { Definition } from '../../components/atoms/hints/definition';
-import { useHintState, useResetHint } from '../../context/hint-context/index';
-
-const makeArray = (word: string, wordLength: number) => {
-  const returnArr = new Array(wordLength).fill('');
-  word.split('').forEach((l, i) => {
-    returnArr[i] = l;
-  });
-  return returnArr;
-};
+import { Syllable } from '../../components/atoms/hints/syllable';
+import { useHintState, useNextHint } from '../../context/hint-context/index';
+import { useSpellingSpeech } from '../../hooks';
+import type { WordDef } from '../../words';
+import { makeArray, useFullWordState } from './full-word-state';
+import { Avatar } from '../../components/organisms/avatar/avatar';
 
 export const FullWordGame = forwardRef<
   GameRef,
   { wordDef: WordDef; setDisableChecking: (disable: boolean) => void }
 >(({ wordDef, setDisableChecking }, ref) => {
-  const [userInput, setUserInput] = useState<string[]>([]);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const { state, setIsCorrect, setUserInput, setNewWord } = useFullWordState();
+  const nextHint = useNextHint();
+
+  useEffect(() => {
+    if (state.incorrectAttempts === 0) return;
+    const isEvenAttempt = state.incorrectAttempts % 2 === 0;
+    if (isEvenAttempt) {
+      Avatar.show({
+        text: 'Want some hint?',
+        yesText: 'Yes, please!',
+        noText: 'No, I got this!',
+        onYes: () => {
+          nextHint();
+        },
+      });
+    } else {
+      Avatar.changeCharacter('by_rating/1');
+    }
+  }, [nextHint, setUserInput, state.incorrectAttempts, wordDef.word]);
+
   const hintState = useHintState();
 
   const { speak, isPlaying, isSupported } = useSpellingSpeech();
 
   const wordLength = wordDef.word.length;
-  const resetHint = useResetHint();
 
   useImperativeHandle(ref, () => {
     return {
       isCorrect: () => {
-        const userWord = userInput.join('');
+        const userWord = state.userInput.join('');
         const isWordCorrect = userWord === wordDef.word;
         setIsCorrect(isWordCorrect);
         return isWordCorrect;
@@ -42,24 +53,24 @@ export const FullWordGame = forwardRef<
   });
 
   useEffect(() => {
-    setUserInput(new Array(wordLength).fill(''));
-    resetHint(1);
-    setIsCorrect(null);
-  }, [resetHint, wordDef.word, wordLength]);
+    speak(wordDef.word);
+    setNewWord(wordDef);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wordDef]);
 
   useEffect(() => {
-    setDisableChecking(userInput.includes(''));
-  }, [setDisableChecking, userInput]);
+    setDisableChecking(state.userInput.includes(''));
+  }, [setDisableChecking, state.userInput]);
 
   const handleKeyPress = (key: string) => {
-    let newWord = userInput.join('');
+    let newWord = state.userInput.join('');
     if (key === '⌫') {
       newWord = newWord.slice(0, newWord.length - 1);
       const newArr = makeArray(newWord, wordLength);
       setUserInput(newArr);
       return;
     }
-    if (newWord.length === userInput.length) return;
+    if (newWord.length === state.userInput.length) return;
     newWord += key;
     const newArr = makeArray(newWord, wordLength);
     setUserInput(newArr);
@@ -97,17 +108,17 @@ export const FullWordGame = forwardRef<
         )}
 
         <WordInput
-          userInput={userInput}
-          isCorrect={isCorrect}
+          userInput={state.userInput}
+          isCorrect={state.isCorrect}
           className="mb-8"
           wordDef={wordDef}
         />
 
         <Keyboard onKeyPress={handleKeyPress} className="mb-6 p-2" />
 
-        {isCorrect !== null && (
+        {state.isCorrect !== null && (
           <div className="mt-6 text-center">
-            {isCorrect ? (
+            {state.isCorrect ? (
               <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
                 <p className="text-lg font-semibold text-game-success-300">
                   🎉 Awesome! That's correct! 🎉
