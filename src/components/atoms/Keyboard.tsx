@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 interface KeyboardKeyProps {
   children: ReactNode;
@@ -35,13 +35,33 @@ interface KeyboardProps {
   onKeyPress: (key: string) => void;
   className?: string;
 }
+const keyboard = [
+  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+  ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+];
 
 export const Keyboard = ({ onKeyPress, className = '' }: KeyboardProps) => {
-  const keyboard = [
-    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-    ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
-  ];
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'Backspace') {
+        onKeyPress('⌫');
+        return;
+      }
+      if (e.key.length !== 1) return;
+      if (/[a-zA-Z]/.test(e.key) === false) return;
+      const key = e.key.toUpperCase();
+      const allKeys = keyboard.flat();
+      if (allKeys.includes(key)) {
+        onKeyPress(key);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onKeyPress]);
 
   return (
     <div className={`space-y-2 ${className}`}>

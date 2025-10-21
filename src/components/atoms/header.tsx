@@ -12,6 +12,7 @@ export const Header = ({ ProgressComponent }: HeaderProps) => {
 
   return (
     <header className={`m-auto flex max-w-md items-center justify-between p-4`}>
+      {/* empty div to center the progress bar */}
       <div />
       {ProgressComponent}
       <div

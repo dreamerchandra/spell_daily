@@ -32,7 +32,11 @@ export const WordInput = ({
   return (
     <div className={`flex justify-center gap-2 ${className}`}>
       {word.map((letter, index) => (
-        <div key={index} className={getBoxStyles(index, letter)}>
+        <div
+          key={index}
+          className={getBoxStyles(index, letter)}
+          tabIndex={index}
+        >
           {letter || ''}
         </div>
       ))}

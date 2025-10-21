@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { arrayShuffle } from '../util/array-shuffle';
 
 export interface SpeechConfig {
   rate?: number;
@@ -63,14 +64,13 @@ export const useSpeech = (
     (targetLang: string = 'en'): SpeechSynthesisVoice | null => {
       if (!voices.length) return null;
 
-      // Priority order for voice selection
-      const preferredVoiceNames = [
+      const preferredVoiceNames = arrayShuffle([
         'Google',
         'Microsoft',
         'Alex',
         'Samantha',
         'Daniel',
-      ];
+      ]);
 
       // Find voices that match the language
       const matchingVoices = voices.filter(voice =>
@@ -154,7 +154,6 @@ export const useSpeech = (
   };
 };
 
-// Convenience hook for simple text-to-speech
 export const useSimpleSpeech = () => {
   return useSpeech({
     rate: 0.8,
@@ -163,11 +162,10 @@ export const useSimpleSpeech = () => {
   });
 };
 
-// Hook specifically for spelling games
 export const useSpellingSpeech = () => {
   return useSpeech({
-    rate: 0.7, // Even slower for spelling
-    pitch: 1.2, // Higher pitch for kids
+    rate: 0.7,
+    pitch: 1.2,
     volume: 1,
   });
 };

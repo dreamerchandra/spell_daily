@@ -133,14 +133,9 @@ export const FullWordGame = () => {
         }
       />
 
-      <div className="flex h-[calc(100vh-90px)] items-center justify-center">
+      <div className="flex h-[calc(100vh-100px)] items-center justify-center">
         <div className="relative w-full max-w-md px-4 text-center">
-          <div className="flex items-center justify-center"></div>
-
-          {/* Main Game Area */}
-          <div className="mb-4 lg:rounded-3xl lg:border lg:border-gray-700/30 lg:bg-gray-800/80 lg:p-6 lg:shadow-2xl lg:backdrop-blur-sm">
-            {/* Audio Controls */}
-            {/* Audio Controls */}
+          <div className="mb-4">
             <div className="mb-6 text-center">
               <p className="mb-4 text-lg font-semibold text-gray-300">
                 TYPE WHAT YOU HEAR
