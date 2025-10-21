@@ -6,6 +6,7 @@ export interface SpeechConfig {
   pitch?: number;
   volume?: number;
   lang?: string;
+  voice?: string;
 }
 
 export interface UseSpeechReturn {
@@ -64,13 +65,18 @@ export const useSpeech = (
     (targetLang: string = 'en'): SpeechSynthesisVoice | null => {
       if (!voices.length) return null;
 
-      const preferredVoiceNames = arrayShuffle([
-        'Google',
-        'Microsoft',
-        'Alex',
-        'Samantha',
-        'Daniel',
-      ]);
+      const preferredVoiceNames = initialConfig.voice
+        ? [
+            initialConfig.voice,
+            ...arrayShuffle([
+              'Google',
+              'Microsoft',
+              'Alex',
+              'Samantha',
+              'Daniel',
+            ]),
+          ]
+        : arrayShuffle(['Google', 'Microsoft', 'Alex', 'Samantha', 'Daniel']);
 
       // Find voices that match the language
       const matchingVoices = voices.filter(voice =>
@@ -88,7 +94,7 @@ export const useSpeech = (
       // Fallback to first matching voice or default
       return matchingVoices[0] || voices[0] || null;
     },
-    [voices]
+    [initialConfig.voice, voices]
   );
 
   const stop = useCallback(() => {
@@ -167,5 +173,14 @@ export const useSpellingSpeech = () => {
     rate: 0.7,
     pitch: 1.2,
     volume: 1,
+  });
+};
+
+export const useSyllabiSpeech = () => {
+  return useSpeech({
+    rate: 1,
+    pitch: 1.2,
+    volume: 1,
+    voice: 'Google US English',
   });
 };

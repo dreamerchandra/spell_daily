@@ -1,14 +1,20 @@
+import { useHintState } from '../../context/hint-context';
+import type { WordDef } from '../../words';
+
 interface WordInputProps {
-  word: string[];
+  userInput: string[];
   isCorrect?: boolean | null;
   className?: string;
+  wordDef: WordDef;
 }
 
 export const WordInput = ({
-  word,
+  userInput,
   isCorrect = null,
   className = '',
+  wordDef,
 }: WordInputProps) => {
+  const hintState = useHintState();
   const getBoxStyles = (index: number, letter: string) => {
     const baseClasses =
       'flex h-12 w-12 items-center justify-center rounded-xl border text-xl font-bold transition-all duration-300';
@@ -23,7 +29,7 @@ export const WordInput = ({
       return `${baseClasses} border-game-primary-500/60 bg-game-primary-500/20 text-game-primary-300`;
     }
 
-    const isActive = index === word.findIndex(l => l === '');
+    const isActive = index === userInput.findIndex(l => l === '');
     return `${baseClasses} border-gray-600/50 bg-gray-700/30 text-gray-400 ${
       isActive ? 'ring-2 ring-game-primary-400/50' : ''
     }`;
@@ -31,7 +37,7 @@ export const WordInput = ({
 
   return (
     <div className={`flex justify-center gap-2 ${className}`}>
-      {word.map((letter, index) => (
+      {userInput.map((letter, index) => (
         <div
           key={index}
           className={getBoxStyles(index, letter)}
