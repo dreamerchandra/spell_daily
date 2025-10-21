@@ -1,10 +1,5 @@
-import Rive from '@rive-app/react-canvas';
+import { FullWordGame } from './game/full-word';
 
-export const App = () => (
-  <div className="h-screen w-screen">
-    <Rive
-      src="https://cdn.rive.app/animations/vehicles.riv"
-      stateMachines="bumpy"
-    />
-  </div>
-);
+export const App = () => {
+  return <FullWordGame />;
+};
