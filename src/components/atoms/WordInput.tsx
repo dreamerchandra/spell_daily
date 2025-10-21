@@ -1,3 +1,4 @@
+import { getPhoneticColorByActualSyllable } from '../../config/pallet-config';
 import { useHintState } from '../../context/hint-context';
 import type { WordDef } from '../../words';
 import { useEffect, useMemo, useState } from 'react';
@@ -9,17 +10,7 @@ interface WordInputProps {
   wordDef: WordDef;
 }
 
-// Color palette for phonetic grouping
-const phoneticColors = [
-  'bg-blue-500/20 border-blue-500/60',
-  'bg-green-500/20 border-green-500/60',
-  'bg-purple-500/20 border-purple-500/60',
-  'bg-orange-500/20 border-orange-500/60',
-  'bg-pink-500/20 border-pink-500/60',
-  'bg-cyan-500/20 border-cyan-500/60',
-  'bg-yellow-500/20 border-yellow-500/60',
-  'bg-red-500/20 border-red-500/60',
-];
+const showWord = (hint: number) => hint >= 3;
 
 export const WordInput = ({
   userInput,
@@ -31,7 +22,7 @@ export const WordInput = ({
   const [hintRequiredPlace, setHintRequiredPlace] = useState(-1);
 
   useEffect(() => {
-    if (hintState.currentHint >= 3) {
+    if (showWord(hintState.currentHint)) {
       const firstEmptyIndex = userInput.findIndex(l => l === '');
       setHintRequiredPlace(firstEmptyIndex);
     } else {
@@ -41,23 +32,13 @@ export const WordInput = ({
   }, [hintState.currentHint]);
 
   const phoneticGrouping = useMemo(() => {
-    const mapping: number[] = [];
-    let charIndex = 0;
-
-    wordDef.actualSyllable.forEach((syllable, groupIndex) => {
-      for (let i = 0; i < syllable.length; i++) {
-        mapping[charIndex] = groupIndex % phoneticColors.length;
-        charIndex++;
-      }
-    });
-
-    return mapping;
-  }, [wordDef.actualSyllable, phoneticColors.length]);
+    return getPhoneticColorByActualSyllable(wordDef.actualSyllable);
+  }, [wordDef.actualSyllable]);
 
   // Check if a character at index is a placeholder (auto-filled hint)
   const isPlaceholder = (index: number, userLetter: string) => {
     return (
-      hintState.currentHint >= 3 &&
+      showWord(hintState.currentHint) &&
       !userLetter &&
       getDisplayValue(index, userLetter) !== ''
     );
@@ -65,7 +46,7 @@ export const WordInput = ({
 
   // Get the display value for each input box (with auto-fill for state 3)
   const getDisplayValue = (index: number, userLetter: string) => {
-    if (hintState.currentHint >= 3 && !userLetter) {
+    if (showWord(hintState.currentHint) && !userLetter) {
       // Auto-fill the current syllable when state is 3
       const currentSyllableIndex = getCurrentSyllableIndex();
       if (currentSyllableIndex !== -1) {
@@ -136,8 +117,7 @@ export const WordInput = ({
     // Handle phonetic coloring for states 2 and 3
     if (hintState.currentHint >= 2) {
       const phoneticGroup = phoneticGrouping[index];
-      const phoneticColorClass =
-        phoneticColors[phoneticGroup] || phoneticColors[0];
+      const phoneticColorClass = phoneticGroup;
       const isPlaceholderChar = isPlaceholder(index, letter);
 
       if (displayValue) {

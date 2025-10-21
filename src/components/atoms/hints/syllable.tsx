@@ -8,7 +8,7 @@ export const Syllable = ({
   const { speak } = useSyllabiSpeech();
   return (
     <div className="relative mb-4 text-center">
-      <div className="relative inline-block overflow-hidden rounded-2xl border border-slate-600/40 bg-gradient-to-r from-slate-700/60 to-slate-600/60 p-4 backdrop-blur-sm">
+      <div className="gradient-border relative inline-block overflow-hidden rounded-2xl p-4">
         <div className="absolute inset-0 animate-pulse rounded-2xl border-2 border-blue-500 opacity-75"></div>
         <div className="relative z-10 flex gap-1 text-lg font-medium text-gray-200">
           {wordDef.ipa.map((part, index) => (
