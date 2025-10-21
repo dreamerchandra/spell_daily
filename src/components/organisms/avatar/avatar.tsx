@@ -5,6 +5,7 @@ import type { AvatarData } from '../../common/avatar';
 import { SpeechBubble } from './speech-bubble';
 import { randomImageByPath } from '../../../config/emoji-manager';
 import { useNextHint } from '../../../context/hint-context';
+import { useShortcut } from '../../../hooks/use-shortcut';
 
 const RandomHintMessages = [
   'Want some help?',
@@ -49,6 +50,7 @@ export const AvatarComponent: FC = () => {
     setShow(false);
   };
 
+  useShortcut('h', showNextHint);
   const text =
     data?.text ??
     RandomHintMessages[Math.floor(Math.random() * RandomHintMessages.length)];

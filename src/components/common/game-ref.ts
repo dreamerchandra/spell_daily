@@ -1,3 +1,3 @@
 export type GameRef = {
-  checkAnswer: () => boolean;
+  isCorrect: () => boolean;
 };

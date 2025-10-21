@@ -30,9 +30,21 @@ export const FullWordGame = forwardRef<
   const wordLength = wordDef.word.length;
   const resetHint = useResetHint();
 
+  useImperativeHandle(ref, () => {
+    return {
+      isCorrect: () => {
+        const userWord = userInput.join('');
+        const isWordCorrect = userWord === wordDef.word;
+        setIsCorrect(isWordCorrect);
+        return isWordCorrect;
+      },
+    };
+  });
+
   useEffect(() => {
     setUserInput(new Array(wordLength).fill(''));
     resetHint(1);
+    setIsCorrect(null);
   }, [resetHint, wordDef.word, wordLength]);
 
   useEffect(() => {
@@ -52,17 +64,6 @@ export const FullWordGame = forwardRef<
     const newArr = makeArray(newWord, wordLength);
     setUserInput(newArr);
   };
-
-  useImperativeHandle(ref, () => {
-    return {
-      checkAnswer: () => {
-        const userWord = userInput.join('');
-        const isWordCorrect = userWord === wordDef.word;
-        setIsCorrect(isWordCorrect);
-        return isWordCorrect;
-      },
-    };
-  });
 
   const playAudio = () => {
     speak(wordDef.word);
