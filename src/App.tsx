@@ -40,6 +40,15 @@ export const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (currentWordIndex === 0) return;
+    if (currentWordIndex % 2 === 0) {
+      Avatar.changeCharacter('by_rating/4');
+    } else {
+      Avatar.changeCharacter('by_rating/3');
+    }
+  }, [currentWordIndex]);
+
   return (
     <Layout
       header={
