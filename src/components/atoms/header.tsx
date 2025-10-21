@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export const Header = ({ ProgressComponent }: HeaderProps) => {
   const img = randomImageByPath('by_rating/2');
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
 
   return (
     <header className={`m-auto flex max-w-md items-center justify-between p-4`}>
