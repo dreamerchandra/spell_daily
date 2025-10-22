@@ -13,6 +13,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
+import { pubSub } from '../../../../util/pub-sub';
+import { slow } from '../../../../config/animation-knobs';
 
 export const RippleEffect = ({
   userInput,
@@ -71,6 +73,17 @@ export const RippleEffect = ({
           }, distance * 150)
         );
       }
+
+      timerIds.push(
+        setTimeout(
+          () => {
+            // Reset animation states after completion but keep success state visible
+            // setAnimationStates(new Array(userInput.length).fill(false));
+            pubSub.publish('Animation:End');
+          },
+          slow(maxDistance * 150)
+        )
+      );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
       };

@@ -13,6 +13,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
+import { pubSub } from '../../../../util/pub-sub';
+import { slow } from '../../../../config/animation-knobs';
 
 export const ConfettiBurst = ({
   userInput,
@@ -66,16 +68,20 @@ export const ConfettiBurst = ({
         );
       });
 
+      timerIds.push(
+        setTimeout(
+          () => {
+            // // Reset animation states after completion but keep success state visible
+            // setAnimationStates(new Array(userInput.length).fill(false));
+            pubSub.publish('Animation:End');
+          },
+          slow(userInput.length * 80)
+        )
+      );
+
       return () => {
         timerIds.forEach(id => clearTimeout(id));
       };
-      // // Reset animation states after completion but keep success state visible
-      // setTimeout(
-      //   () => {
-      //     setAnimationStates(new Array(userInput.length).fill(false));
-      //   },
-      //   userInput.length * 80 + 800
-      // );
     }
   }, [isCorrect, userInput]);
 

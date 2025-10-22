@@ -13,6 +13,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
+import { pubSub } from '../../../../util/pub-sub';
+import { slow } from '../../../../config/animation-knobs';
 
 export const ColorFlow = ({
   userInput,
@@ -69,14 +71,17 @@ export const ColorFlow = ({
         );
       });
 
-      // Reset animation states after completion but keep success state visible
-      // setTimeout(
-      //   () => {
-      //     setFlowStates(new Array(userInput.length).fill(false));
-      //     setGlowStates(new Array(userInput.length).fill(false));
-      //   },
-      //   userInput.length * 120 + 800
-      // );
+      timerIds.push(
+        setTimeout(
+          () => {
+            // Reset animation states after completion but keep success state visible
+            // setFlowStates(new Array(userInput.length).fill(false));
+            // setGlowStates(new Array(userInput.length).fill(false));
+            pubSub.publish('Animation:End');
+          },
+          slow(userInput.length * 120)
+        )
+      );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
       };

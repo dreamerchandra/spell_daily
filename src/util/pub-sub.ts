@@ -40,10 +40,10 @@ class PubSub<Events extends Record<string, unknown>> {
   }
 }
 
-// ✅ Explicit event map
 export type NativeEvents = {
   Avatar: AvatarData;
   'Avatar:ChangeCharacter': AvatarCharacterPath;
+  'Animation:End': void;
 };
 
 export const pubSub = new PubSub<NativeEvents>();

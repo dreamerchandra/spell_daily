@@ -13,6 +13,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
+import { pubSub } from '../../../../util/pub-sub';
+import { slow } from '../../../../config/animation-knobs';
 
 export const SequentialBounce = ({
   userInput,
@@ -51,6 +53,17 @@ export const SequentialBounce = ({
           }, index * 100)
         ); // 100ms delay between each letter
       });
+
+      timerIds.push(
+        setTimeout(
+          () => {
+            // Reset animation states after completion but keep success state visible
+            // setAnimationStates(new Array(userInput.length).fill(false));
+            pubSub.publish('Animation:End');
+          },
+          slow(userInput.length * 100)
+        )
+      );
 
       return () => {
         timerIds.forEach(id => clearTimeout(id));

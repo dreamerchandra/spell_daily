@@ -9,6 +9,7 @@ import { FullWordGame } from './game/full-word';
 import { sampleWords } from './words';
 import { useShortcut } from './hooks/use-shortcut';
 import { Avatar } from './components/organisms/avatar/avatar';
+import { Continue } from './components/atoms/continue';
 
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
@@ -22,18 +23,17 @@ export const App = () => {
   const onCheckAnswer = useCallback(() => {
     if (gameRef.current?.isCorrect()) {
       setCanContinue(true);
-      // setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
     }
-  }, [words.length]);
+  }, []);
 
-  const onContinue = useCallback(() => {
+  const moveToNextWord = useCallback(() => {
     setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
     setCanContinue(false);
   }, [words.length]);
 
   useShortcut('Enter', () => {
     if (canContinue) {
-      onContinue();
+      moveToNextWord();
       return;
     }
     if (!disableChecking) {
@@ -73,9 +73,7 @@ export const App = () => {
         <Footer>
           <div className="text-center">
             {canContinue ? (
-              <Button onClick={onContinue} variant="primary" size="lg">
-                CONTINUE
-              </Button>
+              <Continue disabled={!canContinue} onClick={moveToNextWord} />
             ) : (
               <Button
                 onClick={onCheckAnswer}

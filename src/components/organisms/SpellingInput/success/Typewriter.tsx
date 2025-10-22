@@ -13,6 +13,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
+import { pubSub } from '../../../../util/pub-sub';
+import { slow } from '../../../../config/animation-knobs';
 
 export const Typewriter = ({
   userInput,
@@ -60,16 +62,19 @@ export const Typewriter = ({
           () => {
             setShowCursor(-1);
           },
-          userInput.length * 120 + 200
+          userInput.length * 120 + 500
         )
       );
 
-      // setTimeout(
-      //   () => {
-      //     setTypingStates(new Array(userInput.length).fill(true));
-      //   },
-      //   userInput.length * 120 + 400
-      // );
+      timerIds.push(
+        setTimeout(
+          () => {
+            // setTypingStates(new Array(userInput.length).fill(true));
+            pubSub.publish('Animation:End');
+          },
+          slow(userInput.length * 120)
+        )
+      );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
       };
