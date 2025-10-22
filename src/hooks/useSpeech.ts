@@ -115,9 +115,6 @@ export const useSpeech = (
         return;
       }
 
-      // Cancel in the same tick as new utterance setup
-      window.speechSynthesis.cancel();
-
       // Stop any existing speech
       stop();
 
@@ -153,8 +150,6 @@ export const useSpeech = (
 
       // Start speaking
       setTimeout(() => {
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.resume();
         window.speechSynthesis.speak(utterance);
       }, 150);
     },

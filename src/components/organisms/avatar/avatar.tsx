@@ -56,6 +56,8 @@ export const AvatarComponent: FC = () => {
     data?.text ??
     RandomHintMessages[Math.floor(Math.random() * RandomHintMessages.length)];
 
+  const noText = data ? data.noText : 'No, thanks';
+
   return (
     <div className="relative">
       <div
@@ -73,7 +75,7 @@ export const AvatarComponent: FC = () => {
         onNo={onNo}
         onYes={onYes}
         yesText={data?.yesText}
-        noText={data?.noText}
+        noText={noText}
       />
     </div>
   );
