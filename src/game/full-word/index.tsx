@@ -9,7 +9,7 @@ import type { WordDef } from '../../words';
 import { makeArray, useFullWordState } from './full-word-state';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 import { Speaker } from '../../components/atoms/speaker';
-import { SpellingInput } from '../../components/atoms/SpellingInput';
+import { SpellingInput } from '../../components/organisms/SpellingInput';
 
 export const FullWordGame = forwardRef<
   GameRef,

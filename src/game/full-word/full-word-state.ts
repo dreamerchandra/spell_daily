@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
 import { useHintState, useResetHint } from '../../context/hint-context/index';
-import { showSyllable } from '../../components/atoms/SpellingInput/utils';
+import { showSyllable } from '../../components/organisms/SpellingInput/utils';
 
 type FullWordState = {
   userInput: string[];
