@@ -34,7 +34,7 @@ export const ColorFlow = ({
       setGlowStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.COLOR_FLOW);
+      successSoundManager.playSuccess(SuccessAnimationType.COLOR_FLOW, 1);
 
       // Color flow animation - waves of color changes
       userInput.forEach((_, index) => {
