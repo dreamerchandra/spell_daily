@@ -15,6 +15,39 @@ const RandomHintMessages = [
   'Stuck! I can get you some help?',
 ];
 
+const AvatarChange = ({ path }: { path: string }) => {
+  const ref = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+    const fullPath = `/emoji/${path}`;
+    if (!ref.current.src) {
+      ref.current.src = fullPath;
+      return;
+    }
+    ref.current.classList.remove('zoomOut');
+    ref.current.classList.add('zoomIn');
+    let timerId = setTimeout(() => {
+      if (ref.current) {
+        ref.current.classList.remove('zoomIn');
+        ref.current.classList.add('zoomOut');
+        ref.current.src = fullPath;
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [path]);
+
+  return (
+    <>
+      <img ref={ref} alt="reaction" />
+      <style>{`:root { --animation-speed: 0.2s; }`}</style>
+    </>
+  );
+};
+
 export const AvatarComponent: FC = () => {
   const [show, setShow] = useState(false);
   const [data, setData] = useState<AvatarData | null>(null);
@@ -51,6 +84,18 @@ export const AvatarComponent: FC = () => {
     setShow(false);
   };
 
+  useShortcut(
+    ' ',
+    () => {
+      if (show) {
+        onYes();
+      }
+    },
+    {
+      triggerKey: null,
+    }
+  );
+
   useShortcut('h', showNextHint);
   const text =
     data?.text ??
@@ -67,7 +112,7 @@ export const AvatarComponent: FC = () => {
           setShow(true);
         }}
       >
-        <img src={`/emoji/${character}`} alt="reaction" />
+        <AvatarChange path={character!} />
       </div>
       <SpeechBubble
         show={show}

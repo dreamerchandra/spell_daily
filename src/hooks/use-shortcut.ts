@@ -1,9 +1,21 @@
 import { useEffect } from 'react';
 
-export const useShortcut = (key: string, callback: () => void) => {
+export const useShortcut = (
+  key: string,
+  callback: () => void,
+  options: {
+    triggerKey: 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey' | null;
+  } = {
+    triggerKey: 'metaKey',
+  }
+) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === key && event.metaKey) {
+      const isTriggerKey = options.triggerKey
+        ? (event as any)[options.triggerKey]
+        : true;
+      if (event.key === key && isTriggerKey) {
+        event.preventDefault();
         callback();
       }
     };
@@ -11,5 +23,5 @@ export const useShortcut = (key: string, callback: () => void) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [key, callback]);
+  }, [key, callback, options.triggerKey]);
 };

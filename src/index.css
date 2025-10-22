@@ -68,3 +68,65 @@ body,
     animation: none;
   }
 }
+
+@keyframes zoomIn {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.zoomIn {
+  animation: zoomIn var(--animation-speed, 0.2s) cubic-bezier(0.4, 0, 0.2, 1)
+    forwards;
+}
+
+@keyframes zoomOut {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.zoomOut {
+  animation: zoomOut var(--animation-speed, 0.2s) cubic-bezier(0.4, 0, 0.2, 1)
+    forwards;
+}
+
+.success {
+  animation: success 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.success div {
+  flex: 1;
+  background-color: #7c3aed; /* game-primary-700 - darker purple */
+  width: 2ch;
+}
+
+@keyframes success {
+  0% {
+    gap: 8px;
+    div {
+      background-color: #7c3aed; /* game-primary-700 - darker purple */
+    }
+  }
+  50% {
+    gap: 2px;
+    div {
+      background-color: #10b981; /* game-success-500 - green */
+    }
+  }
+  100% {
+    gap: 16px;
+    div {
+      background-color: #7c3aed; /* game-primary-700 - darker purple */
+    }
+  }
+}

@@ -53,7 +53,7 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 12px solid #a855f7;
+  border-bottom: 12px solid #7c3aed;
 }
 
 .hintBubble > p {
@@ -88,10 +88,11 @@
 }
 
 .btn.no {
-  outline: 2px dashed #3123c9;
+  outline: 2px dashed #260067;
+  outline-offset: -2px;
   color: rgb(221, 219, 219);
 }
 .btn.yes {
-  background: #f59e0b; /* game-secondary-500 - orange/yellow accent */
+  background: #260067;
   color: white;
 }

@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import type { GameRef } from '../../common/game-ref';
-import { Button } from '../../components/atoms/Button';
 import { Keyboard } from '../../components/atoms/Keyboard';
 import { WordInput } from '../../components/atoms/WordInput';
 import { Definition } from '../../components/atoms/hints/definition';
@@ -10,6 +9,7 @@ import { useSpellingSpeech } from '../../hooks';
 import type { WordDef } from '../../words';
 import { makeArray, useFullWordState } from './full-word-state';
 import { Avatar } from '../../components/organisms/avatar/avatar';
+import { Speaker } from '../../components/atoms/speaker';
 
 export const FullWordGame = forwardRef<
   GameRef,
@@ -90,14 +90,7 @@ export const FullWordGame = forwardRef<
             </p>
           )}
           <div className="flex justify-center gap-3">
-            <Button
-              onClick={playAudio}
-              variant="secondary"
-              disabled={isPlaying}
-              className={`rounded-full p-3 ${isPlaying ? 'animate-bounce' : ''}`}
-            >
-              <span className="text-xl">{isPlaying ? '🎤' : '🔊'}</span>
-            </Button>
+            <Speaker onSpeak={playAudio} isPlaying={isPlaying} />
           </div>
         </div>
 

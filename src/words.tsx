@@ -9,6 +9,21 @@ export interface WordDef {
 
 export const sampleWords: WordDef[] = [
   {
+    word: 'CULTURE',
+    ipa: ['ˈkʌl', 'tʃər'],
+    syllable: ['cul', 'tur'],
+    actualSyllable: ['cul', 'ture'],
+    definition:
+      'The ideas, customs, and social behavior of a particular people or society. 🌍',
+  },
+  {
+    word: 'DEFINITELY',
+    ipa: ['ˈdɛf', 'ɪ', 'nɪt', 'li'],
+    syllable: ['def', 'i', 'nite', 'li'],
+    actualSyllable: ['def', 'i', 'nite', 'ly'],
+    definition: 'Without a doubt; for sure. ✅',
+  },
+  {
     word: 'OPINION',
     ipa: ['oʊ', 'ˈpɪn', 'jən'],
     syllable: ['o', 'pin', 'ion'],
@@ -32,13 +47,6 @@ export const sampleWords: WordDef[] = [
     definition: 'To make someone feel admiration and respect. 🌟',
   },
   {
-    word: 'DEFINITELY',
-    ipa: ['ˈdɛf', 'ɪ', 'nɪt', 'li'],
-    syllable: ['def', 'i', 'nite', 'lee'],
-    actualSyllable: ['def', 'i', 'nite', 'ly'],
-    definition: 'Without a doubt; for sure. ✅',
-  },
-  {
     word: 'ARRANGEMENT',
     ipa: ['ə', 'ˈreɪn', 'dʒmənt'],
     syllable: ['are', 'range', 'ment'],
@@ -59,14 +67,6 @@ export const sampleWords: WordDef[] = [
     syllable: ['mem', 'o', 'ra', 'bel'],
     actualSyllable: ['mem', 'o', 'ra', 'ble'],
     definition: 'Something worth remembering; significant or interesting. 📝',
-  },
-  {
-    word: 'CULTURE',
-    ipa: ['ˈkʌl', 'tʃər'],
-    syllable: ['cul', 'tur'],
-    actualSyllable: ['cul', 'ture'],
-    definition:
-      'The ideas, customs, and social behavior of a particular people or society. 🌍',
   },
   {
     word: 'SPECIAL',
