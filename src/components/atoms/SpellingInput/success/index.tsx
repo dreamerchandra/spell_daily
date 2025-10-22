@@ -4,7 +4,8 @@ import { RippleEffect } from './RippleEffect';
 import { ConfettiBurst } from './ConfettiBurst';
 import { Typewriter } from './Typewriter';
 import { ColorFlow } from './ColorFlow';
-import { useMemo } from 'react';
+import { triggerSpellingSuccess } from '../../../../util/success-vibrations';
+import { memo, useState, useEffect } from 'react';
 
 const ANIMATION_COMPONENTS = [
   SequentialBounce,
@@ -22,24 +23,26 @@ const ANIMATION_NAMES = [
   'Color Flow',
 ] as const;
 
-export const SuccessAnimation = (props: SpellingInputBaseProps) => {
+const InternalSuccessAnimation = (props: SpellingInputBaseProps) => {
   // Generate a truly random animation selection each time isCorrect becomes true
-  const animationIndex = useMemo(() => {
-    if (props.isCorrect === true) {
-      return Math.floor(Math.random() * ANIMATION_COMPONENTS.length);
-    }
-    return 0;
-  }, [props.isCorrect]);
-
-  const AnimationComponent = ANIMATION_COMPONENTS[animationIndex];
-
-  // Optional: Log which animation is being used (for debugging)
-  if (props.isCorrect === true) {
+  const [AnimationComponent] = useState(() => {
+    const animationIndex = Math.floor(
+      Math.random() * ANIMATION_COMPONENTS.length
+    );
     console.log(`🎉 Playing animation: ${ANIMATION_NAMES[animationIndex]}`);
-  }
+    return ANIMATION_COMPONENTS[animationIndex];
+  });
+
+  // Trigger vibration on success
+  useEffect(() => {
+    if (props.isCorrect === true) {
+      triggerSpellingSuccess();
+    }
+  }, [props.isCorrect]);
 
   return <AnimationComponent {...props} />;
 };
 
-// Export individual animations for direct use if needed
+export const SuccessAnimation = memo(InternalSuccessAnimation, () => true); // Never re-render
+
 export { SequentialBounce, RippleEffect, ConfettiBurst, Typewriter, ColorFlow };

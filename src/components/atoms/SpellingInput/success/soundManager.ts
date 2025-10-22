@@ -37,7 +37,7 @@ const SOUND_CONFIGS = {
 class SuccessSoundManager {
   private audioCache: Map<SuccessAnimationTypeValue, HTMLAudioElement> =
     new Map();
-  private volume: number = 0.3; // Default volume (30%)
+  private volume: number = 0.5; // Default volume (30%)
   private enabled: boolean = true;
 
   constructor() {

@@ -26,7 +26,16 @@ export const App = () => {
     }
   }, [words.length]);
 
+  const onContinue = useCallback(() => {
+    setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
+    setCanContinue(false);
+  }, [words.length]);
+
   useShortcut('Enter', () => {
+    if (canContinue) {
+      onContinue();
+      return;
+    }
     if (!disableChecking) {
       onCheckAnswer();
     }
@@ -64,16 +73,7 @@ export const App = () => {
         <Footer>
           <div className="text-center">
             {canContinue ? (
-              <Button
-                onClick={() => {
-                  setCurrentWordIndex(prev =>
-                    prev < words.length - 1 ? prev + 1 : prev
-                  );
-                  setCanContinue(false);
-                }}
-                variant="primary"
-                size="lg"
-              >
+              <Button onClick={onContinue} variant="primary" size="lg">
                 CONTINUE
               </Button>
             ) : (
