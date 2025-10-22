@@ -51,23 +51,29 @@ export const RippleEffect = ({
         centerIndex,
         userInput.length - 1 - centerIndex
       );
+      let timerIds: number[] = [];
 
       for (let distance = 1; distance <= maxDistance; distance++) {
-        setTimeout(() => {
-          setAnimationStates(prev => {
-            const newState = [...prev];
-            // Animate left side
-            if (centerIndex - distance >= 0) {
-              newState[centerIndex - distance] = true;
-            }
-            // Animate right side
-            if (centerIndex + distance < userInput.length) {
-              newState[centerIndex + distance] = true;
-            }
-            return newState;
-          });
-        }, distance * 150);
+        timerIds.push(
+          setTimeout(() => {
+            setAnimationStates(prev => {
+              const newState = [...prev];
+              // Animate left side
+              if (centerIndex - distance >= 0) {
+                newState[centerIndex - distance] = true;
+              }
+              // Animate right side
+              if (centerIndex + distance < userInput.length) {
+                newState[centerIndex + distance] = true;
+              }
+              return newState;
+            });
+          }, distance * 150)
+        );
       }
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+      };
     }
   }, [isCorrect, userInput]);
 

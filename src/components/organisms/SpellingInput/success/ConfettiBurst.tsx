@@ -36,32 +36,39 @@ export const ConfettiBurst = ({
       // Play success sound
       successSoundManager.playSuccess(SuccessAnimationType.CONFETTI_BURST);
 
+      let timerIds: number[] = [];
+
       // Trigger confetti and jump animation for each letter
       userInput.forEach((_, index) => {
-        setTimeout(() => {
-          setAnimationStates(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-
-          setShowConfetti(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-
-          // Hide confetti after animation
+        timerIds.push(
           setTimeout(() => {
-            setShowConfetti(prev => {
+            setAnimationStates(prev => {
               const newState = [...prev];
-              newState[index] = false;
+              newState[index] = true;
               return newState;
             });
-          }, 600);
-        }, index * 80);
+
+            setShowConfetti(prev => {
+              const newState = [...prev];
+              newState[index] = true;
+              return newState;
+            });
+
+            // Hide confetti after animation
+            setTimeout(() => {
+              setShowConfetti(prev => {
+                const newState = [...prev];
+                newState[index] = false;
+                return newState;
+              });
+            }, 600);
+          }, index * 80)
+        );
       });
 
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+      };
       // // Reset animation states after completion but keep success state visible
       // setTimeout(
       //   () => {

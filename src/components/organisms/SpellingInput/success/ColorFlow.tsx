@@ -36,33 +36,37 @@ export const ColorFlow = ({
       // Play success sound
       successSoundManager.playSuccess(SuccessAnimationType.COLOR_FLOW, 1);
 
+      let timerIds: number[] = [];
+
       // Color flow animation - waves of color changes
       userInput.forEach((_, index) => {
-        setTimeout(() => {
-          setFlowStates(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-
-          // Add glow effect
+        timerIds.push(
           setTimeout(() => {
-            setGlowStates(prev => {
+            setFlowStates(prev => {
               const newState = [...prev];
               newState[index] = true;
               return newState;
             });
-          }, 100);
 
-          // Remove glow effect
-          setTimeout(() => {
-            setGlowStates(prev => {
-              const newState = [...prev];
-              newState[index] = false;
-              return newState;
-            });
-          }, 500);
-        }, index * 120);
+            // Add glow effect
+            setTimeout(() => {
+              setGlowStates(prev => {
+                const newState = [...prev];
+                newState[index] = true;
+                return newState;
+              });
+            }, 100);
+
+            // Remove glow effect
+            setTimeout(() => {
+              setGlowStates(prev => {
+                const newState = [...prev];
+                newState[index] = false;
+                return newState;
+              });
+            }, 500);
+          }, index * 120)
+        );
       });
 
       // Reset animation states after completion but keep success state visible
@@ -73,6 +77,9 @@ export const ColorFlow = ({
       //   },
       //   userInput.length * 120 + 800
       // );
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+      };
     }
   }, [isCorrect, userInput]);
 

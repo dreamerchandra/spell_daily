@@ -36,34 +36,43 @@ export const Typewriter = ({
       // Play success sound
       successSoundManager.playSuccess(SuccessAnimationType.TYPEWRITER);
 
-      userInput.forEach((_, index) => {
-        setTimeout(() => {
-          setShowCursor(index);
+      let timerIds: number[] = [];
 
+      userInput.forEach((_, index) => {
+        timerIds.push(
           setTimeout(() => {
-            setTypingStates(prev => {
-              const newState = [...prev];
-              newState[index] = true;
-              return newState;
-            });
-          }, 100);
-        }, index * 120);
+            setShowCursor(index);
+
+            setTimeout(() => {
+              setTypingStates(prev => {
+                const newState = [...prev];
+                newState[index] = true;
+                return newState;
+              });
+            }, 100);
+          }, index * 120)
+        );
       });
 
       // Hide cursor after all letters are typed
-      setTimeout(
-        () => {
-          setShowCursor(-1);
-        },
-        userInput.length * 120 + 200
+      timerIds.push(
+        setTimeout(
+          () => {
+            setShowCursor(-1);
+          },
+          userInput.length * 120 + 200
+        )
       );
 
-      setTimeout(
-        () => {
-          setTypingStates(new Array(userInput.length).fill(true));
-        },
-        userInput.length * 120 + 400
-      );
+      // setTimeout(
+      //   () => {
+      //     setTypingStates(new Array(userInput.length).fill(true));
+      //   },
+      //   userInput.length * 120 + 400
+      // );
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+      };
     }
   }, [isCorrect, userInput]);
 

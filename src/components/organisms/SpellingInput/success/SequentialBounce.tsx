@@ -37,16 +37,24 @@ export const SequentialBounce = ({
         1
       );
 
+      let timerIds: number[] = [];
+
       // Trigger sequential bounce animation
       userInput.forEach((_, index) => {
-        setTimeout(() => {
-          setAnimationStates(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-        }, index * 100); // 100ms delay between each letter
+        timerIds.push(
+          setTimeout(() => {
+            setAnimationStates(prev => {
+              const newState = [...prev];
+              newState[index] = true;
+              return newState;
+            });
+          }, index * 100)
+        ); // 100ms delay between each letter
       });
+
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+      };
     }
   }, [isCorrect, userInput]);
 
