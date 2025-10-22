@@ -2,8 +2,8 @@ import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
 import { useHintState, useResetHint } from '../../context/hint-context/index';
-import { showSyllable } from '../../components/atoms/WordInput';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
+import { showSyllable } from '../../components/atoms/SpellingInput/utils';
 
 type FullWordState = {
   userInput: string[];

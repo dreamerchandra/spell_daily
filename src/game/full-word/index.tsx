@@ -1,7 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import type { GameRef } from '../../common/game-ref';
 import { Keyboard } from '../../components/atoms/Keyboard';
-import { WordInput } from '../../components/atoms/WordInput';
 import { Definition } from '../../components/atoms/hints/definition';
 import { Syllable } from '../../components/atoms/hints/syllable';
 import { useHintState, useNextHint } from '../../context/hint-context/index';
@@ -10,6 +9,7 @@ import type { WordDef } from '../../words';
 import { makeArray, useFullWordState } from './full-word-state';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 import { Speaker } from '../../components/atoms/speaker';
+import { SpellingInput } from '../../components/atoms/SpellingInput';
 
 export const FullWordGame = forwardRef<
   GameRef,
@@ -100,7 +100,7 @@ export const FullWordGame = forwardRef<
           <Definition definition={wordDef.definition} />
         )}
 
-        <WordInput
+        <SpellingInput
           userInput={state.userInput}
           isCorrect={state.isCorrect}
           className="mb-8"

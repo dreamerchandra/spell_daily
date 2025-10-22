@@ -1,8 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useReducer,
+  useRef,
   type ActionDispatch,
   type FC,
   type ReactNode,
@@ -70,4 +73,22 @@ export const useResetHint = () => {
 export const useHintState = () => {
   const context = useHintContext();
   return context.state;
+};
+
+export const useOnHintIncrease = (cb: (currentHint: number) => void) => {
+  const { state } = useHintContext();
+  const ref = useRef(cb);
+  const prevHintRef = useRef(state.currentHint);
+
+  useEffect(() => {
+    ref.current = cb;
+  }, [cb]);
+
+  useEffect(() => {
+    // Only call if hint actually increased (not reset or initial)
+    if (state.currentHint > prevHintRef.current) {
+      ref.current(state.currentHint);
+    }
+    prevHintRef.current = state.currentHint;
+  }, [state.currentHint]);
 };
