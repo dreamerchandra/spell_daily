@@ -64,7 +64,7 @@ export const App = () => {
             <Button
               onClick={onCheckAnswer}
               disabled={disableChecking}
-              variant="success"
+              variant="primary"
               size="lg"
             >
               CHECK ✨

@@ -30,7 +30,7 @@ export const Button = ({
     error:
       'bg-gradient-to-r from-game-error-600 to-game-error-700 border-game-error-500/30 text-white hover:from-game-error-700 hover:to-game-error-800',
     ghost:
-      'bg-gradient-to-r from-slate-600/70 to-slate-700/70 border-slate-500/30 text-gray-200 hover:from-slate-700 hover:to-slate-800',
+      'bg-gradient-to-r from-dark-700/70 to-dark-800/70 border-dark-600/30 text-gray-200 hover:from-dark-800 hover:to-dark-900',
   };
 
   const sizeClasses = {
@@ -40,7 +40,7 @@ export const Button = ({
   };
 
   const disabledClasses =
-    'cursor-not-allowed bg-gray-700/50 border-gray-600/30 text-gray-500 hover:scale-100';
+    'cursor-not-allowed bg-dark-800/50 border-dark-700/30 text-dark-500 hover:scale-100';
 
   const combinedClasses = `
     ${baseClasses}

@@ -21,7 +21,7 @@
 
 /* Bubble slide & fade */
 .hintBubble {
-  background: #d9480f;
+  background: #7c3aed; /* game-primary-700 - darker purple */
   color: white;
   padding: 16px 20px;
   border-radius: 20px;
@@ -53,7 +53,7 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 12px solid #d9480f;
+  border-bottom: 12px solid #a855f7;
 }
 
 .hintBubble > p {
@@ -88,10 +88,10 @@
 }
 
 .btn.no {
-  background: #93370d;
-  color: white;
+  outline: 2px dashed #3123c9;
+  color: rgb(221, 219, 219);
 }
 .btn.yes {
-  background: white;
-  color: black;
+  background: #f59e0b; /* game-secondary-500 - orange/yellow accent */
+  color: white;
 }

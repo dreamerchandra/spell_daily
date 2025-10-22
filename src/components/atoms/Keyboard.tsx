@@ -16,7 +16,7 @@ const KeyboardKey = ({
 
   const variantClasses = {
     normal:
-      'bg-gradient-to-r from-slate-600/70 to-slate-700/70 border-slate-500/30 text-gray-200 hover:from-slate-700 hover:to-slate-800',
+      'bg-gradient-to-r from-dark-700/70 to-dark-800/70 border-dark-600/30 text-gray-200 hover:from-dark-800 hover:to-dark-900',
     special:
       'bg-gradient-to-r from-game-error-600/80 to-game-error-700/80 border-game-error-500/30 text-white hover:from-game-error-700 hover:to-game-error-800',
   };

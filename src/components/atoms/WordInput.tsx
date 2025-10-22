@@ -128,7 +128,7 @@ export const WordInput = ({
           return `${baseClasses} border-game-error-500/60 bg-game-error-500/20 text-game-error-300`;
         }
         // Use dimmed text color for placeholders
-        const textColor = isPlaceholderChar ? 'text-gray-400/70' : 'text-white';
+        const textColor = isPlaceholderChar ? 'text-dark-500/70' : 'text-white';
         return `${baseClasses} ${phoneticColorClass} ${textColor}`;
       }
 
@@ -150,7 +150,7 @@ export const WordInput = ({
     }
 
     const isActive = index === userInput.findIndex(l => l === '');
-    return `${baseClasses} border-gray-600/50 bg-gray-700/30 text-gray-400 ${
+    return `${baseClasses} border-dark-700/50 bg-dark-800/30 text-dark-500 ${
       isActive ? 'ring-2 ring-game-primary-400/50' : ''
     }`;
   };
