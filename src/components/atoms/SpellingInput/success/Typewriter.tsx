@@ -12,6 +12,7 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
+import { successSoundManager, SuccessAnimationType } from './soundManager';
 
 export const Typewriter = ({
   userInput,
@@ -32,7 +33,10 @@ export const Typewriter = ({
       setTypingStates(new Array(userInput.length).fill(false));
       setShowCursor(-1);
 
-      // Typewriter effect - letters appear one by one
+      // Play success sound
+      successSoundManager.playSuccess(SuccessAnimationType.TYPEWRITER);
+
+      // Typewriter effect - letters appear one by one with longer timing
       userInput.forEach((_, index) => {
         setTimeout(() => {
           setShowCursor(index);
@@ -43,8 +47,8 @@ export const Typewriter = ({
               newState[index] = true;
               return newState;
             });
-          }, 200);
-        }, index * 300);
+          }, 400); // Increased from 200 to 400ms
+        }, index * 500); // Increased from 300 to 500ms
       });
 
       // Hide cursor after all letters are typed
@@ -52,21 +56,21 @@ export const Typewriter = ({
         () => {
           setShowCursor(-1);
         },
-        userInput.length * 300 + 500
+        userInput.length * 500 + 800 // Adjusted timing
       );
 
-      // Reset animation states after completion
+      // Reset animation states after completion but keep success state visible
       setTimeout(
         () => {
-          setTypingStates([]);
+          setTypingStates(new Array(userInput.length).fill(false));
         },
-        userInput.length * 300 + 1000
+        userInput.length * 500 + 1500 // Adjusted timing
       );
     }
   }, [isCorrect, userInput]);
 
   const getBoxStyles = (index: number, letter: string) => {
-    const isTyped = typingStates[index];
+    const isTyped = typingStates.length > 0 && typingStates[index];
     const showingCursor = showCursor === index;
     const animationClass = isTyped ? 'animate-pulse' : '';
     const cursorClass = showingCursor
@@ -109,7 +113,7 @@ export const Typewriter = ({
   };
 
   const getLetterDisplay = (letter: string, index: number) => {
-    const isTyped = typingStates[index];
+    const isTyped = typingStates.length > 0 && typingStates[index];
     const showingCursor = showCursor === index;
 
     if (isCorrect === true) {

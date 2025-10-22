@@ -74,7 +74,7 @@ export const App = () => {
                 variant="primary"
                 size="lg"
               >
-                CONTINUE 🎉
+                CONTINUE
               </Button>
             ) : (
               <Button
@@ -83,7 +83,7 @@ export const App = () => {
                 variant="primary"
                 size="lg"
               >
-                CHECK ✨
+                CHECK
               </Button>
             )}
           </div>

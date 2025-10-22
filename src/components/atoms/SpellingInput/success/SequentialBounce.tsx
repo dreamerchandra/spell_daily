@@ -12,6 +12,7 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
+import { successSoundManager, SuccessAnimationType } from './soundManager';
 
 export const SequentialBounce = ({
   userInput,
@@ -29,6 +30,9 @@ export const SequentialBounce = ({
   useEffect(() => {
     if (isCorrect === true) {
       setAnimationStates(new Array(userInput.length).fill(false));
+
+      // Play success sound
+      successSoundManager.playSuccess(SuccessAnimationType.SEQUENTIAL_BOUNCE);
 
       // Trigger sequential bounce animation
       userInput.forEach((_, index) => {

@@ -12,6 +12,7 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
+import { successSoundManager, SuccessAnimationType } from './soundManager';
 
 export const ColorFlow = ({
   userInput,
@@ -31,6 +32,9 @@ export const ColorFlow = ({
     if (isCorrect === true) {
       setFlowStates(new Array(userInput.length).fill(false));
       setGlowStates(new Array(userInput.length).fill(false));
+
+      // Play success sound
+      successSoundManager.playSuccess(SuccessAnimationType.COLOR_FLOW);
 
       // Color flow animation - waves of color changes
       userInput.forEach((_, index) => {

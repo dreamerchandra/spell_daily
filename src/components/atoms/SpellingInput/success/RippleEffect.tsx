@@ -12,6 +12,7 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
+import { successSoundManager, SuccessAnimationType } from './soundManager';
 
 export const RippleEffect = ({
   userInput,
@@ -29,6 +30,9 @@ export const RippleEffect = ({
   useEffect(() => {
     if (isCorrect === true) {
       setAnimationStates(new Array(userInput.length).fill(false));
+
+      // Play success sound
+      successSoundManager.playSuccess(SuccessAnimationType.RIPPLE_EFFECT);
 
       // Start ripple from center
       const centerIndex = Math.floor(userInput.length / 2);

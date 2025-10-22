@@ -12,6 +12,7 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
+import { successSoundManager, SuccessAnimationType } from './soundManager';
 
 export const ConfettiBurst = ({
   userInput,
@@ -31,6 +32,9 @@ export const ConfettiBurst = ({
     if (isCorrect === true) {
       setAnimationStates(new Array(userInput.length).fill(false));
       setShowConfetti(new Array(userInput.length).fill(false));
+
+      // Play success sound
+      successSoundManager.playSuccess(SuccessAnimationType.CONFETTI_BURST);
 
       // Trigger confetti and jump animation for each letter
       userInput.forEach((_, index) => {
@@ -58,10 +62,10 @@ export const ConfettiBurst = ({
         }, index * 80);
       });
 
-      // Reset animation states after completion
+      // Reset animation states after completion but keep success state visible
       setTimeout(
         () => {
-          setAnimationStates([]);
+          setAnimationStates(new Array(userInput.length).fill(false));
         },
         userInput.length * 80 + 800
       );
@@ -69,7 +73,7 @@ export const ConfettiBurst = ({
   }, [isCorrect, userInput]);
 
   const getBoxStyles = (index: number, letter: string) => {
-    const isAnimating = animationStates[index];
+    const isAnimating = animationStates.length > 0 && animationStates[index];
     const animationClass = isAnimating
       ? 'animate-bounce -translate-y-2 rotate-12'
       : '';
@@ -117,7 +121,7 @@ export const ConfettiBurst = ({
             {letter || ''}
           </div>
           {/* Confetti particles */}
-          {showConfetti[index] && (
+          {showConfetti.length > 0 && showConfetti[index] && (
             <div className="pointer-events-none absolute inset-0">
               <div className="absolute -left-1 -top-2 animate-ping text-xs">
                 🎉
