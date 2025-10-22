@@ -65,7 +65,7 @@ export const AvatarComponent: FC = () => {
           setShow(true);
         }}
       >
-        <img src={`public/emoji/${character}`} alt="reaction" />
+        <img src={`/emoji/${character}`} alt="reaction" />
       </div>
       <SpeechBubble
         show={show}
