@@ -32,7 +32,7 @@ export const RippleEffect = ({
       setAnimationStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.RIPPLE_EFFECT);
+      successSoundManager.playSuccess(SuccessAnimationType.RIPPLE_EFFECT, 1);
 
       // Start ripple from center
       const centerIndex = Math.floor(userInput.length / 2);
@@ -68,14 +68,6 @@ export const RippleEffect = ({
           });
         }, distance * 150);
       }
-
-      // Reset animation states after completion but keep success state visible
-      setTimeout(
-        () => {
-          setAnimationStates(new Array(userInput.length).fill(false));
-        },
-        maxDistance * 150 + 800
-      );
     }
   }, [isCorrect, userInput]);
 

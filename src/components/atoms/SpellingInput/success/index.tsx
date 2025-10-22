@@ -8,18 +8,18 @@ import { triggerSpellingSuccess } from '../../../../util/success-vibrations';
 import { memo, useState, useEffect } from 'react';
 
 const ANIMATION_COMPONENTS = [
+  Typewriter,
   SequentialBounce,
   RippleEffect,
   ConfettiBurst,
-  Typewriter,
   ColorFlow,
 ] as const;
 
 const ANIMATION_NAMES = [
+  'Typewriter',
   'Sequential Bounce',
   'Ripple Effect',
   'Confetti Burst',
-  'Typewriter',
   'Color Flow',
 ] as const;
 

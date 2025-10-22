@@ -32,7 +32,10 @@ export const SequentialBounce = ({
       setAnimationStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.SEQUENTIAL_BOUNCE);
+      successSoundManager.playSuccess(
+        SuccessAnimationType.SEQUENTIAL_BOUNCE,
+        1
+      );
 
       // Trigger sequential bounce animation
       userInput.forEach((_, index) => {
@@ -44,14 +47,6 @@ export const SequentialBounce = ({
           });
         }, index * 100); // 100ms delay between each letter
       });
-
-      // Reset animation states after completion but keep success state visible
-      setTimeout(
-        () => {
-          setAnimationStates(new Array(userInput.length).fill(false));
-        },
-        userInput.length * 100 + 600
-      );
     }
   }, [isCorrect, userInput]);
 

@@ -62,13 +62,13 @@ export const ConfettiBurst = ({
         }, index * 80);
       });
 
-      // Reset animation states after completion but keep success state visible
-      setTimeout(
-        () => {
-          setAnimationStates(new Array(userInput.length).fill(false));
-        },
-        userInput.length * 80 + 800
-      );
+      // // Reset animation states after completion but keep success state visible
+      // setTimeout(
+      //   () => {
+      //     setAnimationStates(new Array(userInput.length).fill(false));
+      //   },
+      //   userInput.length * 80 + 800
+      // );
     }
   }, [isCorrect, userInput]);
 

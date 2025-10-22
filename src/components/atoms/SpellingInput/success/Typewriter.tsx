@@ -36,7 +36,6 @@ export const Typewriter = ({
       // Play success sound
       successSoundManager.playSuccess(SuccessAnimationType.TYPEWRITER);
 
-      // Typewriter effect - letters appear one by one with longer timing
       userInput.forEach((_, index) => {
         setTimeout(() => {
           setShowCursor(index);
@@ -47,8 +46,8 @@ export const Typewriter = ({
               newState[index] = true;
               return newState;
             });
-          }, 400); // Increased from 200 to 400ms
-        }, index * 500); // Increased from 300 to 500ms
+          }, 100);
+        }, index * 120);
       });
 
       // Hide cursor after all letters are typed
@@ -56,15 +55,14 @@ export const Typewriter = ({
         () => {
           setShowCursor(-1);
         },
-        userInput.length * 500 + 800 // Adjusted timing
+        userInput.length * 120 + 200
       );
 
-      // Reset animation states after completion but keep success state visible
       setTimeout(
         () => {
-          setTypingStates(new Array(userInput.length).fill(false));
+          setTypingStates(new Array(userInput.length).fill(true));
         },
-        userInput.length * 500 + 1500 // Adjusted timing
+        userInput.length * 120 + 400
       );
     }
   }, [isCorrect, userInput]);

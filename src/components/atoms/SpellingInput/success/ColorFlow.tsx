@@ -66,13 +66,13 @@ export const ColorFlow = ({
       });
 
       // Reset animation states after completion but keep success state visible
-      setTimeout(
-        () => {
-          setFlowStates(new Array(userInput.length).fill(false));
-          setGlowStates(new Array(userInput.length).fill(false));
-        },
-        userInput.length * 120 + 800
-      );
+      // setTimeout(
+      //   () => {
+      //     setFlowStates(new Array(userInput.length).fill(false));
+      //     setGlowStates(new Array(userInput.length).fill(false));
+      //   },
+      //   userInput.length * 120 + 800
+      // );
     }
   }, [isCorrect, userInput]);
 

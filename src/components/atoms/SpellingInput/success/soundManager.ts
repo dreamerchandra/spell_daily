@@ -61,12 +61,15 @@ class SuccessSoundManager {
     });
   }
 
-  playSuccess(animationType: SuccessAnimationTypeValue) {
+  playSuccess(animationType: SuccessAnimationTypeValue, volume?: number) {
     if (!this.enabled) return;
 
     const audio = this.audioCache.get(animationType);
     if (audio) {
       // Reset audio to beginning in case it's already playing
+      if (volume !== undefined) {
+        audio.volume = Math.max(0, Math.min(1, volume));
+      }
       audio.currentTime = 0;
       audio.play().catch(error => {
         console.warn('Could not play success sound:', error);
