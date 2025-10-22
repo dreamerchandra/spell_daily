@@ -2,7 +2,6 @@ import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
 import { useHintState, useResetHint } from '../../context/hint-context/index';
-import { useSetTimeout } from '../../hooks/use-setTimeout';
 import { showSyllable } from '../../components/atoms/SpellingInput/utils';
 
 type FullWordState = {
@@ -76,7 +75,6 @@ export const useFullWordState = () => {
     incorrectAttempts: 0,
     wordDef: null,
   });
-  const setTimer = useSetTimeout();
   const ref = useRef(state);
   useEffect(() => {
     ref.current = state;
@@ -101,12 +99,6 @@ export const useFullWordState = () => {
         type: 'SET_INCORRECT_ATTEMPTS',
       });
     }
-    setTimer(() => {
-      dispatch({
-        type: 'SET_IS_CORRECT',
-        action: { isCorrect: null },
-      });
-    }, 1000);
   }, []);
 
   const setNewWord = useCallback(

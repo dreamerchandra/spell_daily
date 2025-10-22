@@ -15,12 +15,14 @@ export const App = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [words] = useState(sampleWords);
   const [disableChecking, setDisableChecking] = useState(true);
+  const [canContinue, setCanContinue] = useState(false);
 
   const [start, setStart] = useState(false);
 
   const onCheckAnswer = useCallback(() => {
     if (gameRef.current?.isCorrect()) {
-      setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
+      setCanContinue(true);
+      // setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
     }
   }, [words.length]);
 
@@ -61,14 +63,29 @@ export const App = () => {
       footer={
         <Footer>
           <div className="text-center">
-            <Button
-              onClick={onCheckAnswer}
-              disabled={disableChecking}
-              variant="primary"
-              size="lg"
-            >
-              CHECK ✨
-            </Button>
+            {canContinue ? (
+              <Button
+                onClick={() => {
+                  setCurrentWordIndex(prev =>
+                    prev < words.length - 1 ? prev + 1 : prev
+                  );
+                  setCanContinue(false);
+                }}
+                variant="primary"
+                size="lg"
+              >
+                CONTINUE 🎉
+              </Button>
+            ) : (
+              <Button
+                onClick={onCheckAnswer}
+                disabled={disableChecking}
+                variant="primary"
+                size="lg"
+              >
+                CHECK ✨
+              </Button>
+            )}
           </div>
         </Footer>
       }

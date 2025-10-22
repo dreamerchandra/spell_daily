@@ -26,3 +26,13 @@ export const PLACEHOLDER_TEXT = 'text-dark-500/70';
 // Default text colors
 export const WHITE_TEXT = 'text-white';
 export const GRAY_TEXT = 'text-gray-300';
+
+// Custom animation classes
+export const CELEBRATION_ANIMATIONS = {
+  bounce: 'animate-bounce scale-110 duration-300',
+  pulse: 'animate-pulse scale-105 shadow-lg shadow-green-500/50',
+  jump: 'animate-bounce -translate-y-2 rotate-12',
+  glow: 'shadow-xl shadow-emerald-400/50 ring-2 ring-emerald-400/30 scale-110',
+  typewriter: 'animate-pulse',
+  cursor: 'animate-ping ring-2 ring-blue-400',
+} as const;
