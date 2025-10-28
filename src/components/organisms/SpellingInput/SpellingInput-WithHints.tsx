@@ -4,8 +4,6 @@ import { useMemo, useState } from 'react';
 import { SyllableAnalyzer } from './SyllableAnalyzer';
 import {
   BASE_BOX_CLASSES,
-  SUCCESS_STYLES,
-  ERROR_STYLES,
   ACTIVE_RING,
   WHITE_TEXT,
   GRAY_TEXT,
@@ -28,7 +26,6 @@ const useHintRequestedPlace = (userInput: string[]) => {
 
 export const SpellingInputWithHints = ({
   userInput,
-  isCorrect = null,
   className = '',
   wordDef,
   currentEmptyIndex,
@@ -90,12 +87,6 @@ export const SpellingInputWithHints = ({
     const isPlaceholderChar = isPlaceholder(index, letter);
 
     if (displayValue) {
-      if (isCorrect === true) {
-        return `${BASE_BOX_CLASSES} ${SUCCESS_STYLES}`;
-      }
-      if (isCorrect === false) {
-        return `${BASE_BOX_CLASSES} ${ERROR_STYLES}`;
-      }
       // Use dimmed text color for placeholders
       const textColor = isPlaceholderChar ? PLACEHOLDER_TEXT : WHITE_TEXT;
       return `${BASE_BOX_CLASSES} ${phoneticColorClass} ${textColor}`;
