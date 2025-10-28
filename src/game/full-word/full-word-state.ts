@@ -3,6 +3,7 @@ import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
 import { useHintState, useResetHint } from '../../context/hint-context/index';
 import { showSyllable } from '../../components/organisms/SpellingInput/utils';
+import { useSpellingSpeech } from '../../hooks';
 
 type FullWordState = {
   userInput: string[];
@@ -81,6 +82,7 @@ export const useFullWordState = () => {
   }, [state]);
   const resetHint = useResetHint();
   const hintState = useHintState();
+  const { speak } = useSpellingSpeech();
 
   const setUserInput = useCallback((userInput: string[]) => {
     dispatch({
@@ -102,14 +104,16 @@ export const useFullWordState = () => {
   }, []);
 
   const setNewWord = useCallback(
-    (word: WordDef) => {
-      resetHint(Infinity);
+    (wordDef: WordDef) => {
+      const HINTS = 2; // [syllable, color hint, ...fillSyllable]
+      resetHint(wordDef.actualSyllable.length + HINTS);
       dispatch({
         type: 'NEW_WORD',
-        action: { wordDef: word },
+        action: { wordDef: wordDef },
       });
+      speak(wordDef.word);
     },
-    [resetHint]
+    [resetHint, speak]
   );
 
   useEffect(() => {

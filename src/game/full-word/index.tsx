@@ -53,10 +53,8 @@ export const FullWordGame = forwardRef<
   });
 
   useEffect(() => {
-    speak(wordDef.word);
     setNewWord(wordDef);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wordDef]);
+  }, [setNewWord, wordDef]);
 
   useEffect(() => {
     setDisableChecking(state.userInput.includes(''));

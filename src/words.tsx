@@ -2,9 +2,10 @@ export interface WordDef {
   word: string;
   definition: string;
   audioUrl?: string;
-  syllable: string[];
-  ipa: string[];
-  actualSyllable: string[];
+  syllable: string[]; // for audio hints
+  ipa: string[]; // for displaying pronunciation
+  actualSyllable: string[]; // correct syllable split
+  syllableOptions?: string[][];
 }
 
 export const sampleWords: WordDef[] = [
@@ -15,6 +16,10 @@ export const sampleWords: WordDef[] = [
     actualSyllable: ['cul', 'ture'],
     definition:
       'The ideas, customs, and social behavior of a particular people or society. 🌍',
+    syllableOptions: [
+      ['cul', 'kul', 'col'],
+      ['ture', 'chur', 'tour'],
+    ],
   },
   {
     word: 'DEFINITELY',
@@ -22,6 +27,12 @@ export const sampleWords: WordDef[] = [
     syllable: ['def', 'i', 'nite', 'li'],
     actualSyllable: ['def', 'i', 'nite', 'ly'],
     definition: 'Without a doubt; for sure. ✅',
+    syllableOptions: [
+      ['def', 'deff', 'deaf'],
+      ['i', 'e', 'a'],
+      ['nite', 'night', 'nyte'],
+      ['ly', 'li', 'lee'],
+    ],
   },
   {
     word: 'OPINION',
@@ -30,6 +41,11 @@ export const sampleWords: WordDef[] = [
     actualSyllable: ['o', 'pin', 'ion'],
     definition:
       'A thought or belief about something, not necessarily based on fact. 💭',
+    syllableOptions: [
+      ['o', 'oh', 'ow'],
+      ['pin', 'pen', 'pinn'],
+      ['ion', 'eon', 'yon'],
+    ],
   },
   {
     word: 'COUSIN',
@@ -38,6 +54,10 @@ export const sampleWords: WordDef[] = [
     actualSyllable: ['cous', 'in'],
     definition:
       'The child of your aunt or uncle; your family member who is not a sibling. 👪',
+    syllableOptions: [
+      ['cous', 'kous', 'cows'],
+      ['in', 'en', 'inn'],
+    ],
   },
   {
     word: 'IMPRESS',
@@ -45,6 +65,10 @@ export const sampleWords: WordDef[] = [
     syllable: ['em', 'press'],
     actualSyllable: ['im', 'press'],
     definition: 'To make someone feel admiration and respect. 🌟',
+    syllableOptions: [
+      ['im', 'em', 'um'],
+      ['press', 'pres', 'pross'],
+    ],
   },
   {
     word: 'ARRANGEMENT',
@@ -53,6 +77,11 @@ export const sampleWords: WordDef[] = [
     actualSyllable: ['ar', 'range', 'ment'],
     definition:
       'The act of organizing or putting things in a certain order. 📅',
+    syllableOptions: [
+      ['ar', 'are', 'arr'],
+      ['range', 'ranje', 'rang'],
+      ['ment', 'mant', 'mint'],
+    ],
   },
   {
     word: 'EXHAUST',
@@ -60,6 +89,10 @@ export const sampleWords: WordDef[] = [
     syllable: ['ex', 'haust'],
     actualSyllable: ['ex', 'haust'],
     definition: 'To use up all of something; to tire someone out. 🌬️',
+    syllableOptions: [
+      ['ex', 'eks', 'ax'],
+      ['haust', 'host', 'hawst'],
+    ],
   },
   {
     word: 'MEMORABLE',
@@ -67,6 +100,12 @@ export const sampleWords: WordDef[] = [
     syllable: ['mem', 'o', 'ra', 'bel'],
     actualSyllable: ['mem', 'o', 'ra', 'ble'],
     definition: 'Something worth remembering; significant or interesting. 📝',
+    syllableOptions: [
+      ['mem', 'mam', 'mom'],
+      ['o', 'a', 'or'],
+      ['ra', 'rah', 'ray'],
+      ['ble', 'bel', 'bal'],
+    ],
   },
   {
     word: 'SPECIAL',
@@ -75,6 +114,10 @@ export const sampleWords: WordDef[] = [
     actualSyllable: ['spe', 'cial'],
     definition:
       'The ideas, customs, and social behavior of a particular people or society. 🌍',
+    syllableOptions: [
+      ['spe', 'spa', 'spy'],
+      ['cial', 'shial', 'shal'],
+    ],
   },
   {
     word: 'SYSTEM',
@@ -82,6 +125,10 @@ export const sampleWords: WordDef[] = [
     syllable: ['sis', 'tem'],
     actualSyllable: ['sys', 'tem'],
     definition: 'A plan or way things are organized or set up. 📋',
+    syllableOptions: [
+      ['sys', 'sis', 'cys'],
+      ['tem', 'tam', 'tim'],
+    ],
   },
   {
     word: 'RAINBOW',
@@ -89,6 +136,10 @@ export const sampleWords: WordDef[] = [
     syllable: ['rain', 'bow'],
     actualSyllable: ['rain', 'bow'],
     definition: 'Beautiful colors that appear in the sky after rain! 🌈',
+    syllableOptions: [
+      ['rain', 'rane', 'rein'],
+      ['bow', 'bou', 'bo'],
+    ],
   },
   {
     word: 'BUTTERFLY',
@@ -96,6 +147,11 @@ export const sampleWords: WordDef[] = [
     syllable: ['but', 'ter', 'fly'],
     actualSyllable: ['but', 'ter', 'fly'],
     definition: 'A pretty insect with colorful wings that can fly! 🦋',
+    syllableOptions: [
+      ['but', 'butt', 'bot'],
+      ['ter', 'tur', 'tar'],
+      ['fly', 'fli', 'flai'],
+    ],
   },
   {
     word: 'ELEPHANT',
@@ -103,6 +159,11 @@ export const sampleWords: WordDef[] = [
     syllable: ['el', 'e', 'phant'],
     actualSyllable: ['el', 'e', 'phant'],
     definition: 'A big gray animal with a long trunk and big ears! 🐘',
+    syllableOptions: [
+      ['el', 'elle', 'al'],
+      ['e', 'i', 'ee'],
+      ['phant', 'fant', 'pant'],
+    ],
   },
   {
     word: 'TREASURE',
@@ -110,5 +171,9 @@ export const sampleWords: WordDef[] = [
     syllable: ['trea', 'sure'],
     actualSyllable: ['trea', 'sure'],
     definition: 'Special valuable things like gold coins and jewels! 💎',
+    syllableOptions: [
+      ['trea', 'tree', 'tra'],
+      ['sure', 'shur', 'sur'],
+    ],
   },
 ];
