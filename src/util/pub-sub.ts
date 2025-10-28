@@ -34,10 +34,8 @@ class PubSub<Events extends Record<string, unknown>> {
   ): void {
     const [event, data, postCb] = args;
     const callbacks = this.events[event];
-    console.log(new Error().stack);
     if (!callbacks) return;
     for (const cb of callbacks) {
-      console.log('Publishing event:', event, 'to subscriber:', cb);
       cb(data as Events[K]);
     }
     postCb?.();

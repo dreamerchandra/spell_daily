@@ -112,16 +112,7 @@ export const SyllableGame = forwardRef<
 
         {state.isCorrect !== null && (
           <div className="mt-6 text-center">
-            {state.isCorrect ? (
-              <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
-                <p className="text-lg font-semibold text-game-success-300">
-                  🎉 Excellent! You built the word correctly! 🎉
-                </p>
-                <p className="mt-2 text-sm text-game-success-400">
-                  {wordDef.actualSyllable.join(' + ')} = {wordDef.word}
-                </p>
-              </div>
-            ) : (
+            {state.isCorrect ? null : (
               <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
                 <p className="text-base font-medium text-game-error-300">
                   😊 Try again! Look at the syllables carefully! 💪
