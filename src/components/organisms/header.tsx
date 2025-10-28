@@ -1,15 +1,27 @@
 import { type ReactNode } from 'react';
 import { AvatarComponent } from './avatar/avatar';
+import { GameModeSelector } from '../atoms/GameModeSelector';
+
+type GameMode = 'fullWord' | 'syllable';
 
 interface HeaderProps {
   ProgressComponent: ReactNode;
+  gameMode?: GameMode;
+  onGameModeChange: (mode: GameMode) => void;
 }
 
-export const Header = ({ ProgressComponent }: HeaderProps) => {
+export const Header = ({
+  ProgressComponent,
+  gameMode = 'fullWord',
+  onGameModeChange,
+}: HeaderProps) => {
   return (
     <header className={`m-auto flex max-w-md items-center justify-between p-4`}>
-      {/* empty div to center the progress bar */}
-      <div />
+      {/* Game mode selector */}
+      <GameModeSelector
+        currentMode={gameMode}
+        onModeChange={onGameModeChange}
+      />
       {ProgressComponent}
       <div className="h-16 w-16" aria-label="Helper">
         <AvatarComponent />

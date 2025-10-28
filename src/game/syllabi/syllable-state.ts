@@ -22,7 +22,6 @@ type SetIsCorrectPayload = ActionPayload<
   { isCorrect: boolean | null }
 >;
 type SetIncorrectAttemptsPayload = ActionPayload<'SET_INCORRECT_ATTEMPTS'>;
-type ResetSelectionPayload = ActionPayload<'RESET_SELECTION'>;
 type RemoveSyllablePayload = ActionPayload<
   'REMOVE_SYLLABLE',
   { index: number }
@@ -33,7 +32,6 @@ export type SyllableAction =
   | SelectSyllablePayload
   | SetIsCorrectPayload
   | SetIncorrectAttemptsPayload
-  | ResetSelectionPayload
   | RemoveSyllablePayload;
 
 export const syllableReducer = (
@@ -74,15 +72,6 @@ export const syllableReducer = (
       return {
         ...state,
         incorrectAttempts: state.incorrectAttempts + 1,
-      };
-    case 'RESET_SELECTION':
-      return {
-        ...state,
-        selectedSyllables: new Array(
-          state.wordDef?.actualSyllable.length || 0
-        ).fill(''),
-        currentSyllableIndex: 0,
-        isCorrect: null,
       };
     case 'REMOVE_SYLLABLE': {
       const newSelectedSyllables = [...state.selectedSyllables];
@@ -138,12 +127,6 @@ export const useSyllableState = () => {
     }
   }, []);
 
-  const resetSelection = useCallback(() => {
-    dispatch({
-      type: 'RESET_SELECTION',
-    });
-  }, []);
-
   const removeSyllable = useCallback((index: number) => {
     dispatch({
       type: 'REMOVE_SYLLABLE',
@@ -168,7 +151,6 @@ export const useSyllableState = () => {
     state,
     selectSyllable,
     setIsCorrect,
-    resetSelection,
     removeSyllable,
     setNewWord,
   };

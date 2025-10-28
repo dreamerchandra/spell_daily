@@ -64,6 +64,7 @@ export const SyllableGroup: React.FC<SyllableGroupProps> = ({
                   onClick={() => onSelect(option, syllableIndex)}
                   onDragStart={e => handleDragStart(e, option, syllableIndex)}
                   className={buttonClasses}
+                  data-syllable-option={option}
                 >
                   {option}
                 </button>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useHintState } from '../../context/hint-context';
-import { useSyllabiSpeech } from '../../hooks/useSpeech';
+import { useHintState } from '../../../context/hint-context';
+import { useSyllabiSpeech } from '../../../hooks/useSpeech';
+import { SuccessDroppableSlot } from './success-droppable-slot';
 
 interface DroppableSlotProps {
   index: number;
@@ -10,9 +11,9 @@ interface DroppableSlotProps {
   onDrop: (syllable: string, targetIndex: number) => void;
   onRemove?: (index: number) => void;
   isCorrect?: boolean | null;
+  onAnimationEnd: () => void;
 }
-
-export const DroppableSlot: React.FC<DroppableSlotProps> = ({
+const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
   index,
   syllable,
   placeholder,
@@ -70,7 +71,7 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
 
   const getSlotClasses = () => {
     let classes =
-      'min-w-[80px] rounded-lg border-2 px-3 py-2 text-center font-medium transition-all duration-200 ';
+      'border-dashed rounded-lg border-2 px-3 py-2 text-center font-medium transition-all duration-200 ';
 
     if (isDragOver) {
       classes +=
@@ -86,7 +87,7 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
       }
     } else {
       classes +=
-        'border-dashed border-gray-400 bg-white text-gray-400 dark:bg-gray-700 dark:text-gray-500 hover:border-game-primary-400 hover:bg-game-primary-50 dark:hover:bg-game-primary-900';
+        ' border-gray-400 bg-white text-gray-400 dark:bg-gray-700 dark:text-gray-500 hover:border-game-primary-400 hover:bg-game-primary-50 dark:hover:bg-game-primary-900';
       if (showHintSpeaker) {
         classes += ' cursor-pointer';
       }
@@ -110,9 +111,12 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
         onDrop={handleDrop}
         onClick={handleClick}
         title={getTitle()}
+        data-droppable-slot={index}
       >
         {syllable || placeholder}
-        {syllable && <span className="ml-1 text-xs opacity-60">✕</span>}
+        {syllable && isCorrect !== true && (
+          <span className="ml-1 text-xs opacity-60">✕</span>
+        )}
       </div>
       {showHintSpeaker && !syllable && (
         <button
@@ -132,4 +136,26 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
       )}
     </div>
   );
+};
+
+export const DroppableSlot = (props: DroppableSlotProps) => {
+  if (props.isCorrect === true) {
+    // Randomly pick animation types for unpredictable, exciting variety
+    const animationTypes = [
+      'flyDown',
+      'slideLeft',
+      'rotateIn',
+      'bounce',
+      'flipIn',
+    ] as const;
+
+    // Use index as seed for consistent randomness per slot position
+    const seed = props.index * 7 + 13; // Simple seeding
+    const randomIndex =
+      Math.abs(Math.sin(seed) * 10000) % animationTypes.length;
+    const animationType = animationTypes[Math.floor(randomIndex)];
+
+    return <SuccessDroppableSlot {...props} animationType={animationType} />;
+  }
+  return <InputDroppableSlot {...props} />;
 };

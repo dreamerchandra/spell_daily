@@ -11,20 +11,14 @@ import { useSyllableState } from './syllable-state';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 import { Speaker } from '../../components/atoms/speaker';
 import { SyllableGroup } from './syllable-group';
-import { DroppableSlot } from './droppable-slot';
+import { SyllableInput } from '../../components/organisms/SyllableInput';
 
 export const SyllableGame = forwardRef<
   GameRef,
   { wordDef: WordDef; setDisableChecking: (disable: boolean) => void }
 >(({ wordDef, setDisableChecking }, ref) => {
-  const {
-    state,
-    selectSyllable,
-    setIsCorrect,
-    resetSelection,
-    removeSyllable,
-    setNewWord,
-  } = useSyllableState();
+  const { state, selectSyllable, setIsCorrect, removeSyllable, setNewWord } =
+    useSyllableState();
   const nextHint = useNextHint();
 
   useOnHintIncrease(() => {
@@ -86,10 +80,6 @@ export const SyllableGame = forwardRef<
     speak(wordDef.word);
   };
 
-  const handleReset = () => {
-    resetSelection();
-  };
-
   const handleDragStart = (syllable: string, fromIndex: number) => {
     // Optional: Add visual feedback or logging when drag starts
     console.log(`Dragging syllable "${syllable}" from picker ${fromIndex}`);
@@ -122,49 +112,26 @@ export const SyllableGame = forwardRef<
 
         <Definition definition={wordDef.definition} />
 
-        <div className="mb-6 rounded-xl border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800">
-          <h3 className="mb-3 text-lg font-semibold text-gray-700 dark:text-gray-200">
-            Build the word:
-          </h3>
-          <div className="flex flex-wrap justify-center gap-2">
-            {wordDef.actualSyllable.map((_, index) => (
-              <DroppableSlot
-                key={index}
-                index={index}
-                syllable={state.selectedSyllables[index]}
-                placeholder={`Part ${index + 1}`}
-                onDrop={selectSyllable}
-                onRemove={removeSyllable}
-                audioSyllable={wordDef.syllable[index]}
-                isCorrect={state.isCorrect}
-              />
-            ))}
-          </div>
-        </div>
+        <SyllableInput
+          key={wordDef.word}
+          wordDef={wordDef}
+          state={state}
+          selectSyllable={selectSyllable}
+          removeSyllable={removeSyllable}
+        />
 
         {/* Syllable groups */}
         <div className="mb-6">
-          <SyllableGroup
-            allOptions={wordDef.syllableOptions}
-            actualSyllables={wordDef.actualSyllable}
-            onSelect={selectSyllable}
-            selectedSyllables={state.selectedSyllables}
-            onDragStart={handleDragStart}
-          />
+          {state.isCorrect === null ? (
+            <SyllableGroup
+              allOptions={wordDef.syllableOptions}
+              actualSyllables={wordDef.actualSyllable}
+              onSelect={selectSyllable}
+              selectedSyllables={state.selectedSyllables}
+              onDragStart={handleDragStart}
+            />
+          ) : null}
         </div>
-
-        {/* Reset button */}
-        {state.selectedSyllables.some(s => s !== '') &&
-          state.isCorrect === null && (
-            <div className="mb-4">
-              <button
-                onClick={handleReset}
-                className="rounded-lg bg-gray-500 px-4 py-2 font-medium text-white transition-colors hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
-              >
-                Reset Selection
-              </button>
-            </div>
-          )}
 
         {state.isCorrect !== null && (
           <div className="mt-6 text-center">
