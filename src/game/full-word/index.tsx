@@ -3,11 +3,10 @@ import type { GameRef } from '../../common/game-ref';
 import { Keyboard } from '../../components/atoms/Keyboard';
 import { Definition } from '../../components/atoms/hints/definition';
 import { Syllable } from '../../components/atoms/hints/syllable';
-import { useHintState, useNextHint } from '../../context/hint-context/index';
+import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import type { WordDef } from '../../words';
 import { makeArray, useFullWordState } from './full-word-state';
-import { Avatar } from '../../components/organisms/avatar/avatar';
 import { Speaker } from '../../components/atoms/speaker';
 import { SpellingInput } from '../../components/organisms/SpellingInput';
 
@@ -16,24 +15,6 @@ export const FullWordGame = forwardRef<
   { wordDef: WordDef; setDisableChecking: (disable: boolean) => void }
 >(({ wordDef, setDisableChecking }, ref) => {
   const { state, setIsCorrect, setUserInput, setNewWord } = useFullWordState();
-  const nextHint = useNextHint();
-
-  useEffect(() => {
-    if (state.incorrectAttempts === 0) return;
-    const isEvenAttempt = state.incorrectAttempts % 2 === 0;
-    if (isEvenAttempt) {
-      Avatar.show({
-        text: 'Want some hint?',
-        yesText: 'Yes, please!',
-        noText: 'No, I got this!',
-        onYes: () => {
-          nextHint();
-        },
-      });
-    } else {
-      Avatar.changeCharacter('by_rating/1');
-    }
-  }, [nextHint, setUserInput, state.incorrectAttempts, wordDef.word]);
 
   const hintState = useHintState();
 

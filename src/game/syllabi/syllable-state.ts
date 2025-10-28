@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
-import { useResetHint } from '../../context/hint-context/index';
+import { useNextHint, useResetHint } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
+import { Avatar } from '../../components/organisms/avatar/avatar';
 
 type SyllableState = {
   selectedSyllables: string[];
@@ -106,6 +107,7 @@ export const useSyllableState = () => {
   }, [state]);
 
   const resetHint = useResetHint();
+  const nextHint = useNextHint();
   const { speak } = useSpellingSpeech();
 
   const selectSyllable = useCallback((syllable: string, index: number) => {
@@ -115,17 +117,35 @@ export const useSyllableState = () => {
     });
   }, []);
 
-  const setIsCorrect = useCallback((isCorrect: boolean | null) => {
-    dispatch({
-      type: 'SET_IS_CORRECT',
-      action: { isCorrect },
-    });
-    if (isCorrect === false) {
+  const setIsCorrect = useCallback(
+    (isCorrect: boolean | null) => {
       dispatch({
-        type: 'SET_INCORRECT_ATTEMPTS',
+        type: 'SET_IS_CORRECT',
+        action: { isCorrect },
       });
-    }
-  }, []);
+      if (isCorrect === false) {
+        dispatch({
+          type: 'SET_INCORRECT_ATTEMPTS',
+        });
+        const incorrectAttempts = ref.current.incorrectAttempts + 1;
+        if (incorrectAttempts === 0) return;
+        const isEvenAttempt = incorrectAttempts % 2 === 0;
+        if (isEvenAttempt) {
+          Avatar.show({
+            text: 'Want some hint?',
+            yesText: 'Yes, please!',
+            noText: 'No, I got this!',
+            onYes: () => {
+              nextHint();
+            },
+          });
+        } else {
+          Avatar.changeCharacter('by_rating/1');
+        }
+      }
+    },
+    [nextHint]
+  );
 
   const removeSyllable = useCallback((index: number) => {
     dispatch({

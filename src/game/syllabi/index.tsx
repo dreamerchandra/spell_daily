@@ -1,14 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import type { GameRef } from '../../common/game-ref';
 import { Definition } from '../../components/atoms/hints/definition';
-import {
-  useNextHint,
-  useOnHintIncrease,
-} from '../../context/hint-context/index';
+import { useOnHintIncrease } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import type { WordDef } from '../../words';
 import { useSyllableState } from './syllable-state';
-import { Avatar } from '../../components/organisms/avatar/avatar';
 import { Speaker } from '../../components/atoms/speaker';
 import { SyllableGroup } from './syllable-group';
 import { SyllableInput } from '../../components/organisms/SyllableInput';
@@ -19,7 +15,6 @@ export const SyllableGame = forwardRef<
 >(({ wordDef, setDisableChecking }, ref) => {
   const { state, selectSyllable, setIsCorrect, removeSyllable, setNewWord } =
     useSyllableState();
-  const nextHint = useNextHint();
 
   useOnHintIncrease(() => {
     if (state.incorrectAttempts === 0) return;
@@ -34,23 +29,6 @@ export const SyllableGame = forwardRef<
       removeSyllable(i);
     }
   });
-
-  useEffect(() => {
-    if (state.incorrectAttempts === 0) return;
-    const isEvenAttempt = state.incorrectAttempts % 2 === 0;
-    if (isEvenAttempt) {
-      Avatar.show({
-        text: 'Want some hint?',
-        yesText: 'Yes, please!',
-        noText: 'No, I got this!',
-        onYes: () => {
-          nextHint();
-        },
-      });
-    } else {
-      Avatar.changeCharacter('by_rating/1');
-    }
-  }, [nextHint, state.incorrectAttempts, wordDef.word]);
 
   const { speak, isPlaying, isSupported } = useSpellingSpeech();
 
