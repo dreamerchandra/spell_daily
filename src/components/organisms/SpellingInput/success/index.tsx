@@ -1,4 +1,3 @@
-import type { SpellingInputBaseProps } from '../types';
 import { SequentialBounce } from './SequentialBounce';
 import { RippleEffect } from './RippleEffect';
 import { ConfettiBurst } from './ConfettiBurst';
@@ -6,6 +5,7 @@ import { Typewriter } from './Typewriter';
 import { ColorFlow } from './ColorFlow';
 import { triggerSpellingSuccess } from '../../../../util/success-vibrations';
 import { memo, useState, useEffect } from 'react';
+import type { AnimationInputProps } from './type';
 
 const ANIMATION_COMPONENTS = [
   Typewriter,
@@ -23,7 +23,7 @@ const ANIMATION_NAMES = [
   'Color Flow',
 ] as const;
 
-const InternalSuccessAnimation = (props: SpellingInputBaseProps) => {
+const InternalSuccessAnimation = (props: AnimationInputProps) => {
   // Generate a truly random animation selection each time isCorrect becomes true
   const [AnimationComponent] = useState(() => {
     const animationIndex = Math.floor(

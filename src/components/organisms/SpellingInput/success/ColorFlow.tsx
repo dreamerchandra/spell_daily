@@ -1,4 +1,3 @@
-import type { SpellingInputBaseProps } from '../types';
 import { getPhoneticColorByActualSyllable } from '../../../../config/pallet-config';
 import { useMemo, useEffect, useState } from 'react';
 import {
@@ -13,8 +12,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
-import { pubSub } from '../../../../util/pub-sub';
 import { slow } from '../../../../config/animation-knobs';
+import type { AnimationInputProps } from './type';
 
 export const ColorFlow = ({
   userInput,
@@ -22,7 +21,8 @@ export const ColorFlow = ({
   className = '',
   wordDef,
   showSyllableColors,
-}: SpellingInputBaseProps) => {
+  onAnimationEnd,
+}: AnimationInputProps) => {
   const [flowStates, setFlowStates] = useState<boolean[]>([]);
   const [glowStates, setGlowStates] = useState<boolean[]>([]);
 
@@ -77,7 +77,7 @@ export const ColorFlow = ({
             // Reset animation states after completion but keep success state visible
             // setFlowStates(new Array(userInput.length).fill(false));
             // setGlowStates(new Array(userInput.length).fill(false));
-            pubSub.publish('Animation:End');
+            onAnimationEnd();
           },
           slow(userInput.length * 120)
         )
@@ -86,7 +86,7 @@ export const ColorFlow = ({
         timerIds.forEach(id => clearTimeout(id));
       };
     }
-  }, [isCorrect, userInput]);
+  }, [isCorrect, onAnimationEnd, userInput]);
 
   const getBoxStyles = (index: number, letter: string) => {
     const isFlowing = flowStates.length > 0 && flowStates[index];

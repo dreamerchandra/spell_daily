@@ -4,6 +4,11 @@ import { SpellingInputBasic } from './SpellingInput-Basic';
 import { SpellingInputWithHints } from './SpellingInput-WithHints';
 import { SuccessAnimation } from './success';
 import { showPlaceholder, showSyllable, findActiveIndex } from './utils';
+import { pubSub } from '../../../util/pub-sub';
+
+const onAnimationEnd = () => {
+  pubSub.publish('Animation:End');
+};
 
 export const SpellingInput = ({
   userInput,
@@ -22,6 +27,7 @@ export const SpellingInput = ({
         className={className}
         wordDef={wordDef}
         showSyllableColors={showSyllable(hintState.currentHint)}
+        onAnimationEnd={onAnimationEnd}
       />
     );
   }

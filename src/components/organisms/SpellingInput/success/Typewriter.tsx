@@ -1,4 +1,3 @@
-import type { SpellingInputBaseProps } from '../types';
 import { getPhoneticColorByActualSyllable } from '../../../../config/pallet-config';
 import { useMemo, useEffect, useState } from 'react';
 import {
@@ -13,8 +12,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
-import { pubSub } from '../../../../util/pub-sub';
 import { slow } from '../../../../config/animation-knobs';
+import type { AnimationInputProps } from './type';
 
 export const Typewriter = ({
   userInput,
@@ -22,7 +21,8 @@ export const Typewriter = ({
   className = '',
   wordDef,
   showSyllableColors,
-}: SpellingInputBaseProps) => {
+  onAnimationEnd,
+}: AnimationInputProps) => {
   const [typingStates, setTypingStates] = useState<boolean[]>([]);
   const [showCursor, setShowCursor] = useState<number>(-1);
 
@@ -70,7 +70,7 @@ export const Typewriter = ({
         setTimeout(
           () => {
             // setTypingStates(new Array(userInput.length).fill(true));
-            pubSub.publish('Animation:End');
+            onAnimationEnd();
           },
           slow(userInput.length * 120)
         )
@@ -79,7 +79,7 @@ export const Typewriter = ({
         timerIds.forEach(id => clearTimeout(id));
       };
     }
-  }, [isCorrect, userInput]);
+  }, [isCorrect, onAnimationEnd, userInput]);
 
   const getBoxStyles = (index: number, letter: string) => {
     const isTyped = typingStates.length > 0 && typingStates[index];

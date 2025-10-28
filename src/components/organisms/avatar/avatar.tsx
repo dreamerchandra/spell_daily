@@ -22,6 +22,8 @@ const AvatarChange = ({ path }: { path: string }) => {
       return;
     }
     const fullPath = `/emoji/${path}`;
+    const preload = new Image();
+    preload.src = fullPath;
     if (!ref.current.src) {
       ref.current.src = fullPath;
       return;

@@ -1,4 +1,3 @@
-import type { SpellingInputBaseProps } from '../types';
 import { getPhoneticColorByActualSyllable } from '../../../../config/pallet-config';
 import { useMemo, useEffect, useState } from 'react';
 import {
@@ -13,8 +12,8 @@ import {
 } from '../styles';
 import { findActiveIndex } from '../utils';
 import { successSoundManager, SuccessAnimationType } from './soundManager';
-import { pubSub } from '../../../../util/pub-sub';
 import { slow } from '../../../../config/animation-knobs';
+import type { AnimationInputProps } from './type';
 
 export const ConfettiBurst = ({
   userInput,
@@ -22,7 +21,8 @@ export const ConfettiBurst = ({
   className = '',
   wordDef,
   showSyllableColors,
-}: SpellingInputBaseProps) => {
+  onAnimationEnd,
+}: AnimationInputProps) => {
   const [animationStates, setAnimationStates] = useState<boolean[]>([]);
   const [showConfetti, setShowConfetti] = useState<boolean[]>([]);
 
@@ -73,7 +73,7 @@ export const ConfettiBurst = ({
           () => {
             // // Reset animation states after completion but keep success state visible
             // setAnimationStates(new Array(userInput.length).fill(false));
-            pubSub.publish('Animation:End');
+            onAnimationEnd();
           },
           slow(userInput.length * 80)
         )
@@ -83,7 +83,7 @@ export const ConfettiBurst = ({
         timerIds.forEach(id => clearTimeout(id));
       };
     }
-  }, [isCorrect, userInput]);
+  }, [isCorrect, onAnimationEnd, userInput]);
 
   const getBoxStyles = (index: number, letter: string) => {
     const isAnimating = animationStates.length > 0 && animationStates[index];
