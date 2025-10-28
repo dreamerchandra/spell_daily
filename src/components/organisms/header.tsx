@@ -17,7 +17,6 @@ export const Header = ({
 }: HeaderProps) => {
   return (
     <header className={`m-auto flex max-w-md items-center justify-between p-4`}>
-      {/* Game mode selector */}
       <GameModeSelector
         currentMode={gameMode}
         onModeChange={onGameModeChange}

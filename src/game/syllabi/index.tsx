@@ -120,9 +120,8 @@ export const SyllableGame = forwardRef<
           removeSyllable={removeSyllable}
         />
 
-        {/* Syllable groups */}
         <div className="mb-6">
-          {state.isCorrect === null ? (
+          {state.isCorrect !== true ? (
             <SyllableGroup
               allOptions={wordDef.syllableOptions}
               actualSyllables={wordDef.actualSyllable}
