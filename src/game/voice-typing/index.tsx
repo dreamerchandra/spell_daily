@@ -9,6 +9,35 @@ import { useVoiceTypingState } from './voice-typing-state';
 import { Speaker } from '../../components/atoms/speaker';
 import { SpellingInput } from '../../components/organisms/SpellingInput';
 
+const VoiceWaveAnimation = ({ isActive }: { isActive: boolean }) => {
+  if (!isActive) return null;
+
+  const bars = [
+    { height: 'h-3', delay: '0ms' },
+    { height: 'h-5', delay: '100ms' },
+    { height: 'h-4', delay: '200ms' },
+    { height: 'h-6', delay: '300ms' },
+    { height: 'h-4', delay: '400ms' },
+    { height: 'h-5', delay: '500ms' },
+    { height: 'h-3', delay: '600ms' },
+  ];
+
+  return (
+    <div className="mb-4 flex h-12 items-end justify-center gap-1">
+      {bars.map((bar, i) => (
+        <div
+          key={i}
+          className={`w-1 animate-pulse rounded-full bg-gradient-to-t from-blue-600 to-blue-400 ${bar.height}`}
+          style={{
+            animationDelay: bar.delay,
+            animationDuration: '800ms',
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const VoiceMicrophoneButton = ({
   isListening,
   isSupported,
@@ -195,6 +224,8 @@ export const VoiceTypingGame = forwardRef<
           onStop={stopListening}
           error={error}
         />
+
+        <VoiceWaveAnimation isActive={!!interimTranscript} />
 
         {state.isCorrect !== null && (
           <div className="mt-6 text-center">
