@@ -34,6 +34,7 @@ import {
   WHITE_TEXT,
   GRAY_TEXT,
 } from './styles';
+import { useOnHintIncrease } from '../../../context/hint-context';
 
 export interface SpellingInputDragDropProps {
   userInput: string[];
@@ -42,10 +43,7 @@ export interface SpellingInputDragDropProps {
   className?: string;
   wordDef: WordDef;
   showSyllableColors?: boolean;
-  onUserInputChange: (
-    newInput: string[],
-    newAvailableLetters: string[]
-  ) => void;
+  onUserInputChange: (newInput: string[]) => void;
 }
 
 // Droppable slot component for input letters
@@ -58,6 +56,7 @@ interface DroppableSlotProps {
   showSyllableColors: boolean;
   phoneticColorClass?: string;
   onDoubleClick: () => void;
+  placeHolder: string | null;
 }
 
 const DroppableSlot = ({
@@ -69,6 +68,7 @@ const DroppableSlot = ({
   showSyllableColors,
   phoneticColorClass,
   onDoubleClick,
+  placeHolder,
 }: DroppableSlotProps) => {
   const {
     attributes,
@@ -93,6 +93,11 @@ const DroppableSlot = ({
 
     if (isDragging) {
       baseStyles += ' opacity-50';
+    }
+
+    if (!letter && placeHolder) {
+      baseStyles += ' italic text-gray-500';
+      letter = placeHolder;
     }
 
     if (showSyllableColors && phoneticColorClass) {
@@ -205,6 +210,12 @@ export const SpellingInputDragDrop = ({
   showSyllableColors = false,
   onUserInputChange,
 }: SpellingInputDragDropProps) => {
+  const [showPlaceHolders, setShowPlaceHolders] = useState(false);
+  useOnHintIncrease(hint => {
+    if (hint >= 3) {
+      setShowPlaceHolders(true);
+    }
+  });
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
@@ -296,37 +307,23 @@ export const SpellingInputDragDrop = ({
     const overIndex = parseInt(overIndexStr);
 
     if (activeSource === 'available' && overSource === 'input') {
-      // Dragging from available letters to input slots
       const newUserInput = [...userInput];
-      const newAvailableLetters = [...availableLetters];
       const letter = availableLetters[activeIndex];
-
-      // If target slot is occupied, return that letter to available
-      if (newUserInput[overIndex]) {
-        newAvailableLetters.push(newUserInput[overIndex]);
-      }
-
-      // Place the new letter
       newUserInput[overIndex] = letter;
-
-      // Remove letter from available
-      newAvailableLetters.splice(activeIndex, 1);
-
-      onUserInputChange(newUserInput, newAvailableLetters);
+      onUserInputChange(newUserInput);
     } else if (activeSource === 'input' && overSource === 'input') {
       // Rearranging within input slots
       if (activeIndex !== overIndex) {
         const newUserInput = arrayMove(userInput, activeIndex, overIndex);
-        onUserInputChange(newUserInput, availableLetters);
+        onUserInputChange(newUserInput);
       }
     } else if (activeSource === 'input' && overSource === 'available') {
       // Moving from input back to available (remove from input)
       const letter = userInput[activeIndex];
       if (letter) {
         const newUserInput = [...userInput];
-        const newAvailableLetters = [...availableLetters, letter];
         newUserInput[activeIndex] = '';
-        onUserInputChange(newUserInput, newAvailableLetters);
+        onUserInputChange(newUserInput);
       }
     }
   };
@@ -336,10 +333,9 @@ export const SpellingInputDragDrop = ({
     if (!letter) return;
 
     const newUserInput = [...userInput];
-    const newAvailableLetters = [...availableLetters, letter];
     newUserInput[index] = '';
 
-    onUserInputChange(newUserInput, newAvailableLetters);
+    onUserInputChange(newUserInput);
   };
 
   const handleAvailableLetterClick = (letter: string) => {
@@ -347,13 +343,9 @@ export const SpellingInputDragDrop = ({
     if (firstEmptyIndex === -1) return;
 
     const newUserInput = [...userInput];
-    const newAvailableLetters = [...availableLetters];
-
     newUserInput[firstEmptyIndex] = letter;
-    const availableIndex = newAvailableLetters.indexOf(letter);
-    newAvailableLetters.splice(availableIndex, 1);
 
-    onUserInputChange(newUserInput, newAvailableLetters);
+    onUserInputChange(newUserInput);
   };
 
   return (
@@ -379,6 +371,9 @@ export const SpellingInputDragDrop = ({
                 index={index}
                 isDragOver={dragOverId === item.id}
                 isCorrect={isCorrect}
+                placeHolder={
+                  showPlaceHolders && !item.letter ? wordDef.word[index] : null
+                }
                 showSyllableColors={showSyllableColors}
                 phoneticColorClass={phoneticGrouping[index]}
                 onDoubleClick={() => handleInputLetterDoubleClick(index)}

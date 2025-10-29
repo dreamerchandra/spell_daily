@@ -21,10 +21,6 @@ type JumbledWordState = {
 };
 
 type NewWordPayload = ActionPayload<'NEW_WORD', { wordDef: WordDef }>;
-type SetUserInputPayload = ActionPayload<
-  'SET_USER_INPUT',
-  { userInput: string[] }
->;
 type SetIsCorrectPayload = ActionPayload<
   'SET_IS_CORRECT',
   { isCorrect: boolean | null }
@@ -34,12 +30,11 @@ type AddLetterPayload = ActionPayload<'ADD_LETTER', { letter: string }>;
 type RemoveLetterPayload = ActionPayload<'REMOVE_LETTER'>;
 type UpdateInputAndAvailablePayload = ActionPayload<
   'UPDATE_INPUT_AND_AVAILABLE',
-  { userInput: string[]; availableLetters: string[] }
+  { userInput: string[] }
 >;
 
 export type JumbledWordAction =
   | NewWordPayload
-  | SetUserInputPayload
   | SetIsCorrectPayload
   | SetIncorrectAttemptsPayload
   | AddLetterPayload
@@ -72,11 +67,6 @@ export const jumbledWordReducer = (
         incorrectAttempts: 0,
       };
     }
-    case 'SET_USER_INPUT':
-      return {
-        ...state,
-        userInput: action.action.userInput,
-      };
     case 'SET_IS_CORRECT':
       return {
         ...state,
@@ -127,12 +117,32 @@ export const jumbledWordReducer = (
         availableLetters: newAvailableLetters,
       };
     }
-    case 'UPDATE_INPUT_AND_AVAILABLE':
+    case 'UPDATE_INPUT_AND_AVAILABLE': {
+      const newUserInput = action.action.userInput;
+
+      // Compute available letters based on what's left unused from the original word
+      if (!state.wordDef) return state;
+
+      const originalLetters = state.wordDef.word.split('');
+      const usedLetters = newUserInput.filter(letter => letter !== '');
+
+      // Create available letters by removing used letters from original letters
+      const newAvailableLetters = [...originalLetters];
+      usedLetters.forEach(usedLetter => {
+        const index = newAvailableLetters.findIndex(
+          letter => letter.toLowerCase() === usedLetter.toLowerCase()
+        );
+        if (index !== -1) {
+          newAvailableLetters.splice(index, 1);
+        }
+      });
+
       return {
         ...state,
-        userInput: action.action.userInput,
-        availableLetters: action.action.availableLetters,
+        userInput: newUserInput,
+        availableLetters: newAvailableLetters,
       };
+    }
     default:
       return state;
   }
@@ -156,13 +166,6 @@ export const useJumbledWordState = () => {
   const nextHint = useNextHint();
   const { speak } = useSpellingSpeech();
 
-  const setUserInput = useCallback((userInput: string[]) => {
-    dispatch({
-      type: 'SET_USER_INPUT',
-      action: { userInput },
-    });
-  }, []);
-
   const addLetter = useCallback((letter: string) => {
     dispatch({
       type: 'ADD_LETTER',
@@ -176,15 +179,12 @@ export const useJumbledWordState = () => {
     });
   }, []);
 
-  const updateInputAndAvailable = useCallback(
-    (userInput: string[], availableLetters: string[]) => {
-      dispatch({
-        type: 'UPDATE_INPUT_AND_AVAILABLE',
-        action: { userInput, availableLetters },
-      });
-    },
-    []
-  );
+  const updateInputAndAvailable = useCallback((userInput: string[]) => {
+    dispatch({
+      type: 'UPDATE_INPUT_AND_AVAILABLE',
+      action: { userInput },
+    });
+  }, []);
 
   const setIsCorrect = useCallback(
     (isCorrect: boolean | null) => {
@@ -231,21 +231,22 @@ export const useJumbledWordState = () => {
 
   useEffect(() => {
     if (!ref.current.wordDef) return;
-    if (showSyllable(hintState.currentHint)) {
+    if (
+      showSyllable(hintState.currentHint) &&
+      !ref.current.userInput.includes('')
+    ) {
       const firstWrongIndex = ref.current.userInput.findIndex(
         (l, i) => l !== ref.current.wordDef?.word[i]
       );
       const correctLetters = ref.current.wordDef?.word
         .split('')
-        .splice(0, firstWrongIndex)
-        .join('');
-      setUserInput(makeArray(correctLetters, ref.current.wordDef?.word.length));
+        .map((l, i) => (i <= firstWrongIndex ? l : ''));
+      updateInputAndAvailable(correctLetters);
     }
-  }, [hintState.currentHint, setUserInput]);
+  }, [hintState.currentHint, updateInputAndAvailable]);
 
   return {
     state,
-    setUserInput,
     addLetter,
     removeLetter,
     updateInputAndAvailable,
