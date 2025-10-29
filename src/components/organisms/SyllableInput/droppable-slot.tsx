@@ -31,6 +31,7 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
   };
 
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isTouchOver, setIsTouchOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -50,6 +51,53 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
     if (droppedSyllable) {
       onDrop(droppedSyllable, index);
     }
+  };
+
+  // Touch event handlers for mobile support
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const elementBelow = document.elementFromPoint(
+      touch.clientX,
+      touch.clientY
+    );
+    const dropSlot = elementBelow?.closest('[data-droppable-slot]');
+
+    if (
+      dropSlot &&
+      dropSlot.getAttribute('data-droppable-slot') === String(index)
+    ) {
+      setIsTouchOver(true);
+    } else {
+      setIsTouchOver(false);
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touch = e.changedTouches[0];
+    const elementBelow = document.elementFromPoint(
+      touch.clientX,
+      touch.clientY
+    );
+    const dropSlot = elementBelow?.closest('[data-droppable-slot]');
+
+    if (
+      dropSlot &&
+      dropSlot.getAttribute('data-droppable-slot') === String(index)
+    ) {
+      // Check if there's dragged syllable data in a global state or custom data attribute
+      const draggedElement = document.querySelector(
+        '[data-touch-dragging="true"]'
+      );
+      if (draggedElement) {
+        const syllable = draggedElement.getAttribute('data-syllable-option');
+        if (syllable) {
+          onDrop(syllable, index);
+        }
+        draggedElement.removeAttribute('data-touch-dragging');
+      }
+    }
+
+    setIsTouchOver(false);
   };
 
   const handleRemove = () => {
@@ -73,7 +121,7 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
     let classes =
       'border-dashed rounded-lg border-2 px-3 py-2 text-center font-medium transition-all duration-200 ';
 
-    if (isDragOver) {
+    if (isDragOver || isTouchOver) {
       classes +=
         'border-game-success-500 bg-game-success-50 text-game-success-700 dark:bg-game-success-900 dark:text-game-success-300 scale-105';
     } else if (syllable) {
@@ -109,6 +157,8 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onClick={handleClick}
         title={getTitle()}
         data-droppable-slot={index}

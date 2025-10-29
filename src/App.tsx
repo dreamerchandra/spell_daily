@@ -13,8 +13,15 @@ import { useShortcut } from './hooks/use-shortcut';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Continue } from './components/atoms/continue';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
+import { JumbledWordGame } from './game/jumbled-word/index';
+import type { GameMode } from './common/game-type';
 
-type GameMode = 'fullWord' | 'syllable' | 'voiceTyping';
+const ComponentMap: Record<GameMode, any> = {
+  fullWord: FullWordGame,
+  syllable: SyllableGame,
+  voiceTyping: VoiceTypingGame,
+  jumbled: JumbledWordGame,
+} as const;
 
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
@@ -27,6 +34,7 @@ export const App = () => {
     'syllable'
   );
 
+  const Component = ComponentMap[gameMode];
   const [start, setStart] = useState(false);
   const onCheckAnswer = useCallback(() => {
     if (gameRef.current?.isCorrect()) {
@@ -99,25 +107,11 @@ export const App = () => {
       }
     >
       {start ? (
-        gameMode === 'fullWord' ? (
-          <FullWordGame
-            ref={gameRef}
-            wordDef={sampleWords[currentWordIndex]}
-            setDisableChecking={setDisableChecking}
-          />
-        ) : gameMode === 'voiceTyping' ? (
-          <VoiceTypingGame
-            ref={gameRef}
-            wordDef={sampleWords[currentWordIndex]}
-            setDisableChecking={setDisableChecking}
-          />
-        ) : (
-          <SyllableGame
-            ref={gameRef}
-            wordDef={sampleWords[currentWordIndex]}
-            setDisableChecking={setDisableChecking}
-          />
-        )
+        <Component
+          ref={gameRef}
+          wordDef={sampleWords[currentWordIndex]}
+          setDisableChecking={setDisableChecking}
+        />
       ) : null}
     </Layout>
   );

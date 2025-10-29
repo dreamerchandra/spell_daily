@@ -7,7 +7,7 @@ import { useSpellingSpeech, useSpeechRecognition } from '../../hooks';
 import type { WordDef } from '../../words';
 import { useVoiceTypingState } from './voice-typing-state';
 import { Speaker } from '../../components/atoms/speaker';
-import { SpellingInput } from '../../components/organisms/SpellingInput';
+import { SpellingInput } from '../../components/organisms/SpellingInput/KeyboardInput';
 
 const VoiceWaveAnimation = ({ isActive }: { isActive: boolean }) => {
   if (!isActive) return null;

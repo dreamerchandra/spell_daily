@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Popover } from '../atoms/Popover';
-
-type GameMode = 'fullWord' | 'syllable' | 'voiceTyping';
+import type { GameMode } from '../../common/game-type';
 
 interface GameModeSelectorProps {
   currentMode: GameMode;
@@ -34,6 +33,11 @@ export const GameModeSelector = ({
       value: 'voiceTyping' as GameMode,
       label: 'Voice Typing',
       description: 'Speak the word using your microphone',
+    },
+    {
+      value: 'jumbled' as GameMode,
+      label: 'Jumbled Words',
+      description: 'Rearrange the letters to form the correct word',
     },
   ];
 

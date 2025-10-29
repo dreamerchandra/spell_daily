@@ -23,7 +23,19 @@ const RandomOption: FC<{
     syllable: string,
     fromIndex: number
   ) => void;
-}> = ({ options, syllableIndex, selectedSyllables, onSelect, onDragStart }) => {
+  onTouchStart?: (
+    e: React.TouchEvent,
+    syllable: string,
+    fromIndex: number
+  ) => void;
+}> = ({
+  options,
+  syllableIndex,
+  selectedSyllables,
+  onSelect,
+  onDragStart,
+  onTouchStart,
+}) => {
   const shuffled = useRef(getRandomOptions(options));
 
   return (
@@ -55,6 +67,15 @@ const RandomOption: FC<{
               draggable={true}
               onClick={() => onSelect(option, syllableIndex)}
               onDragStart={e => onDragStart(e, option, syllableIndex)}
+              onTouchStart={e => {
+                // Mark this element as being dragged for touch interactions
+                e.currentTarget.setAttribute('data-touch-dragging', 'true');
+                onTouchStart?.(e, option, syllableIndex);
+              }}
+              onTouchEnd={e => {
+                // Clean up dragging state
+                e.currentTarget.removeAttribute('data-touch-dragging');
+              }}
               className={buttonClasses}
               data-syllable-option={option}
             >
@@ -91,6 +112,17 @@ export const SyllableGroup: React.FC<SyllableGroupProps> = ({
     onDragStart?.(syllable, fromIndex);
   };
 
+  const handleTouchStart = (
+    _e: React.TouchEvent,
+    syllable: string,
+    fromIndex: number
+  ) => {
+    // Touch start logic if needed
+    console.log(
+      `Touch started on syllable "${syllable}" from index ${fromIndex}`
+    );
+  };
+
   return (
     <div className="flex flex-wrap justify-center gap-4">
       {allOptions.map((options, syllableIndex) => (
@@ -101,6 +133,7 @@ export const SyllableGroup: React.FC<SyllableGroupProps> = ({
           selectedSyllables={selectedSyllables}
           onSelect={onSelect}
           onDragStart={handleDragStart}
+          onTouchStart={handleTouchStart}
         />
       ))}
     </div>

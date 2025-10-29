@@ -1,8 +1,7 @@
 import { type ReactNode } from 'react';
 import { AvatarComponent } from './avatar/avatar';
 import { GameModeSelector } from '../atoms/GameModeSelector';
-
-type GameMode = 'fullWord' | 'syllable' | 'voiceTyping';
+import type { GameMode } from '../../common/game-type';
 
 interface HeaderProps {
   ProgressComponent: ReactNode;

@@ -25,6 +25,15 @@ body,
   -ms-user-select: none;
 }
 
+/* Drag and Drop Touch Support */
+[data-dnd-kit-draggable] {
+  touch-action: none !important;
+}
+
+[data-dnd-kit-droppable] {
+  touch-action: none !important;
+}
+
 .gradient-border {
   --border-width: 4px;
   position: relative;

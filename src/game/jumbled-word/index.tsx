@@ -1,26 +1,25 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import type { GameRef } from '../../common/game-ref';
-import { Keyboard } from '../../components/atoms/Keyboard';
 import { Definition } from '../../components/atoms/hints/definition';
 import { Syllable } from '../../components/atoms/hints/syllable';
 import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import type { WordDef } from '../../words';
-import { makeArray, useFullWordState } from './full-word-state';
+import { useJumbledWordState } from './jumbled-word-state';
 import { Speaker } from '../../components/atoms/speaker';
-import { SpellingInput } from '../../components/organisms/SpellingInput/KeyboardInput';
+import { showSyllable } from '../../components/organisms/SpellingInput/utils';
+import { JumbledInput } from '../../components/organisms/SpellingInput/JumbledInput';
 
-export const FullWordGame = forwardRef<
+export const JumbledWordGame = forwardRef<
   GameRef,
   { wordDef: WordDef; setDisableChecking: (disable: boolean) => void }
 >(({ wordDef, setDisableChecking }, ref) => {
-  const { state, setIsCorrect, setUserInput, setNewWord } = useFullWordState();
+  const { state, updateInputAndAvailable, setIsCorrect, setNewWord } =
+    useJumbledWordState();
 
   const hintState = useHintState();
 
   const { speak, isPlaying, isSupported } = useSpellingSpeech();
-
-  const wordLength = wordDef.word.length;
 
   useImperativeHandle(ref, () => {
     return {
@@ -40,20 +39,6 @@ export const FullWordGame = forwardRef<
   useEffect(() => {
     setDisableChecking(state.userInput.includes(''));
   }, [setDisableChecking, state.userInput]);
-
-  const handleKeyPress = (key: string) => {
-    let newWord = state.userInput.join('');
-    if (key === '⌫') {
-      newWord = newWord.slice(0, newWord.length - 1);
-      const newArr = makeArray(newWord, wordLength);
-      setUserInput(newArr);
-      return;
-    }
-    if (newWord.length === state.userInput.length) return;
-    newWord += key;
-    const newArr = makeArray(newWord, wordLength);
-    setUserInput(newArr);
-  };
 
   const playAudio = () => {
     speak(wordDef.word);
@@ -79,15 +64,15 @@ export const FullWordGame = forwardRef<
           <Definition definition={wordDef.definition} />
         )}
 
-        <SpellingInput
+        <JumbledInput
           userInput={state.userInput}
+          availableLetters={state.availableLetters}
           isCorrect={state.isCorrect}
           className="mb-8"
           wordDef={wordDef}
-          disableTalkBack={false}
+          showSyllableColors={showSyllable(hintState.currentHint)}
+          onUserInputChange={updateInputAndAvailable}
         />
-
-        <Keyboard onKeyPress={handleKeyPress} className="mb-6 p-2" />
 
         {state.isCorrect !== null && (
           <div className="mt-6 text-center">
