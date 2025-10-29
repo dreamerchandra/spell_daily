@@ -24,7 +24,9 @@ import {
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
 import { ContextGame } from './game/context';
+import { CorrectSentenceGame } from './game/correct-sentence';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ComponentMap: Record<GameMode, GameComponent<any>> = {
   fullWord: FullWordGame,
   syllable: SyllableGame,
@@ -34,6 +36,7 @@ const ComponentMap: Record<GameMode, GameComponent<any>> = {
   twoOption: TwoOptionGame,
   typing: TypingGame,
   context: ContextGame,
+  correctSentence: CorrectSentenceGame,
 } as const;
 
 const useWords = (mode: GameMode) => {
@@ -41,7 +44,7 @@ const useWords = (mode: GameMode) => {
     sampleSpellingWords
   );
   useEffect(() => {
-    if (mode === 'context') {
+    if (mode === 'context' || mode === 'correctSentence') {
       setWords(sampleWordUsage);
     } else {
       setWords(sampleSpellingWords);

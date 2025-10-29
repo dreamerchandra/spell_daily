@@ -11,7 +11,7 @@ export type SpellingGameMode =
   | 'fourOption'
   | 'typing';
 
-export type UsageGameMode = 'context';
+export type UsageGameMode = 'context' | 'correctSentence';
 
 export type GameMode = SpellingGameMode | UsageGameMode;
 export type GameComponent<T = WordDef> = ForwardRefExoticComponent<

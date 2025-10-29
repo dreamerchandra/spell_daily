@@ -6,14 +6,14 @@ import { Avatar } from '../../components/organisms/avatar/avatar';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
 import { pubSub } from '../../util/pub-sub';
 
-type ContextState = {
+type CorrectSentenceState = {
   selectedAnswer: string | null;
   isCorrect: boolean | null;
   incorrectAttempts: number;
   wordDef: WordUsage | null;
   // Random selections for current round
   currentQuestion: {
-    sentence: string;
+    question: string;
     correctAnswer: string;
     options: string[]; // 4 options total (1 correct + 3 wrong)
   } | null;
@@ -27,7 +27,7 @@ type SetIsCorrectPayload = ActionPayload<
 >;
 type SetIncorrectAttemptsPayload = ActionPayload<'SET_INCORRECT_ATTEMPTS'>;
 
-export type ContextAction =
+export type CorrectSentenceAction =
   | NewWordPayload
   | SelectAnswerPayload
   | SetIsCorrectPayload
@@ -44,16 +44,16 @@ const getRandomElements = <T>(array: T[], count: number): T[] => {
 };
 
 const generateQuestion = (wordDef: WordUsage) => {
-  // Pick random contextChoice
-  const contextChoice = getRandomElement(wordDef.contextChoice);
+  // Pick random sentence group
+  const sentenceGroup = getRandomElement(wordDef.sentences);
 
-  // Pick random sentence and correct answer
-  const sentence = getRandomElement(contextChoice.sentence);
-  const correctAnswer = getRandomElement(contextChoice.correct);
+  // Pick random question and correct answer
+  const question = getRandomElement(sentenceGroup.question);
+  const correctAnswer = getRandomElement(sentenceGroup.correct);
 
   // Pick 3 random wrong options (ensure they don't include the correct answer)
-  const availableWrongOptions = contextChoice.options.filter(
-    option => !contextChoice.correct.includes(option)
+  const availableWrongOptions = sentenceGroup.options.filter(
+    option => !sentenceGroup.correct.includes(option)
   );
   const wrongOptions = getRandomElements(availableWrongOptions, 3);
 
@@ -63,16 +63,16 @@ const generateQuestion = (wordDef: WordUsage) => {
   );
 
   return {
-    sentence,
+    question,
     correctAnswer,
     options: allOptions,
   };
 };
 
-export const contextReducer = (
-  state: ContextState,
-  action: ContextAction
-): ContextState => {
+export const correctSentenceReducer = (
+  state: CorrectSentenceState,
+  action: CorrectSentenceAction
+): CorrectSentenceState => {
   switch (action.type) {
     case 'NEW_WORD':
       return {
@@ -102,8 +102,8 @@ export const contextReducer = (
   }
 };
 
-export const useContextState = () => {
-  const [state, dispatch] = useReducer(contextReducer, {
+export const useCorrectSentenceState = () => {
+  const [state, dispatch] = useReducer(correctSentenceReducer, {
     selectedAnswer: null,
     isCorrect: null,
     incorrectAttempts: 0,

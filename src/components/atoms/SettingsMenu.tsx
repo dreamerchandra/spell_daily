@@ -28,6 +28,7 @@ export const SettingsMenu = ({
     { value: 'twoOption' as GameMode, label: '2-Option' },
     { value: 'typing' as GameMode, label: 'Typing' },
     { value: 'context' as GameMode, label: 'Context' },
+    { value: 'correctSentence' as GameMode, label: 'Correct Sentence' },
   ];
 
   const handleModeChange = (mode: GameMode) => {
