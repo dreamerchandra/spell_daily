@@ -15,6 +15,7 @@ export const SpellingInput = ({
   isCorrect = null,
   className = '',
   wordDef,
+  disableTalkBack,
 }: SpellingInputProps) => {
   const hintState = useHintState();
 
@@ -28,6 +29,7 @@ export const SpellingInput = ({
         wordDef={wordDef}
         showSyllableColors={showSyllable(hintState.currentHint)}
         onAnimationEnd={onAnimationEnd}
+        disableTalkBack={disableTalkBack}
       />
     );
   }
@@ -41,6 +43,7 @@ export const SpellingInput = ({
         className={className}
         wordDef={wordDef}
         currentEmptyIndex={currentEmptyIndex}
+        disableTalkBack={disableTalkBack}
       />
     );
   }
@@ -53,6 +56,7 @@ export const SpellingInput = ({
       className={className}
       wordDef={wordDef}
       showSyllableColors={showSyllable(hintState.currentHint)}
+      disableTalkBack={disableTalkBack}
     />
   );
 };

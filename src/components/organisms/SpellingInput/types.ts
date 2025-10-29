@@ -5,6 +5,7 @@ export interface SpellingInputProps {
   isCorrect?: boolean | null;
   className?: string;
   wordDef: WordDef;
+  disableTalkBack: boolean;
 }
 
 export interface SpellingInputBaseProps extends SpellingInputProps {

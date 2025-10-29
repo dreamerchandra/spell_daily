@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { AvatarComponent } from './avatar/avatar';
 import { GameModeSelector } from '../atoms/GameModeSelector';
 
-type GameMode = 'fullWord' | 'syllable';
+type GameMode = 'fullWord' | 'syllable' | 'voiceTyping';
 
 interface HeaderProps {
   ProgressComponent: ReactNode;

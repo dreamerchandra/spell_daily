@@ -84,6 +84,7 @@ export const FullWordGame = forwardRef<
           isCorrect={state.isCorrect}
           className="mb-8"
           wordDef={wordDef}
+          disableTalkBack={false}
         />
 
         <Keyboard onKeyPress={handleKeyPress} className="mb-6 p-2" />

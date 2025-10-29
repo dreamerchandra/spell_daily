@@ -7,13 +7,14 @@ import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
 import { FullWordGame } from './game/full-word';
 import { SyllableGame } from './game/syllabi';
+import { VoiceTypingGame } from './game/voice-typing';
 import { sampleWords } from './words';
 import { useShortcut } from './hooks/use-shortcut';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Continue } from './components/atoms/continue';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 
-type GameMode = 'fullWord' | 'syllable';
+type GameMode = 'fullWord' | 'syllable' | 'voiceTyping';
 
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
@@ -100,6 +101,12 @@ export const App = () => {
       {start ? (
         gameMode === 'fullWord' ? (
           <FullWordGame
+            ref={gameRef}
+            wordDef={sampleWords[currentWordIndex]}
+            setDisableChecking={setDisableChecking}
+          />
+        ) : gameMode === 'voiceTyping' ? (
+          <VoiceTypingGame
             ref={gameRef}
             wordDef={sampleWords[currentWordIndex]}
             setDisableChecking={setDisableChecking}

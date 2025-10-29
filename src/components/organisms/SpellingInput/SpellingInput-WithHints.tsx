@@ -14,7 +14,8 @@ import { useSyllabiSpeech } from '../../../hooks/useSpeech';
 
 const useHintRequestedPlace = (
   userInput: string[],
-  syllableAnalyzer: SyllableAnalyzer
+  syllableAnalyzer: SyllableAnalyzer,
+  option: { disableTalkBack: boolean }
 ) => {
   const [hintRequiredPlace, setHintRequiredPlace] = useState(() =>
     userInput.findIndex(l => l === '')
@@ -23,13 +24,19 @@ const useHintRequestedPlace = (
   const trackSpokenLetters = useRef(new Set<number>());
 
   useEffect(() => {
+    if (option.disableTalkBack) {
+      return;
+    }
     const audioSyllable = syllableAnalyzer.getAudioSyllable(hintRequiredPlace);
     if (audioSyllable) {
       speak(audioSyllable);
     }
-  }, [hintRequiredPlace, speak, syllableAnalyzer]);
+  }, [hintRequiredPlace, option.disableTalkBack, speak, syllableAnalyzer]);
 
   useEffect(() => {
+    if (option.disableTalkBack) {
+      return;
+    }
     const firstEmptyIndex = userInput.findIndex(l => l === '');
     let currentTypedIndex: number;
     if (firstEmptyIndex !== -1) {
@@ -45,7 +52,7 @@ const useHintRequestedPlace = (
       speak(userInput[currentTypedIndex]);
     }, 0);
     return () => clearTimeout(timerId);
-  }, [speak, userInput]);
+  }, [option.disableTalkBack, speak, userInput]);
 
   useOnHintIncrease(() => {
     const firstEmptyIndex = userInput.findIndex(l => l === '');
@@ -60,12 +67,15 @@ export const SpellingInputWithHints = ({
   className = '',
   wordDef,
   currentEmptyIndex,
+  disableTalkBack,
 }: SpellingInputWithHintsProps) => {
   const syllableAnalyzer = useMemo(
     () => new SyllableAnalyzer(wordDef),
     [wordDef]
   );
-  const hintRequiredPlace = useHintRequestedPlace(userInput, syllableAnalyzer);
+  const hintRequiredPlace = useHintRequestedPlace(userInput, syllableAnalyzer, {
+    disableTalkBack,
+  });
 
   const phoneticGrouping = useMemo(() => {
     return getPhoneticColorByActualSyllable(wordDef.actualSyllable);

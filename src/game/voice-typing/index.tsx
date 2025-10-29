@@ -1,0 +1,225 @@
+import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import type { GameRef } from '../../common/game-ref';
+import { Definition } from '../../components/atoms/hints/definition';
+import { Syllable } from '../../components/atoms/hints/syllable';
+import { useHintState } from '../../context/hint-context/index';
+import { useSpellingSpeech, useSpeechRecognition } from '../../hooks';
+import type { WordDef } from '../../words';
+import { useVoiceTypingState } from './voice-typing-state';
+import { Speaker } from '../../components/atoms/speaker';
+import { SpellingInput } from '../../components/organisms/SpellingInput';
+
+const VoiceMicrophoneButton = ({
+  isListening,
+  isSupported,
+  onStart,
+  onStop,
+  error,
+}: {
+  isListening: boolean;
+  isSupported: boolean;
+  onStart: () => void;
+  onStop: () => void;
+  error: string | null;
+}) => {
+  return (
+    <div className="mb-6 text-center">
+      {!isSupported && (
+        <p className="mb-2 text-sm text-yellow-400">
+          ⚠️ Speech recognition not supported in this browser
+        </p>
+      )}
+
+      {error && <p className="mb-2 text-sm text-red-400">❌ {error}</p>}
+
+      <button
+        onClick={isListening ? onStop : onStart}
+        disabled={!isSupported}
+        className={`relative mx-auto mb-4 flex h-12 w-12 transform items-center justify-center rounded-full text-2xl text-white transition-all duration-200 hover:scale-105 active:scale-95 ${isListening ? 'animate-pulse bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} ${!isSupported ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+      >
+        {isListening ? <>🔴</> : <>🎤</>}
+      </button>
+
+      <p className="text-sm text-gray-400">
+        {isListening ? 'Listening... Click to stop' : 'Click to say letters'}
+      </p>
+    </div>
+  );
+};
+
+export const VoiceTypingGame = forwardRef<
+  GameRef,
+  { wordDef: WordDef; setDisableChecking: (disable: boolean) => void }
+>(({ wordDef, setDisableChecking }, ref) => {
+  const {
+    state,
+    setIsCorrect,
+    addCharacter,
+    setNewWord,
+    setRecognizedText,
+    tryAgain,
+  } = useVoiceTypingState();
+  const hintState = useHintState();
+  const {
+    speak,
+    isPlaying,
+    isSupported: speechSupported,
+  } = useSpellingSpeech();
+
+  const {
+    interimTranscript,
+    finalTranscript,
+    isListening,
+    isSupported: recognitionSupported,
+    start: startListening,
+    stop: stopListening,
+    reset: resetRecognition,
+    error,
+  } = useSpeechRecognition({
+    continuous: false,
+    interimResults: true,
+  });
+
+  useImperativeHandle(ref, () => {
+    return {
+      isCorrect: () => {
+        const userWord = state.userInput.join('');
+        const isWordCorrect =
+          userWord.toLocaleLowerCase() === wordDef.word.toLocaleLowerCase();
+        setIsCorrect(isWordCorrect);
+        return isWordCorrect;
+      },
+    };
+  });
+
+  useEffect(() => {
+    setNewWord(wordDef);
+    resetRecognition();
+  }, [setNewWord, wordDef, resetRecognition]);
+
+  // Process speech recognition results
+  useEffect(() => {
+    if (finalTranscript) {
+      const cleanedTranscript = finalTranscript.toUpperCase().trim();
+      setRecognizedText(finalTranscript);
+
+      const spaceSeparatedLetters = cleanedTranscript.split(' ');
+      if (!spaceSeparatedLetters.every(letter => letter.length === 1)) {
+        return;
+      }
+      spaceSeparatedLetters.forEach(letter => {
+        addCharacter(letter);
+      });
+    }
+  }, [finalTranscript, addCharacter, setRecognizedText]);
+
+  useEffect(() => {
+    // Disable checking when word is not complete or still listening
+    setDisableChecking(state.userInput.includes('') || isListening);
+  }, [setDisableChecking, state.userInput, isListening]);
+
+  const handleStartListening = () => {
+    resetRecognition();
+    setRecognizedText('');
+    startListening();
+  };
+
+  const handleTryAgain = () => {
+    tryAgain();
+    resetRecognition();
+    startListening();
+  };
+
+  const playAudio = () => {
+    speak(wordDef.word);
+  };
+
+  return (
+    <div className="relative w-full max-w-md px-4 text-center">
+      <div className="mb-4">
+        <div className="mb-6 text-center">
+          {!speechSupported && (
+            <p className="mb-2 text-sm text-yellow-400">
+              ⚠️ Audio not supported in this browser
+            </p>
+          )}
+          <div className="flex justify-center gap-3">
+            <Speaker onSpeak={playAudio} isPlaying={isPlaying} />
+          </div>
+        </div>
+
+        {hintState.currentHint > 0 ? (
+          <Syllable wordDef={wordDef} />
+        ) : (
+          <Definition definition={wordDef.definition} />
+        )}
+
+        <div className="mb-4 text-center text-xs text-gray-500">
+          You can say one letter or multiple letters at once
+        </div>
+
+        <SpellingInput
+          userInput={state.userInput}
+          isCorrect={state.isCorrect}
+          className="mb-8"
+          wordDef={wordDef}
+          disableTalkBack={true}
+        />
+        <button
+          onClick={handleTryAgain}
+          disabled={!state.userInput.some(char => char !== '')}
+          className="mb-4 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-300"
+        >
+          Clear Input
+        </button>
+
+        {state.recognizedText && (
+          <div className="mb-4 rounded-lg border border-blue-400/40 bg-blue-400/10 p-3 text-center">
+            <div className="mb-1 text-sm text-blue-400">You said:</div>
+            <div className="text-lg font-semibold text-white">
+              {state.recognizedText}
+              {interimTranscript && (
+                <span className="italic text-gray-400">
+                  {' '}
+                  {interimTranscript} (listening...)
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        <VoiceMicrophoneButton
+          isListening={isListening}
+          isSupported={recognitionSupported}
+          onStart={handleStartListening}
+          onStop={stopListening}
+          error={error}
+        />
+
+        {state.isCorrect !== null && (
+          <div className="mt-6 text-center">
+            {state.isCorrect ? (
+              <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
+                <p className="text-lg font-semibold text-game-success-300">
+                  🎉 Awesome! That's correct! 🎉
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
+                <p className="text-base font-medium text-game-error-300">
+                  😊 Try again! You've got this! 💪
+                </p>
+                <button
+                  onClick={handleTryAgain}
+                  className="mt-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
