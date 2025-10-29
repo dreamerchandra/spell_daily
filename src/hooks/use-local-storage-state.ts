@@ -7,6 +7,7 @@ import {
 
 const LOCAL_STORAGE_KEYS = {
   GAME_TYPE: 'game_type',
+  SOUND_ENABLED: 'sound_enabled',
 } as const;
 
 export const useLocalStorageState = <T>(

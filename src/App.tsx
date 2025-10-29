@@ -36,6 +36,10 @@ export const App = () => {
     'GAME_TYPE',
     'syllable'
   );
+  const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
+    'SOUND_ENABLED',
+    true
+  );
 
   const Component = ComponentMap[gameMode];
   const [start, setStart] = useState(false);
@@ -88,6 +92,8 @@ export const App = () => {
           }
           gameMode={gameMode}
           onGameModeChange={setGameMode}
+          soundEnabled={soundEnabled}
+          onSoundToggle={setSoundEnabled}
         />
       }
       footer={
