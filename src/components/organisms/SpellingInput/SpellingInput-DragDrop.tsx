@@ -105,9 +105,6 @@ const DroppableSlot = ({
         if (isCorrect === true) {
           return `${baseStyles} ${SUCCESS_STYLES}`;
         }
-        if (isCorrect === false) {
-          return `${baseStyles} ${ERROR_STYLES}`;
-        }
         return `${baseStyles} ${phoneticColorClass} ${WHITE_TEXT}`;
       }
       return `${baseStyles} ${phoneticColorClass} ${GRAY_TEXT} border-dashed`;
