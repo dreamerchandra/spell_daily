@@ -23,6 +23,8 @@ import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import type { WordDef } from '../../words';
 import { useMultiChoiceState } from './multiple-choice-state';
+import { useSetTimeout } from '../../hooks/use-setTimeout';
+import { pubSub } from '../../util/pub-sub';
 
 interface DroppableSlotProps {
   id: string;
@@ -33,9 +35,15 @@ interface DroppableSlotProps {
 
 const DroppableSlot = ({ children, isOver, isCorrect }: DroppableSlotProps) => {
   const isEmpty = !children;
+  const timer = useSetTimeout();
 
   return (
     <span
+      onAnimationEnd={() => {
+        timer(() => {
+          pubSub.publish('Animation:End');
+        }, 500);
+      }}
       className={`inline-flex min-w-16 items-center justify-center px-2 py-1 transition-all duration-300 ease-out ${
         isEmpty
           ? `border-b-2 border-dashed border-gray-300 dark:border-gray-600 ${
@@ -68,12 +76,14 @@ interface DraggableOptionProps {
   option: string;
   isDragging: boolean;
   onSelect: () => void;
+  disabled: boolean;
 }
 
 const DraggableOption = ({
   option,
   onSelect,
   isDragging,
+  disabled,
 }: DraggableOptionProps) => {
   return (
     <div
@@ -81,7 +91,7 @@ const DraggableOption = ({
         isDragging
           ? 'rotate-2 scale-110 opacity-50'
           : 'cursor-grab border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300 hover:bg-gray-100 active:cursor-grabbing dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-      }`}
+      } ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       onClick={onSelect}
       draggable
     >
@@ -261,10 +271,11 @@ const MultiOptionGame = forwardRef<
             <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
               Choose the correct spelling:
             </h4>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-start gap-4">
               {state.options.map((option, idx) => (
                 <DraggableOption
                   key={idx}
+                  disabled={state.isCorrect === true}
                   id={option}
                   option={option}
                   isDragging={false}
