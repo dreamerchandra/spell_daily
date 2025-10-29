@@ -44,6 +44,11 @@ export const GameModeSelector = ({
       label: '4-Option',
       description: 'Choose the correct word from four options',
     },
+    {
+      value: 'twoOption' as GameMode,
+      label: '2-Option',
+      description: 'Choose the correct word from two options',
+    },
   ];
 
   return (

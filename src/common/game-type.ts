@@ -7,6 +7,7 @@ export type GameMode =
   | 'syllable'
   | 'voiceTyping'
   | 'jumbled'
+  | 'twoOption'
   | 'fourOption';
 export type GameComponent = ForwardRefExoticComponent<
   {

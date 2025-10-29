@@ -16,7 +16,10 @@ export type FourOptionState = {
   incorrectAttempts: number;
 };
 
-type NewWordPayload = ActionPayload<'NEW_WORD', { wordDef: WordDef }>;
+type NewWordPayload = ActionPayload<
+  'NEW_WORD',
+  { wordDef: WordDef; numberOfOptions: number }
+>;
 type SetIsCorrectPayload = ActionPayload<
   'SET_IS_CORRECT',
   { isCorrect: boolean | null }
@@ -38,38 +41,60 @@ export type FourOptionAction =
   | SetSelectedOptionPayload
   | SetDroppedOptionPayload;
 
-const generateOptions = (wordDef: WordDef): string[] => {
+const pickNRandom = <T>(arr: T[], n: number): T[] => {
+  const shuffled = arrayShuffle(arr);
+  return shuffled.slice(0, n);
+};
+
+const generate4Options = (wordDef: WordDef): string[] => {
   const correctWord = wordDef.word.toLowerCase();
   const { easy, medium, hard } = wordDef.option;
 
-  // Pick one random option from each difficulty level
-  const easyOption = easy[Math.floor(Math.random() * easy.length)];
-  const mediumOption = medium[Math.floor(Math.random() * medium.length)];
-  const hardOption = hard[Math.floor(Math.random() * hard.length)];
+  const result = arrayShuffle([
+    ...pickNRandom(easy, 1),
+    ...pickNRandom(medium, 1),
+    ...pickNRandom(hard, 1),
+    correctWord,
+  ]);
+  return result;
+};
 
-  // Create the options array with the correct word and the selected incorrect options
-  const options = [correctWord, easyOption, mediumOption, hardOption];
+const generate3Options = (wordDef: WordDef): string[] => {
+  const correctWord = wordDef.word.toLowerCase();
+  const { easy, hard } = wordDef.option;
 
-  // Remove duplicates (in case any of the wrong options match the correct word)
-  const uniqueOptions = Array.from(new Set(options));
+  return arrayShuffle([
+    ...pickNRandom(easy, 1),
+    ...pickNRandom(hard, 1),
+    correctWord,
+  ]);
+};
 
-  // If we have less than 4 unique options, add some fallback options
-  while (uniqueOptions.length < 4) {
-    const allIncorrect = [...easy, ...medium, ...hard].filter(
-      opt => opt.toLowerCase() !== correctWord && !uniqueOptions.includes(opt)
-    );
-    if (allIncorrect.length > 0) {
-      uniqueOptions.push(
-        allIncorrect[Math.floor(Math.random() * allIncorrect.length)]
-      );
-    } else {
-      // Fallback: create a slightly modified version
-      uniqueOptions.push(correctWord + 'x');
-    }
+const generate2Options = (wordDef: WordDef): string[] => {
+  const correctWord = wordDef.word.toLowerCase();
+  const { hard } = wordDef.option;
+
+  return arrayShuffle([...pickNRandom(hard, 1), correctWord]);
+};
+
+const generateNOptions = (wordDef: WordDef, n: number): string[] => {
+  switch (n) {
+    case 2:
+      return generate2Options(wordDef);
+    case 3:
+      return generate3Options(wordDef);
+    case 4:
+      return generate4Options(wordDef);
+    default:
+      return generate4Options(wordDef);
   }
+};
 
-  // Shuffle the options so the correct answer isn't always in the same position
-  return arrayShuffle(uniqueOptions.slice(0, 4));
+const generateOptions = (
+  wordDef: WordDef,
+  numberOfOptions: number
+): string[] => {
+  return generateNOptions(wordDef, numberOfOptions);
 };
 
 const getRandomUsage = (wordDef: WordDef): string => {
@@ -83,8 +108,8 @@ export const fourOptionReducer = (
 ): FourOptionState => {
   switch (action.type) {
     case 'NEW_WORD': {
-      const wordDef = action.action.wordDef;
-      const options = generateOptions(wordDef);
+      const { wordDef, numberOfOptions } = action.action;
+      const options = generateOptions(wordDef, numberOfOptions);
       const selectedUsage = getRandomUsage(wordDef);
 
       return {
@@ -122,7 +147,7 @@ export const fourOptionReducer = (
   }
 };
 
-export const useFourOptionState = () => {
+export const useMultiChoiceState = (numberOfOptions: number = 4) => {
   const [state, dispatch] = useReducer(fourOptionReducer, {
     wordDef: null,
     selectedUsage: '',
@@ -176,11 +201,11 @@ export const useFourOptionState = () => {
       resetHint(HINTS);
       dispatch({
         type: 'NEW_WORD',
-        action: { wordDef },
+        action: { wordDef, numberOfOptions },
       });
       speak(wordDef.word);
     },
-    [resetHint, speak]
+    [resetHint, speak, numberOfOptions]
   );
 
   return {
