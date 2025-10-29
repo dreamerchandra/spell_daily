@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { AvatarComponent } from './avatar/avatar';
 import { SettingsMenu } from '../atoms/SettingsMenu';
-import type { GameMode } from '../../common/game-type';
+import { type GameMode } from '../../common/game-type';
 import { useIsTestMode, useSetTestMode } from '../../context/hint-context';
 
 interface HeaderProps {

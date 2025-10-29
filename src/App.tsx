@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameRef } from './common/game-ref';
-import type { GameComponent, GameMode } from './common/game-type';
+import { type GameComponent, type GameMode } from './common/game-type';
 import { Button } from './components/atoms/Button';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
@@ -15,11 +15,17 @@ import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { useShortcut } from './hooks/use-shortcut';
-import { sampleWords } from './words';
+import {
+  sampleSpellingWords,
+  sampleWordUsage,
+  type WordDef,
+  type WordUsage,
+} from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
+import { ContextGame } from './game/context';
 
-const ComponentMap: Record<GameMode, GameComponent> = {
+const ComponentMap: Record<GameMode, GameComponent<any>> = {
   fullWord: FullWordGame,
   syllable: SyllableGame,
   voiceTyping: VoiceTypingGame,
@@ -27,18 +33,35 @@ const ComponentMap: Record<GameMode, GameComponent> = {
   fourOption: FourOptionGame,
   twoOption: TwoOptionGame,
   typing: TypingGame,
+  context: ContextGame,
 } as const;
+
+const useWords = (mode: GameMode) => {
+  const [words, setWords] = useState<WordUsage[] | WordDef[]>(
+    sampleSpellingWords
+  );
+  useEffect(() => {
+    if (mode === 'context') {
+      setWords(sampleWordUsage);
+    } else {
+      setWords(sampleSpellingWords);
+    }
+  }, [mode]);
+  return words;
+};
 
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [words] = useState(sampleWords);
+
   const [disableChecking, setDisableChecking] = useState(true);
   const [canContinue, setCanContinue] = useState(false);
   const [gameMode, setGameMode] = useLocalStorageState<GameMode>(
     'GAME_TYPE',
     'syllable'
   );
+  const words = useWords(gameMode);
+
   const timerRef = useRef<TimerRef>(null);
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
     'SOUND_ENABLED',
@@ -156,7 +179,7 @@ export const App = () => {
       {start ? (
         <Component
           ref={gameRef}
-          wordDef={sampleWords[currentWordIndex]}
+          wordDef={words[currentWordIndex]}
           setDisableChecking={setDisableChecking}
         />
       ) : null}

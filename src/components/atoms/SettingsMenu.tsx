@@ -27,6 +27,7 @@ export const SettingsMenu = ({
     { value: 'fourOption' as GameMode, label: '4-Option' },
     { value: 'twoOption' as GameMode, label: '2-Option' },
     { value: 'typing' as GameMode, label: 'Typing' },
+    { value: 'context' as GameMode, label: 'Context' },
   ];
 
   const handleModeChange = (mode: GameMode) => {
