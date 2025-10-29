@@ -63,6 +63,12 @@ export const AvatarComponent: FC = () => {
     setData(data);
   });
 
+  useSubscribe('Avatar:Hint', data => {
+    if (isTestMode) return;
+    setShow(true);
+    setData(data);
+  });
+
   useSubscribe('Avatar:ChangeCharacter', imagePath => {
     setCharacter(randomImageByPath(imagePath));
   });
@@ -139,6 +145,10 @@ export const AvatarComponent: FC = () => {
 };
 
 export const Avatar = {
+  hint: (data: AvatarData) => {
+    pubSub.publish('Avatar:Hint', data);
+    return null;
+  },
   show: (data: AvatarData) => {
     pubSub.publish('Avatar', data);
   },

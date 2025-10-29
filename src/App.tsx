@@ -54,10 +54,15 @@ export const App = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (isTestMode) {
+      timerRef.current?.startTimer(words[currentWordIndex].word.length * 2);
+    }
+  }, [currentWordIndex, isTestMode, words]);
+
   const moveToNextWord = useCallback(() => {
     setCurrentWordIndex(prev => {
       const nextIndex = prev < words.length - 1 ? prev + 1 : prev;
-      timerRef.current?.startTimer(words[nextIndex].word.length * 2);
       return nextIndex;
     });
     setCanContinue(false);

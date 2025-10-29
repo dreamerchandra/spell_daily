@@ -179,7 +179,7 @@ export const useVoiceTypingState = () => {
         if (incorrectAttempts === 0) return;
         const isEvenAttempt = incorrectAttempts % 2 === 0;
         if (isEvenAttempt) {
-          Avatar.show({
+          Avatar.hint({
             text: 'Want some hint?',
             yesText: 'Yes, please!',
             noText: 'No, I got this!',

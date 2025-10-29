@@ -46,6 +46,7 @@ export type NativeEvents = {
   Avatar: AvatarData;
   'Avatar:ChangeCharacter': AvatarCharacterPath;
   'Animation:End': void;
+  'Avatar:Hint': AvatarData;
 };
 
 export const pubSub = new PubSub<NativeEvents>();
