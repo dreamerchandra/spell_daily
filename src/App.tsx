@@ -1,22 +1,22 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { GameRef } from './common/game-ref';
+import type { GameComponent, GameMode } from './common/game-type';
 import { Button } from './components/atoms/Button';
+import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
 import { Progress } from './components/atoms/Progress';
-import type { GameRef } from './common/game-ref';
+import { Avatar } from './components/organisms/avatar/avatar';
 import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
 import { FullWordGame } from './game/full-word';
+import { JumbledWordGame } from './game/jumbled-word/index';
 import { SyllableGame } from './game/syllabi';
 import { VoiceTypingGame } from './game/voice-typing';
-import { sampleWords } from './words';
-import { useShortcut } from './hooks/use-shortcut';
-import { Avatar } from './components/organisms/avatar/avatar';
-import { Continue } from './components/atoms/continue';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import { JumbledWordGame } from './game/jumbled-word/index';
-import type { GameMode } from './common/game-type';
+import { useShortcut } from './hooks/use-shortcut';
+import { sampleWords } from './words';
 
-const ComponentMap: Record<GameMode, any> = {
+const ComponentMap: Record<GameMode, GameComponent> = {
   fullWord: FullWordGame,
   syllable: SyllableGame,
   voiceTyping: VoiceTypingGame,
