@@ -50,4 +50,13 @@ export class SyllableAnalyzer {
     const endIndex = this.getSyllableEndIndex(syllableIndex);
     return startIndex <= charIndex && charIndex <= endIndex;
   }
+
+  getAudioSyllable(charIndex: number): string {
+    const syllableIndex = this.wordDef.actualSyllable.findIndex((_, index) => {
+      const startIndex = this.getSyllableStartIndex(index);
+      const endIndex = this.getSyllableEndIndex(index);
+      return startIndex <= charIndex && charIndex <= endIndex;
+    });
+    return syllableIndex !== -1 ? this.wordDef.syllable[syllableIndex] : '';
+  }
 }

@@ -1,6 +1,6 @@
 import type { SpellingInputWithHintsProps } from './types';
 import { getPhoneticColorByActualSyllable } from '../../../config/pallet-config';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SyllableAnalyzer } from './SyllableAnalyzer';
 import {
   BASE_BOX_CLASSES,
@@ -10,11 +10,42 @@ import {
   PLACEHOLDER_TEXT,
 } from './styles';
 import { useOnHintIncrease } from '../../../context/hint-context/index';
+import { useSyllabiSpeech } from '../../../hooks/useSpeech';
 
-const useHintRequestedPlace = (userInput: string[]) => {
+const useHintRequestedPlace = (
+  userInput: string[],
+  syllableAnalyzer: SyllableAnalyzer
+) => {
   const [hintRequiredPlace, setHintRequiredPlace] = useState(() =>
     userInput.findIndex(l => l === '')
   );
+  const { speak } = useSyllabiSpeech();
+  const trackSpokenLetters = useRef(new Set<number>());
+
+  useEffect(() => {
+    const audioSyllable = syllableAnalyzer.getAudioSyllable(hintRequiredPlace);
+    if (audioSyllable) {
+      speak(audioSyllable);
+    }
+  }, [hintRequiredPlace, speak, syllableAnalyzer]);
+
+  useEffect(() => {
+    const firstEmptyIndex = userInput.findIndex(l => l === '');
+    let currentTypedIndex: number;
+    if (firstEmptyIndex !== -1) {
+      currentTypedIndex = firstEmptyIndex - 1;
+    } else {
+      currentTypedIndex = userInput.length - 1;
+    }
+    if (trackSpokenLetters.current.has(currentTypedIndex)) {
+      return;
+    }
+    trackSpokenLetters.current.add(currentTypedIndex);
+    const timerId = setTimeout(() => {
+      speak(userInput[currentTypedIndex]);
+    }, 0);
+    return () => clearTimeout(timerId);
+  }, [speak, userInput]);
 
   useOnHintIncrease(() => {
     const firstEmptyIndex = userInput.findIndex(l => l === '');
@@ -30,16 +61,15 @@ export const SpellingInputWithHints = ({
   wordDef,
   currentEmptyIndex,
 }: SpellingInputWithHintsProps) => {
-  const hintRequiredPlace = useHintRequestedPlace(userInput);
-
-  const phoneticGrouping = useMemo(() => {
-    return getPhoneticColorByActualSyllable(wordDef.actualSyllable);
-  }, [wordDef.actualSyllable]);
-
   const syllableAnalyzer = useMemo(
     () => new SyllableAnalyzer(wordDef),
     [wordDef]
   );
+  const hintRequiredPlace = useHintRequestedPlace(userInput, syllableAnalyzer);
+
+  const phoneticGrouping = useMemo(() => {
+    return getPhoneticColorByActualSyllable(wordDef.actualSyllable);
+  }, [wordDef.actualSyllable]);
 
   // Get the display value for each input box with auto-fill for current syllable
   const getDisplayValue = (index: number, userLetter: string) => {

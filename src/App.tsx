@@ -11,6 +11,7 @@ import { sampleWords } from './words';
 import { useShortcut } from './hooks/use-shortcut';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Continue } from './components/atoms/continue';
+import { useLocalStorageState } from './hooks/use-local-storage-state';
 
 type GameMode = 'fullWord' | 'syllable';
 
@@ -20,7 +21,10 @@ export const App = () => {
   const [words] = useState(sampleWords);
   const [disableChecking, setDisableChecking] = useState(true);
   const [canContinue, setCanContinue] = useState(false);
-  const [gameMode, setGameMode] = useState<GameMode>('syllable');
+  const [gameMode, setGameMode] = useLocalStorageState<GameMode>(
+    'GAME_TYPE',
+    'syllable'
+  );
 
   const [start, setStart] = useState(false);
   const onCheckAnswer = useCallback(() => {
