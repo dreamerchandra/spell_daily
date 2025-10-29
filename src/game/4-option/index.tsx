@@ -27,25 +27,32 @@ interface DroppableSlotProps {
   id: string;
   isOver: boolean;
   children: ReactNode;
+  isCorrect?: boolean | null;
 }
 
-const DroppableSlot = ({ children, isOver }: DroppableSlotProps) => {
+const DroppableSlot = ({ children, isOver, isCorrect }: DroppableSlotProps) => {
   const isEmpty = !children;
 
   return (
     <span
       className={`inline-flex min-w-16 items-center justify-center px-2 py-1 transition-all duration-300 ease-out ${
         isEmpty
-          ? `border-b-2 border-dashed border-game-primary-300 ${
+          ? `border-b-2 border-dashed border-gray-300 dark:border-gray-600 ${
               isOver
-                ? 'scale-105 border-game-primary-400 bg-game-primary-500/10'
-                : 'hover:border-game-primary-400'
+                ? 'scale-105 border-dashed border-game-primary-400 bg-game-primary-500/10'
+                : 'border-dashed hover:border-gray-400 dark:hover:border-gray-500'
             }`
-          : `rounded-md bg-primary-gradient px-3 py-1 shadow-md`
+          : `rounded-md border bg-transparent px-3 py-1 ${
+              isCorrect === true
+                ? 'success-border border-dashed text-game-success-600 dark:text-game-success-400'
+                : isCorrect === false
+                  ? 'border-dashed border-game-error-500 text-game-error-600 dark:text-game-error-400'
+                  : 'border-dashed border-game-primary-500 text-game-primary-600 dark:text-game-primary-400'
+            }`
       }`}
     >
       {isEmpty ? (
-        <span className="select-none text-xs font-medium text-game-primary-300">
+        <span className="select-none text-xs font-medium text-gray-400 dark:text-gray-500">
           {isOver ? '✨' : '___'}
         </span>
       ) : (
@@ -69,14 +76,15 @@ const DraggableOption = ({
 }: DraggableOptionProps) => {
   return (
     <div
-      className={`relative cursor-pointer select-none overflow-hidden rounded-2xl border border-dark-600 bg-gradient-to-br from-dark-800 to-dark-700 p-4 text-center font-semibold shadow-lg backdrop-blur-sm transition-all duration-200 ease-out hover:scale-105 hover:border-game-primary-500 hover:shadow-xl hover:shadow-game-primary-500/20 active:scale-95 active:shadow-md ${
-        isDragging ? 'rotate-2 scale-110 opacity-50' : ''
+      className={`relative cursor-pointer select-none overflow-hidden rounded-lg border p-3 text-center font-medium shadow-sm transition-all duration-200 ease-out hover:scale-105 active:scale-95 ${
+        isDragging
+          ? 'rotate-2 scale-110 opacity-50'
+          : 'cursor-grab border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300 hover:bg-gray-100 active:cursor-grabbing dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
       }`}
       onClick={onSelect}
       draggable
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-game-primary-500/5 to-game-secondary-500/5 opacity-0 transition-opacity hover:opacity-100" />
-      <span className="relative text-white drop-shadow-sm">{option}</span>
+      <span className="relative">{option}</span>
     </div>
   );
 };
@@ -84,14 +92,16 @@ const DraggableOption = ({
 const UsageSentence = ({
   usage,
   droppedOption,
+  isCorrect,
 }: {
   usage: string;
   droppedOption: string | null;
+  isCorrect: boolean | null;
 }) => {
   const words = usage.split(' ');
 
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-center gap-1 rounded-xl border-2 border-dark-600 bg-gradient-to-r from-dark-800/80 to-dark-700/80 p-4 text-lg backdrop-blur-sm">
+    <div className="mb-6 flex flex-wrap items-center justify-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-4 text-lg shadow-sm dark:border-gray-600 dark:bg-gray-800">
       {words.map((word, index) => {
         if (word.includes('___')) {
           const beforeBlank = word.split('___')[0];
@@ -100,9 +110,15 @@ const UsageSentence = ({
           return (
             <span key={index} className="flex items-center">
               {beforeBlank && (
-                <span className="text-white/90">{beforeBlank}</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {beforeBlank}
+                </span>
               )}
-              <DroppableSlot id={`slot-${index}`} isOver={false}>
+              <DroppableSlot
+                id={`slot-${index}`}
+                isOver={false}
+                isCorrect={isCorrect}
+              >
                 {droppedOption && (
                   <span className="relative font-bold tracking-wide text-white drop-shadow-sm">
                     {droppedOption}
@@ -110,14 +126,16 @@ const UsageSentence = ({
                 )}
               </DroppableSlot>
               {afterBlank && (
-                <span className="text-white/90">{afterBlank}</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {afterBlank}
+                </span>
               )}
             </span>
           );
         } else {
           // Regular word
           return (
-            <span key={index} className="text-white/90">
+            <span key={index} className="text-gray-700 dark:text-gray-300">
               {word}
             </span>
           );
@@ -191,7 +209,13 @@ export const FourOptionGame: GameComponent = forwardRef(
     };
 
     if (!wordDef || !state.selectedUsage) {
-      return <div>Loading...</div>;
+      return (
+        <div className="relative w-full max-w-md px-4 text-center">
+          <p className="text-game-secondary-600 dark:text-game-secondary-400">
+            Loading word options...
+          </p>
+        </div>
+      );
     }
 
     return (
@@ -220,11 +244,12 @@ export const FourOptionGame: GameComponent = forwardRef(
               <UsageSentence
                 usage={state.selectedUsage}
                 droppedOption={state.droppedOption}
+                isCorrect={state.isCorrect}
               />
             </div>
 
             <div className="mb-8">
-              <h4 className="text-md mb-4 font-medium text-white/90">
+              <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
                 Choose the correct spelling:
               </h4>
               <div className="mx-auto grid max-w-md grid-cols-2 gap-4">

@@ -139,3 +139,30 @@ body,
     }
   }
 }
+
+@keyframes successBorder {
+  0% {
+    border-color: #a855f7; /* game-primary-500 */
+    transform: scale(1);
+  }
+  25% {
+    border-color: #10b981; /* game-success-500 */
+    transform: scale(1.05);
+  }
+  50% {
+    border-color: #059669; /* game-success-600 */
+    transform: scale(1.4);
+  }
+  75% {
+    border-color: #10b981; /* game-success-500 */
+    transform: scale(1.05);
+  }
+  100% {
+    border-color: #10b981; /* game-success-500 */
+    transform: scale(1);
+  }
+}
+
+.success-border {
+  animation: successBorder 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
