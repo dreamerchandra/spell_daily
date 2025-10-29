@@ -11,6 +11,7 @@ import { Layout } from './components/organisms/layout';
 import { FullWordGame } from './game/full-word';
 import { JumbledWordGame } from './game/jumbled-word/index';
 import { SyllableGame } from './game/syllabi';
+import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { useShortcut } from './hooks/use-shortcut';
@@ -25,6 +26,7 @@ const ComponentMap: Record<GameMode, GameComponent> = {
   jumbled: JumbledWordGame,
   fourOption: FourOptionGame,
   twoOption: TwoOptionGame,
+  typing: TypingGame,
 } as const;
 
 export const App = () => {

@@ -26,6 +26,7 @@ export const SettingsMenu = ({
     { value: 'jumbled' as GameMode, label: 'Jumbled' },
     { value: 'fourOption' as GameMode, label: '4-Option' },
     { value: 'twoOption' as GameMode, label: '2-Option' },
+    { value: 'typing' as GameMode, label: 'Typing' },
   ];
 
   const handleModeChange = (mode: GameMode) => {

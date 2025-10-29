@@ -8,7 +8,8 @@ export type GameMode =
   | 'voiceTyping'
   | 'jumbled'
   | 'twoOption'
-  | 'fourOption';
+  | 'fourOption'
+  | 'typing';
 export type GameComponent = ForwardRefExoticComponent<
   {
     wordDef: WordDef;
