@@ -18,7 +18,8 @@ export const PRIMARY_STYLES =
 export const EMPTY_STYLES = 'border-dark-700/50 bg-dark-800/30 text-dark-500';
 
 // Active state (focus ring)
-export const ACTIVE_RING = 'ring-2 ring-game-primary-400/50';
+export const ACTIVE_RING =
+  'ring-2 ring-game-primary-400/50 animate-pulse transition-all duration-300';
 
 // Placeholder text color (for auto-filled hints)
 export const PLACEHOLDER_TEXT = 'text-dark-500/70';

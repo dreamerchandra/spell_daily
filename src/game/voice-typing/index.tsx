@@ -27,7 +27,7 @@ const VoiceWaveAnimation = ({ isActive }: { isActive: boolean }) => {
       {bars.map((bar, i) => (
         <div
           key={i}
-          className={`w-1 animate-pulse rounded-full bg-gradient-to-t from-blue-600 to-blue-400 ${bar.height}`}
+          className={`w-1 animate-pulse rounded-full bg-gradient-to-t from-game-primary-600 to-game-primary-400 ${bar.height}`}
           style={{
             animationDelay: bar.delay,
             animationDuration: '800ms',
@@ -54,22 +54,22 @@ const VoiceMicrophoneButton = ({
   return (
     <div className="mb-6 text-center">
       {!isSupported && (
-        <p className="mb-2 text-sm text-yellow-400">
+        <p className="mb-2 text-sm text-game-secondary-400">
           ⚠️ Speech recognition not supported in this browser
         </p>
       )}
 
-      {error && <p className="mb-2 text-sm text-red-400">❌ {error}</p>}
+      {error && <p className="mb-2 text-sm text-game-error-400">❌ {error}</p>}
 
       <button
         onClick={isListening ? onStop : onStart}
         disabled={!isSupported}
-        className={`relative mx-auto mb-4 flex h-12 w-12 transform items-center justify-center rounded-full text-2xl text-white transition-all duration-200 hover:scale-105 active:scale-95 ${isListening ? 'animate-pulse bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} ${!isSupported ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        className={`relative mx-auto mb-4 flex h-12 w-12 transform items-center justify-center rounded-full text-2xl text-white transition-all duration-200 hover:scale-105 active:scale-95 ${isListening ? 'animate-pulse bg-game-error-500 hover:bg-game-error-600' : 'bg-game-primary-500 hover:bg-game-primary-600'} ${!isSupported ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
       >
         {isListening ? <>🔴</> : <>🎤</>}
       </button>
 
-      <p className="text-sm text-gray-400">
+      <p className="text-sm text-dark-500">
         {isListening ? 'Listening... Click to stop' : 'Click to say letters'}
       </p>
     </div>
@@ -168,7 +168,7 @@ export const VoiceTypingGame = forwardRef<
       <div className="mb-4">
         <div className="mb-6 text-center">
           {!speechSupported && (
-            <p className="mb-2 text-sm text-yellow-400">
+            <p className="mb-2 text-sm text-game-secondary-400">
               ⚠️ Audio not supported in this browser
             </p>
           )}
@@ -183,7 +183,7 @@ export const VoiceTypingGame = forwardRef<
           <Definition definition={wordDef.definition} />
         )}
 
-        <div className="mb-4 text-center text-xs text-gray-500">
+        <div className="mb-4 text-center text-xs text-dark-500">
           You can say one letter or multiple letters at once
         </div>
 
@@ -197,18 +197,18 @@ export const VoiceTypingGame = forwardRef<
         <button
           onClick={handleTryAgain}
           disabled={!state.userInput.some(char => char !== '')}
-          className="mb-4 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-300"
+          className="mb-4 rounded-lg bg-game-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-game-primary-600 disabled:cursor-not-allowed disabled:bg-game-primary-300"
         >
           Clear Input
         </button>
 
         {state.recognizedText && (
-          <div className="mb-4 rounded-lg border border-blue-400/40 bg-blue-400/10 p-3 text-center">
-            <div className="mb-1 text-sm text-blue-400">You said:</div>
+          <div className="mb-4 rounded-lg border border-game-primary-400/40 bg-game-primary-400/10 p-3 text-center">
+            <div className="mb-1 text-sm text-game-primary-400">You said:</div>
             <div className="text-lg font-semibold text-white">
               {state.recognizedText}
               {interimTranscript && (
-                <span className="italic text-gray-400">
+                <span className="italic text-dark-500">
                   {' '}
                   {interimTranscript} (listening...)
                 </span>
@@ -242,7 +242,7 @@ export const VoiceTypingGame = forwardRef<
                 </p>
                 <button
                   onClick={handleTryAgain}
-                  className="mt-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+                  className="mt-2 rounded-lg bg-game-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-game-primary-600"
                 >
                   Try Again
                 </button>
