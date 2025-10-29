@@ -25,6 +25,7 @@ export const HintContextProvider: FC<{
   const [state, dispatch] = useReducer(hintReducer, {
     currentHint: 0,
     maxHint: 0,
+    testMode: false,
   });
   return (
     <HintContext.Provider
@@ -91,4 +92,24 @@ export const useOnHintIncrease = (cb: (currentHint: number) => void) => {
     }
     prevHintRef.current = state.currentHint;
   }, [state.currentHint]);
+};
+
+export const useIsTestMode = () => {
+  const { state } = useHintContext();
+  return state.testMode;
+};
+
+export const useSetTestMode = () => {
+  const { dispatch } = useHintContext();
+  return useCallback(
+    (enabled: boolean) => {
+      return dispatch({
+        type: 'TEST_MODE',
+        action: {
+          enabled,
+        },
+      });
+    },
+    [dispatch]
+  );
 };

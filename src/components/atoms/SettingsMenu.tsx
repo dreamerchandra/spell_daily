@@ -7,13 +7,15 @@ interface SettingsMenuProps {
   onModeChange: (mode: GameMode) => void;
   soundEnabled?: boolean;
   onSoundToggle?: (enabled: boolean) => void;
+  testMode: boolean;
+  onTestModeToggle: (enabled: boolean) => void;
 }
 
 export const SettingsMenu = ({
   currentMode,
   onModeChange,
-  soundEnabled = true,
-  onSoundToggle,
+  testMode,
+  onTestModeToggle,
 }: SettingsMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -30,11 +32,11 @@ export const SettingsMenu = ({
     onModeChange(mode);
   };
 
-  const handleSoundToggle = () => {
-    if (onSoundToggle) {
-      onSoundToggle(!soundEnabled);
-    }
-  };
+  //   const handleSoundToggle = () => {
+  //     if (onSoundToggle) {
+  //       onSoundToggle(!soundEnabled);
+  //     }
+  //   };
 
   return (
     <Popover
@@ -81,7 +83,7 @@ export const SettingsMenu = ({
         </div>
 
         {/* Sound Section */}
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <span className="text-lg font-light text-white">Sound</span>
           <button
             onClick={handleSoundToggle}
@@ -92,6 +94,23 @@ export const SettingsMenu = ({
             <div
               className={`h-5 w-5 rounded-full border border-white/50 bg-white shadow-sm transition-transform ${
                 soundEnabled
+                  ? 'translate-x-7 bg-white'
+                  : 'translate-x-0 bg-white/20'
+              }`}
+            />
+          </button>
+        </div> */}
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-light text-white">Test Mode</span>
+          <button
+            onClick={() => onTestModeToggle(!testMode)}
+            className={`relative h-8 w-16 rounded-full border-2 border-white/30 p-1 transition-colors ${
+              testMode ? 'bg-red-400' : 'bg-transparent'
+            }`}
+          >
+            <div
+              className={`h-5 w-5 rounded-full border border-white/50 bg-white shadow-sm transition-transform ${
+                testMode
                   ? 'translate-x-7 bg-white'
                   : 'translate-x-0 bg-white/20'
               }`}

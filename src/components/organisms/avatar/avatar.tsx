@@ -4,7 +4,7 @@ import { pubSub } from '../../../util/pub-sub';
 import type { AvatarCharacterPath, AvatarData } from '../../../common/avatar';
 import { SpeechBubble } from './speech-bubble';
 import { randomImageByPath } from '../../../config/emoji-manager';
-import { useNextHint } from '../../../context/hint-context';
+import { useIsTestMode, useNextHint } from '../../../context/hint-context';
 import { useShortcut } from '../../../hooks/use-shortcut';
 import { useSubscribe } from '../../../hooks/usePubSub';
 
@@ -56,6 +56,7 @@ export const AvatarComponent: FC = () => {
   const body = useRef(document.body);
   const [character, setCharacter] = useState(randomImageByPath('by_rating/2'));
   const showNextHint = useNextHint();
+  const isTestMode = useIsTestMode();
 
   useSubscribe('Avatar', data => {
     setShow(true);
@@ -101,9 +102,18 @@ export const AvatarComponent: FC = () => {
   useShortcut('h', showNextHint);
   const text =
     data?.text ??
-    RandomHintMessages[Math.floor(Math.random() * RandomHintMessages.length)];
+    (isTestMode
+      ? 'No hints in Test Mode!'
+      : RandomHintMessages[
+          Math.floor(Math.random() * RandomHintMessages.length)
+        ]);
 
-  const noText = data ? data.noText : 'No, thanks';
+  const noText = data ? data.noText : isTestMode ? undefined : 'No, thanks';
+  const yesText = data
+    ? data.yesText
+    : isTestMode
+      ? 'Understood!'
+      : 'Yes, please!';
 
   return (
     <div className="relative">
@@ -121,7 +131,7 @@ export const AvatarComponent: FC = () => {
         text={text}
         onNo={onNo}
         onYes={onYes}
-        yesText={data?.yesText}
+        yesText={yesText}
         noText={noText}
       />
     </div>

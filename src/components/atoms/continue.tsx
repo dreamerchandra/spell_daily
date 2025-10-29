@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useSubscribe } from '../../hooks/usePubSub';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
-import { DELAY_NEXT_WORD_MS } from '../../config/animation-knobs';
+import {
+  DELAY_NEXT_WORD_MS,
+  DELAY_NEXT_WORD_MS_FAST,
+} from '../../config/animation-knobs';
+import { useIsTestMode } from '../../context/hint-context';
 
 export const Continue = ({
   onClick,
@@ -11,15 +15,19 @@ export const Continue = ({
   disabled: boolean;
 }) => {
   const setTimer = useSetTimeout();
+  const isTestMode = useIsTestMode();
   const [isProgressing, setIsProgressing] = useState(false);
 
   useSubscribe('Animation:End', () => {
     if (!disabled) {
       setIsProgressing(true);
-      setTimer(() => {
-        onClick();
-        setIsProgressing(false);
-      }, DELAY_NEXT_WORD_MS);
+      setTimer(
+        () => {
+          onClick();
+          setIsProgressing(false);
+        },
+        isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS
+      );
     }
   });
 

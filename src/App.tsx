@@ -4,7 +4,7 @@ import type { GameComponent, GameMode } from './common/game-type';
 import { Button } from './components/atoms/Button';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
-import { Progress } from './components/atoms/Progress';
+import { ProgressWithTimer, type TimerRef } from './components/atoms/Progress';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
@@ -16,6 +16,7 @@ import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { useShortcut } from './hooks/use-shortcut';
 import { sampleWords } from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
+import { useIsTestMode, useSetTestMode } from './context/hint-context';
 
 const ComponentMap: Record<GameMode, GameComponent> = {
   fullWord: FullWordGame,
@@ -36,23 +37,31 @@ export const App = () => {
     'GAME_TYPE',
     'syllable'
   );
+  const timerRef = useRef<TimerRef>(null);
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
     'SOUND_ENABLED',
     true
   );
+  const isTestMode = useIsTestMode();
+  const setTestMode = useSetTestMode();
 
   const Component = ComponentMap[gameMode];
   const [start, setStart] = useState(false);
   const onCheckAnswer = useCallback(() => {
     if (gameRef.current?.isCorrect()) {
+      timerRef.current?.stopTimer();
       setCanContinue(true);
     }
   }, []);
 
   const moveToNextWord = useCallback(() => {
-    setCurrentWordIndex(prev => (prev < words.length - 1 ? prev + 1 : prev));
+    setCurrentWordIndex(prev => {
+      const nextIndex = prev < words.length - 1 ? prev + 1 : prev;
+      timerRef.current?.startTimer(words[nextIndex].word.length * 2);
+      return nextIndex;
+    });
     setCanContinue(false);
-  }, [words.length]);
+  }, [words]);
 
   useShortcut('Enter', () => {
     if (canContinue) {
@@ -68,11 +77,17 @@ export const App = () => {
     Avatar.show({
       text: 'Hiii! I can guide you through learning spelling!',
       yesText: "🎉 Let's go!",
+      noText: '🧪 Test Mode',
+      onNo: () => {
+        setTestMode(true);
+        timerRef.current?.startTimer(words[0].word.length * 2);
+        setStart(true);
+      },
       onYes: () => {
         setStart(true);
       },
     });
-  }, []);
+  }, [setTestMode, words]);
 
   useEffect(() => {
     if (currentWordIndex === 0) return;
@@ -88,7 +103,12 @@ export const App = () => {
       header={
         <Header
           ProgressComponent={
-            <Progress score={currentWordIndex + 1} total={words.length} />
+            <ProgressWithTimer
+              score={currentWordIndex + 1}
+              total={words.length}
+              ref={timerRef}
+              disableTimer={!isTestMode}
+            />
           }
           gameMode={gameMode}
           onGameModeChange={setGameMode}

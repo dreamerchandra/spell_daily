@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { AvatarComponent } from './avatar/avatar';
 import { SettingsMenu } from '../atoms/SettingsMenu';
 import type { GameMode } from '../../common/game-type';
+import { useIsTestMode, useSetTestMode } from '../../context/hint-context';
 
 interface HeaderProps {
   ProgressComponent: ReactNode;
@@ -18,6 +19,9 @@ export const Header = ({
   soundEnabled = true,
   onSoundToggle,
 }: HeaderProps) => {
+  const testMode = useIsTestMode();
+  const onTestModeToggle = useSetTestMode();
+
   return (
     <header className={`m-auto flex max-w-md items-center justify-between p-4`}>
       <SettingsMenu
@@ -25,6 +29,8 @@ export const Header = ({
         onModeChange={onGameModeChange}
         soundEnabled={soundEnabled}
         onSoundToggle={onSoundToggle}
+        testMode={testMode}
+        onTestModeToggle={onTestModeToggle}
       />
       {ProgressComponent}
       <div className="h-16 w-16" aria-label="Helper">
