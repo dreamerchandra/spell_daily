@@ -261,17 +261,7 @@ const MultiOptionGame = forwardRef<
             <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
               Choose the correct spelling:
             </h4>
-            <div
-              className={`mx-auto grid max-w-lg gap-4 ${
-                numberOfOptions <= 2
-                  ? 'grid-cols-1'
-                  : numberOfOptions <= 4
-                    ? 'grid-cols-2'
-                    : numberOfOptions <= 6
-                      ? 'grid-cols-2'
-                      : 'grid-cols-3'
-              }`}
-            >
+            <div className="flex flex-wrap justify-center gap-4">
               {state.options.map((option, idx) => (
                 <DraggableOption
                   key={idx}
