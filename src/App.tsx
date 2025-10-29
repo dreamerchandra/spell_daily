@@ -78,6 +78,16 @@ export const App = () => {
     }
   });
 
+  const onTimeUp = useCallback(() => {
+    Avatar.show({
+      text: "Time is up! Let's try the next word.",
+      yesText: 'Next',
+      onYes: () => {
+        moveToNextWord();
+      },
+    });
+  }, [moveToNextWord]);
+
   useEffect(() => {
     Avatar.show({
       text: 'Hiii! I can guide you through learning spelling!',
@@ -113,6 +123,7 @@ export const App = () => {
               total={words.length}
               ref={timerRef}
               disableTimer={!isTestMode}
+              onTimeUp={onTimeUp}
             />
           }
           gameMode={gameMode}

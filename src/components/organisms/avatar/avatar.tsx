@@ -146,13 +146,18 @@ export const AvatarComponent: FC = () => {
 
 export const Avatar = {
   hint: (data: AvatarData) => {
-    pubSub.publish('Avatar:Hint', data);
-    return null;
+    requestAnimationFrame(() => {
+      pubSub.publish('Avatar:Hint', data);
+    });
   },
   show: (data: AvatarData) => {
-    pubSub.publish('Avatar', data);
+    requestAnimationFrame(() => {
+      pubSub.publish('Avatar', data);
+    });
   },
   changeCharacter: (imagePath: AvatarCharacterPath) => {
-    pubSub.publish('Avatar:ChangeCharacter', imagePath);
+    requestAnimationFrame(() => {
+      pubSub.publish('Avatar:ChangeCharacter', imagePath);
+    });
   },
 };
