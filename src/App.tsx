@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameRef } from './common/game-ref';
 import { type GameComponent, type GameMode } from './common/game-type';
 import { Button } from './components/atoms/Button';
@@ -15,12 +15,7 @@ import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { useShortcut } from './hooks/use-shortcut';
-import {
-  sampleSpellingWords,
-  sampleWordUsage,
-  type WordDef,
-  type WordUsage,
-} from './words';
+import { sampleSpellingWords, sampleWordUsage } from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
 import { ContextGame } from './game/context';
@@ -40,17 +35,13 @@ const ComponentMap: Record<GameMode, GameComponent<any>> = {
 } as const;
 
 const useWords = (mode: GameMode) => {
-  const [words, setWords] = useState<WordUsage[] | WordDef[]>(
-    sampleSpellingWords
-  );
-  useEffect(() => {
+  return useMemo(() => {
     if (mode === 'context' || mode === 'correctSentence') {
-      setWords(sampleWordUsage);
+      return sampleWordUsage;
     } else {
-      setWords(sampleSpellingWords);
+      return sampleSpellingWords;
     }
   }, [mode]);
-  return words;
 };
 
 export const App = () => {

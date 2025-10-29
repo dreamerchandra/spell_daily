@@ -28,11 +28,17 @@ export const SettingsMenu = ({
     { value: 'twoOption' as GameMode, label: '2-Option' },
     { value: 'typing' as GameMode, label: 'Typing' },
     { value: 'context' as GameMode, label: 'Context' },
-    { value: 'correctSentence' as GameMode, label: 'Correct Sentence' },
+    { value: 'correctSentence' as GameMode, label: 'Usage' },
   ];
 
   const handleModeChange = (mode: GameMode) => {
     onModeChange(mode);
+    setIsOpen(false);
+  };
+
+  const handleTestModeToggle = () => {
+    onTestModeToggle(!testMode);
+    setIsOpen(false);
   };
 
   //   const handleSoundToggle = () => {
@@ -106,7 +112,7 @@ export const SettingsMenu = ({
         <div className="flex items-center justify-between">
           <span className="text-lg font-light text-white">Test Mode</span>
           <button
-            onClick={() => onTestModeToggle(!testMode)}
+            onClick={handleTestModeToggle}
             className={`relative h-8 w-16 rounded-full border-2 border-white/30 p-1 transition-colors ${
               testMode ? 'bg-red-400' : 'bg-transparent'
             }`}
