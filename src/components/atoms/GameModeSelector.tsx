@@ -39,6 +39,11 @@ export const GameModeSelector = ({
       label: 'Jumbled Words',
       description: 'Rearrange the letters to form the correct word',
     },
+    {
+      value: 'fourOption' as GameMode,
+      label: '4-Option',
+      description: 'Choose the correct word from four options',
+    },
   ];
 
   return (

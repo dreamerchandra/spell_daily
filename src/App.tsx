@@ -15,12 +15,14 @@ import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { useShortcut } from './hooks/use-shortcut';
 import { sampleWords } from './words';
+import { FourOptionGame } from './game/4-option';
 
 const ComponentMap: Record<GameMode, GameComponent> = {
   fullWord: FullWordGame,
   syllable: SyllableGame,
   voiceTyping: VoiceTypingGame,
   jumbled: JumbledWordGame,
+  fourOption: FourOptionGame,
 } as const;
 
 export const App = () => {

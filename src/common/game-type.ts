@@ -2,7 +2,12 @@ import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 import type { GameRef } from './game-ref';
 import type { WordDef } from '../words';
 
-export type GameMode = 'fullWord' | 'syllable' | 'voiceTyping' | 'jumbled';
+export type GameMode =
+  | 'fullWord'
+  | 'syllable'
+  | 'voiceTyping'
+  | 'jumbled'
+  | 'fourOption';
 export type GameComponent = ForwardRefExoticComponent<
   {
     wordDef: WordDef;

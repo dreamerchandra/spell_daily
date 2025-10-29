@@ -6,6 +6,12 @@ export interface WordDef {
   ipa: string[]; // for displaying pronunciation
   actualSyllable: string[]; // correct syllable split
   syllableOptions?: string[][];
+  option: {
+    easy: string[];
+    medium: string[];
+    hard: string[];
+  };
+  usage: string[];
 }
 
 export const sampleWords: WordDef[] = [
@@ -20,6 +26,16 @@ export const sampleWords: WordDef[] = [
       ['cul', 'kul', 'col'],
       ['ture', 'chur', 'tour'],
     ],
+    option: {
+      easy: ['culture', 'kulture'],
+      medium: ['cultuer', 'cultre'],
+      hard: ['culter', 'cultare'],
+    },
+    usage: [
+      `The museum showcases the rich ___ of the indigenous people.`,
+      `Learning about different ___ helps us understand the world better.`,
+      `Pop ___ has influenced many aspects of modern society.`,
+    ],
   },
   {
     word: 'DEFINITELY',
@@ -32,6 +48,16 @@ export const sampleWords: WordDef[] = [
       ['i', 'e', 'a'],
       ['nite', 'night', 'nyte'],
       ['ly', 'li', 'lee'],
+    ],
+    option: {
+      easy: ['definitely', 'definately'],
+      medium: ['definetly', 'defintely'],
+      hard: ['definitly', 'definatley'],
+    },
+    usage: [
+      `I will ___ be there on time for the meeting.`,
+      `She ___ knows the answer to that question.`,
+      `This is ___ the best pizza I've ever tasted.`,
     ],
   },
   {
@@ -46,6 +72,16 @@ export const sampleWords: WordDef[] = [
       ['pin', 'pen', 'pinn'],
       ['ion', 'eon', 'yon'],
     ],
+    option: {
+      easy: ['opinion', 'opinnion'],
+      medium: ['opinyon', 'opineon'],
+      hard: ['opinyun', 'opeenion'],
+    },
+    usage: [
+      `What's your ___ about the new movie?`,
+      `Everyone has a different ___ on this topic.`,
+      `In my ___, we should leave earlier.`,
+    ],
   },
   {
     word: 'COUSIN',
@@ -58,6 +94,16 @@ export const sampleWords: WordDef[] = [
       ['cous', 'kous', 'cows'],
       ['in', 'en', 'inn'],
     ],
+    option: {
+      easy: ['cousin', 'cousen'],
+      medium: ['kousin', 'couzin'],
+      hard: ['cowsin', 'coussn'],
+    },
+    usage: [
+      `My ___ is coming to visit us next week.`,
+      `She introduced me to her ___ from California.`,
+      `Do you know if your ___ will be at the reunion?`,
+    ],
   },
   {
     word: 'IMPRESS',
@@ -68,6 +114,16 @@ export const sampleWords: WordDef[] = [
     syllableOptions: [
       ['im', 'em', 'um'],
       ['press', 'pres', 'pross'],
+    ],
+    option: {
+      easy: ['impress', 'impres'],
+      medium: ['empress', 'impross'],
+      hard: ['umpress', 'imprss'],
+    },
+    usage: [
+      `She wanted to ___ her new boss with her skills.`,
+      `The magic show will ___ the children.`,
+      `His dedication to work never fails to ___ me.`,
     ],
   },
   {
@@ -82,6 +138,16 @@ export const sampleWords: WordDef[] = [
       ['range', 'ranje', 'rang'],
       ['ment', 'mant', 'mint'],
     ],
+    option: {
+      easy: ['arrangement', 'arangement'],
+      medium: ['arranjement', 'arrangment'],
+      hard: ['arangmant', 'arrangmint'],
+    },
+    usage: [
+      `We need to make an ___ for the meeting room.`,
+      `The flower ___ looks beautiful on the table.`,
+      `Can you help with the seating ___ for the party?`,
+    ],
   },
   {
     word: 'EXHAUST',
@@ -92,6 +158,16 @@ export const sampleWords: WordDef[] = [
     syllableOptions: [
       ['ex', 'eks', 'ax'],
       ['haust', 'host', 'hawst'],
+    ],
+    option: {
+      easy: ['exhaust', 'exaust'],
+      medium: ['eksaust', 'exhawst'],
+      hard: ['axhaust', 'exhost'],
+    },
+    usage: [
+      `The long hike will ___ even experienced runners.`,
+      `We need to ___ all possibilities before deciding.`,
+      `The car's ___ pipe needs to be replaced.`,
     ],
   },
   {
@@ -106,6 +182,16 @@ export const sampleWords: WordDef[] = [
       ['ra', 'rah', 'ray'],
       ['ble', 'bel', 'bal'],
     ],
+    option: {
+      easy: ['memorable', 'memorible'],
+      medium: ['mamerable', 'memorahble'],
+      hard: ['momarable', 'memoraybel'],
+    },
+    usage: [
+      `The graduation ceremony was a ___ day for everyone.`,
+      `She gave a ___ speech that moved the audience.`,
+      `Their wedding was the most ___ event of the year.`,
+    ],
   },
   {
     word: 'SPECIAL',
@@ -118,6 +204,16 @@ export const sampleWords: WordDef[] = [
       ['spe', 'spa', 'spy'],
       ['cial', 'shial', 'shal'],
     ],
+    option: {
+      easy: ['special', 'spesial'],
+      medium: ['spashial', 'spycial'],
+      hard: ['spashel', 'spyshal'],
+    },
+    usage: [
+      `Today is a very ___ day for our family.`,
+      `She has a ___ talent for music.`,
+      `The restaurant offers ___ discounts on weekends.`,
+    ],
   },
   {
     word: 'SYSTEM',
@@ -129,6 +225,16 @@ export const sampleWords: WordDef[] = [
       ['sys', 'sis', 'cys'],
       ['tem', 'tam', 'tim'],
     ],
+    option: {
+      easy: ['system', 'sistem'],
+      medium: ['cystem', 'systam'],
+      hard: ['cystam', 'systim'],
+    },
+    usage: [
+      `The school has a new computer ___ installed.`,
+      `Our solar ___ provides clean energy.`,
+      `The traffic light ___ needs to be repaired.`,
+    ],
   },
   {
     word: 'RAINBOW',
@@ -139,6 +245,16 @@ export const sampleWords: WordDef[] = [
     syllableOptions: [
       ['rain', 'rane', 'rein'],
       ['bow', 'bou', 'bo'],
+    ],
+    option: {
+      easy: ['rainbow', 'rainbo'],
+      medium: ['ranebow', 'reinbow'],
+      hard: ['ranebou', 'reinbo'],
+    },
+    usage: [
+      `Look at the beautiful ___ in the sky!`,
+      `After the storm, a bright ___ appeared.`,
+      `The ___ has seven different colors.`,
     ],
   },
   {
@@ -152,6 +268,16 @@ export const sampleWords: WordDef[] = [
       ['ter', 'tur', 'tar'],
       ['fly', 'fli', 'flai'],
     ],
+    option: {
+      easy: ['butterfly', 'buterfly'],
+      medium: ['butterfli', 'butterflai'],
+      hard: ['botterfly', 'buttarfli'],
+    },
+    usage: [
+      `A colorful ___ landed on the flower.`,
+      `The children watched the ___ flutter around the garden.`,
+      `She has a ___ tattoo on her wrist.`,
+    ],
   },
   {
     word: 'ELEPHANT',
@@ -164,6 +290,16 @@ export const sampleWords: WordDef[] = [
       ['e', 'i', 'ee'],
       ['phant', 'fant', 'pant'],
     ],
+    option: {
+      easy: ['elephant', 'elefant'],
+      medium: ['ellephant', 'aleephant'],
+      hard: ['ellefant', 'alepant'],
+    },
+    usage: [
+      `The ___ at the zoo loves to spray water.`,
+      `An ___ never forgets, according to the saying.`,
+      `We saw a baby ___ playing with its mother.`,
+    ],
   },
   {
     word: 'TREASURE',
@@ -174,6 +310,16 @@ export const sampleWords: WordDef[] = [
     syllableOptions: [
       ['trea', 'tree', 'tra'],
       ['sure', 'shur', 'sur'],
+    ],
+    option: {
+      easy: ['treasure', 'treasur'],
+      medium: ['treeshure', 'treasher'],
+      hard: ['trashur', 'treesur'],
+    },
+    usage: [
+      `The pirates buried their ___ on the island.`,
+      `She found a ___ chest full of gold coins.`,
+      `Family photos are a ___ to keep forever.`,
     ],
   },
 ];
