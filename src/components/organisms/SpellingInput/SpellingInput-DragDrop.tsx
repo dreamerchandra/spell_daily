@@ -20,7 +20,10 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS as dndCSS } from '@dnd-kit/utilities';
-import { getPhoneticColorByActualSyllable } from '../../../config/pallet-config';
+import {
+  getPhoneticColorByActualSyllable,
+  phoneticColors,
+} from '../../../config/pallet-config';
 import type { WordDef } from '../../../words';
 import {
   BASE_BOX_CLASSES,
@@ -141,9 +144,17 @@ interface DraggableLetterProps {
   id: string;
   letter: string;
   onClick: () => void;
+  showSyllableColors?: boolean;
+  phoneticColorClass?: string;
 }
 
-const DraggableLetter = ({ id, letter, onClick }: DraggableLetterProps) => {
+const DraggableLetter = ({
+  id,
+  letter,
+  onClick,
+  showSyllableColors = false,
+  phoneticColorClass,
+}: DraggableLetterProps) => {
   const {
     attributes,
     listeners,
@@ -158,6 +169,13 @@ const DraggableLetter = ({ id, letter, onClick }: DraggableLetterProps) => {
     transition,
   };
 
+  const getBackgroundClasses = () => {
+    if (showSyllableColors && phoneticColorClass) {
+      return `${phoneticColorClass} ${WHITE_TEXT}`;
+    }
+    return 'bg-gradient-to-r from-dark-700/70 to-dark-800/70 text-gray-200 hover:from-dark-800 hover:to-dark-900';
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -168,7 +186,7 @@ const DraggableLetter = ({ id, letter, onClick }: DraggableLetterProps) => {
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className={`flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-dark-600/30 bg-gradient-to-r from-dark-700/70 to-dark-800/70 text-sm font-semibold text-gray-200 shadow-sm transition-all duration-200 hover:scale-105 hover:from-dark-800 hover:to-dark-900 ${
+      className={`flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-dark-600/30 text-sm font-semibold shadow-sm transition-all duration-200 hover:scale-105 ${getBackgroundClasses()} ${
         isDragging ? 'opacity-50' : ''
       }`}
       title="Drag to position or click to add"
@@ -218,11 +236,44 @@ export const SpellingInputDragDrop = ({
     index,
   }));
 
-  const availableItems = availableLetters.map((letter, index) => ({
-    id: `available-${index}`,
-    letter,
-    index,
-  }));
+  // Create available items with syllable index for proper color mapping
+  const availableItems = availableLetters.map((letter, availableIndex) => {
+    // Create a mapping of letter positions to syllable indices in the original word
+    const wordLetterToSyllableMap: number[] = [];
+
+    for (let syllIdx = 0; syllIdx < wordDef.actualSyllable.length; syllIdx++) {
+      const syllable = wordDef.actualSyllable[syllIdx];
+      for (let i = 0; i < syllable.length; i++) {
+        wordLetterToSyllableMap.push(syllIdx);
+      }
+    }
+
+    // Find all positions where this letter appears in the word
+    const wordLetters = wordDef.word.split('');
+    const letterPositions = wordLetters
+      .map((wordLetter, pos) =>
+        wordLetter.toLowerCase() === letter.toLowerCase() ? pos : -1
+      )
+      .filter(pos => pos !== -1);
+
+    // Count how many of this letter we've seen before this available index
+    const letterOccurrenceIndex = availableLetters
+      .slice(0, availableIndex)
+      .filter(l => l.toLowerCase() === letter.toLowerCase()).length;
+
+    // Get the syllable index for this occurrence of the letter
+    const wordPosition =
+      letterPositions[letterOccurrenceIndex] || letterPositions[0] || 0;
+    const syllableIndex = wordLetterToSyllableMap[wordPosition] || 0;
+
+    return {
+      id: `available-${availableIndex}`,
+      letter,
+      index: availableIndex,
+      syllableIndex,
+      hintColor: phoneticColors[syllableIndex],
+    };
+  });
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id);
@@ -353,6 +404,8 @@ export const SpellingInputDragDrop = ({
                     id={item.id}
                     letter={item.letter}
                     onClick={() => handleAvailableLetterClick(item.letter)}
+                    showSyllableColors={showSyllableColors}
+                    phoneticColorClass={item.hintColor}
                   />
                 ))}
               </div>
