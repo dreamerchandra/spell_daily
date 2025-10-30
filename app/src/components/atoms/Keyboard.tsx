@@ -1,32 +1,38 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect } from 'react';
 
 interface KeyboardKeyProps {
-  children: ReactNode;
+  char: string;
   onClick: () => void;
-  variant?: 'normal' | 'special';
+  variant?: 'normal' | 'special' | 'wide';
+  className?: string;
 }
 
 const KeyboardKey = ({
-  children,
+  char,
   onClick,
   variant = 'normal',
+  className = '',
 }: KeyboardKeyProps) => {
   const baseClasses =
-    'transform rounded-lg font-semibold shadow-sm transition-all duration-200 hover:scale-105 border';
+    'flex items-center justify-center rounded-md font-normal transition-all duration-100 active:scale-95 select-none touch-manipulation border';
 
   const variantClasses = {
     normal:
-      'bg-gradient-to-r from-dark-700/70 to-dark-800/70 border-dark-600/30 text-gray-200 hover:from-dark-800 hover:to-dark-900',
+      'bg-[#2c2545] border-[#3d3660]/30 text-white/85 hover:bg-[#342d4f] h-[54px] flex-1 min-w-[32px] shadow-sm',
     special:
-      'bg-gradient-to-r from-game-error-600/80 to-game-error-700/80 border-game-error-500/30 text-white hover:from-game-error-700 hover:to-game-error-800',
+      'bg-[#c1352b] border-[#d13028]/30 text-white hover:bg-[#d13028] h-[54px] flex-1 min-w-[48px] shadow-sm',
+    wide: 'bg-[#2c2545] border-[#3d3660]/30 text-white/85 hover:bg-[#342d4f] h-[54px] shadow-sm',
   };
 
   return (
     <button
       onClick={onClick}
-      className={`${baseClasses} ${variantClasses[variant]} px-3 py-2.5 text-sm`}
+      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      type="button"
     >
-      {children}
+      <span className="pointer-events-none text-[16px] leading-none">
+        {char}
+      </span>
     </button>
   );
 };
@@ -35,28 +41,35 @@ interface KeyboardProps {
   onKeyPress: (key: string) => void;
   className?: string;
 }
+
 const keyboard = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+  ['Z', 'X', 'C', 'V', 'B', 'N', 'M'],
 ];
 
 export const Keyboard = ({ onKeyPress, className = '' }: KeyboardProps) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+
       if (e.key === 'Backspace') {
+        e.preventDefault();
         onKeyPress('⌫');
         return;
       }
+
       if (e.key.length !== 1) return;
-      if (/[a-zA-Z]/.test(e.key) === false) return;
+      if (!/[a-zA-Z]/.test(e.key)) return;
+
       const key = e.key.toUpperCase();
       const allKeys = keyboard.flat();
+
       if (allKeys.includes(key)) {
         onKeyPress(key);
       }
     };
+
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -64,20 +77,35 @@ export const Keyboard = ({ onKeyPress, className = '' }: KeyboardProps) => {
   }, [onKeyPress]);
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      {keyboard.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-1.5">
-          {row.map(key => (
-            <KeyboardKey
-              key={key}
-              onClick={() => onKeyPress(key)}
-              variant={key === '⌫' ? 'special' : 'normal'}
-            >
-              {key}
-            </KeyboardKey>
+    <div className={`w-full ${className}`} style={{ maxWidth: '100vw' }}>
+      <div className="flex flex-col gap-3 px-2 pb-3">
+        {/* Row 1: QWERTYUIOP */}
+        <div className="flex justify-center gap-2">
+          {keyboard[0].map(key => (
+            <KeyboardKey key={key} char={key} onClick={() => onKeyPress(key)} />
           ))}
         </div>
-      ))}
+
+        {/* Row 2: ASDFGHJKL */}
+        <div className="flex justify-center gap-2 px-4">
+          {keyboard[1].map(key => (
+            <KeyboardKey key={key} char={key} onClick={() => onKeyPress(key)} />
+          ))}
+        </div>
+
+        {/* Row 3: ZXCVBNM with Backspace */}
+        <div className="flex justify-center gap-2">
+          {keyboard[2].map(key => (
+            <KeyboardKey key={key} char={key} onClick={() => onKeyPress(key)} />
+          ))}
+          <KeyboardKey
+            char="⌫"
+            onClick={() => onKeyPress('⌫')}
+            variant="special"
+            className="min-w-[48px]"
+          />
+        </div>
+      </div>
     </div>
   );
 };
