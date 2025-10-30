@@ -85,7 +85,7 @@ export const FullWordGame: GameComponent = forwardRef(
             disableTalkBack={false}
           />
 
-          <Keyboard onKeyPress={handleKeyPress} className="mb-6 p-2" />
+          <Keyboard onKeyPress={handleKeyPress} />
 
           {state.isCorrect !== null && (
             <div className="mt-6 text-center">

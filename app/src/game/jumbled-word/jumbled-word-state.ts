@@ -10,11 +10,12 @@ import { showSyllable } from '../../components/organisms/SpellingInput/utils';
 import { useSpellingSpeech } from '../../hooks';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 import { arrayShuffle } from '../../util/array-shuffle';
+import type { JumbledInputLetter } from '../../components/organisms/SpellingInput/types';
 
 type JumbledWordState = {
-  userInput: string[];
-  shuffledLetters: string[];
-  availableLetters: string[];
+  userInput: JumbledInputLetter[];
+  shuffledLetters: JumbledInputLetter[];
+  availableLetters: JumbledInputLetter[];
   isCorrect: boolean | null;
   incorrectAttempts: number;
   wordDef: WordDef | null;
@@ -26,19 +27,15 @@ type SetIsCorrectPayload = ActionPayload<
   { isCorrect: boolean | null }
 >;
 type SetIncorrectAttemptsPayload = ActionPayload<'SET_INCORRECT_ATTEMPTS'>;
-type AddLetterPayload = ActionPayload<'ADD_LETTER', { letter: string }>;
-type RemoveLetterPayload = ActionPayload<'REMOVE_LETTER'>;
 type UpdateInputAndAvailablePayload = ActionPayload<
   'UPDATE_INPUT_AND_AVAILABLE',
-  { userInput: string[] }
+  { userInput: JumbledInputLetter[] }
 >;
 
 export type JumbledWordAction =
   | NewWordPayload
   | SetIsCorrectPayload
   | SetIncorrectAttemptsPayload
-  | AddLetterPayload
-  | RemoveLetterPayload
   | UpdateInputAndAvailablePayload;
 
 export const makeArray = (word: string, wordLength: number): string[] => {
@@ -57,10 +54,14 @@ export const jumbledWordReducer = (
     case 'NEW_WORD': {
       const word = action.action.wordDef.word;
       const letters = word.split('');
-      const shuffledLetters = arrayShuffle(letters);
+      const shuffledLetters = arrayShuffle(
+        letters.map((l, i) => ({ letter: l, pos: i }))
+      );
       return {
         wordDef: action.action.wordDef,
-        userInput: new Array(word.length).fill(''),
+        userInput: new Array(word.length)
+          .fill({ letter: '', pos: 0 })
+          .map((_, i) => ({ letter: '', pos: i })),
         shuffledLetters,
         availableLetters: [...shuffledLetters],
         isCorrect: null,
@@ -77,65 +78,21 @@ export const jumbledWordReducer = (
         ...state,
         incorrectAttempts: state.incorrectAttempts + 1,
       };
-    case 'ADD_LETTER': {
-      const letter = action.action.letter;
-      const letterIndex = state.availableLetters.indexOf(letter);
-      if (letterIndex === -1) return state; // Letter not available
 
-      const firstEmptyIndex = state.userInput.indexOf('');
-      if (firstEmptyIndex === -1) return state; // No empty slots
-
-      const newUserInput = [...state.userInput];
-      newUserInput[firstEmptyIndex] = letter;
-
-      const newAvailableLetters = [...state.availableLetters];
-      newAvailableLetters.splice(letterIndex, 1);
-
-      return {
-        ...state,
-        userInput: newUserInput,
-        availableLetters: newAvailableLetters,
-      };
-    }
-    case 'REMOVE_LETTER': {
-      const lastFilledIndex = state.userInput
-        .map((letter, index) => (letter !== '' ? index : -1))
-        .filter(index => index !== -1)
-        .pop();
-
-      if (lastFilledIndex === undefined) return state; // No letters to remove
-
-      const letterToRemove = state.userInput[lastFilledIndex];
-      const newUserInput = [...state.userInput];
-      newUserInput[lastFilledIndex] = '';
-
-      const newAvailableLetters = [...state.availableLetters, letterToRemove];
-
-      return {
-        ...state,
-        userInput: newUserInput,
-        availableLetters: newAvailableLetters,
-      };
-    }
     case 'UPDATE_INPUT_AND_AVAILABLE': {
       const newUserInput = action.action.userInput;
 
       // Compute available letters based on what's left unused from the original word
       if (!state.wordDef) return state;
 
-      const originalLetters = state.wordDef.word.split('');
-      const usedLetters = newUserInput.filter(letter => letter !== '');
-
-      // Create available letters by removing used letters from original letters
-      const newAvailableLetters = [...originalLetters];
-      usedLetters.forEach(usedLetter => {
-        const index = newAvailableLetters.findIndex(
-          letter => letter.toLowerCase() === usedLetter.toLowerCase()
-        );
-        if (index !== -1) {
-          newAvailableLetters.splice(index, 1);
-        }
-      });
+      const newAvailableLetters: JumbledInputLetter[] =
+        state.shuffledLetters.filter(letterObj => {
+          return !newUserInput.find(
+            inputLetterObj =>
+              inputLetterObj.letter === letterObj.letter &&
+              inputLetterObj.pos === letterObj.pos
+          );
+        });
 
       return {
         ...state,
@@ -166,25 +123,15 @@ export const useJumbledWordState = () => {
   const nextHint = useNextHint();
   const { speak } = useSpellingSpeech();
 
-  const addLetter = useCallback((letter: string) => {
-    dispatch({
-      type: 'ADD_LETTER',
-      action: { letter },
-    });
-  }, []);
-
-  const removeLetter = useCallback(() => {
-    dispatch({
-      type: 'REMOVE_LETTER',
-    });
-  }, []);
-
-  const updateInputAndAvailable = useCallback((userInput: string[]) => {
-    dispatch({
-      type: 'UPDATE_INPUT_AND_AVAILABLE',
-      action: { userInput },
-    });
-  }, []);
+  const updateInputAndAvailable = useCallback(
+    (userInput: JumbledInputLetter[]) => {
+      dispatch({
+        type: 'UPDATE_INPUT_AND_AVAILABLE',
+        action: { userInput },
+      });
+    },
+    []
+  );
 
   const setIsCorrect = useCallback(
     (isCorrect: boolean | null) => {
@@ -233,22 +180,26 @@ export const useJumbledWordState = () => {
     if (!ref.current.wordDef) return;
     if (
       showSyllable(hintState.currentHint) &&
-      !ref.current.userInput.includes('')
+      !ref.current.userInput.find(l => l.letter === '')
     ) {
-      const firstWrongIndex = ref.current.userInput.findIndex(
-        (l, i) => l !== ref.current.wordDef?.word[i]
-      );
-      const correctLetters = ref.current.wordDef?.word
-        .split('')
-        .map((l, i) => (i <= firstWrongIndex ? l : ''));
-      updateInputAndAvailable(correctLetters);
+      let newUserInput = [];
+      for (let i = 0; i < ref.current.userInput.length; i++) {
+        if (
+          ref.current.userInput[i].letter ===
+          ref.current.wordDef.actualSyllable[i]
+        ) {
+          newUserInput.push(ref.current.userInput[i]);
+        } else {
+          break;
+        }
+      }
+      updateInputAndAvailable(newUserInput);
     }
   }, [hintState.currentHint, updateInputAndAvailable]);
 
   return {
     state,
-    addLetter,
-    removeLetter,
+
     updateInputAndAvailable,
     setIsCorrect,
     setNewWord,

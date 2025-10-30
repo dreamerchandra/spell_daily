@@ -25,7 +25,7 @@ export const JumbledInput = ({
   if (isCorrect === true) {
     return (
       <SuccessAnimation
-        userInput={userInput}
+        userInput={userInput.map(l => l.letter)}
         isCorrect={isCorrect}
         className={className}
         wordDef={wordDef}

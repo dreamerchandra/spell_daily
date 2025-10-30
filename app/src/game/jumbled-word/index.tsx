@@ -21,7 +21,9 @@ export const JumbledWordGame: GameComponent = forwardRef(
     useImperativeHandle(ref, () => {
       return {
         isCorrect: () => {
-          const userWord = state.userInput.join('');
+          const userWord = state.userInput
+            .map(letterObj => letterObj.letter)
+            .join('');
           const isWordCorrect = userWord === wordDef.word;
           setIsCorrect(isWordCorrect);
           return isWordCorrect;
@@ -34,7 +36,7 @@ export const JumbledWordGame: GameComponent = forwardRef(
     }, [setNewWord, wordDef]);
 
     useEffect(() => {
-      setDisableChecking(state.userInput.includes(''));
+      setDisableChecking(state.userInput.some(l => l.letter === ''));
     }, [setDisableChecking, state.userInput]);
 
     const playAudio = () => {
@@ -42,7 +44,7 @@ export const JumbledWordGame: GameComponent = forwardRef(
     };
 
     return (
-      <div className="relative w-full max-w-md px-4 text-center">
+      <div className="relative w-full max-w-md px-2 text-center">
         <div className="mb-4">
           <div className="mb-6 text-center">
             {!isSupported && (

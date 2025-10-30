@@ -35,27 +35,27 @@ import {
   GRAY_TEXT,
 } from './styles';
 import { useOnHintIncrease } from '../../../context/hint-context';
+import type { JumbledInputLetter } from './types';
 
 export interface SpellingInputDragDropProps {
-  userInput: string[];
-  availableLetters: string[];
+  userInput: JumbledInputLetter[];
+  availableLetters: JumbledInputLetter[];
   isCorrect: boolean | null;
   className?: string;
   wordDef: WordDef;
   showSyllableColors?: boolean;
-  onUserInputChange: (newInput: string[]) => void;
+  onUserInputChange: (newInput: JumbledInputLetter[]) => void;
 }
 
 // Droppable slot component for input letters
 interface DroppableSlotProps {
   id: string;
-  letter: string;
+  letter: JumbledInputLetter | null;
   index: number;
-  isDragOver: boolean;
   isCorrect: boolean | null;
   showSyllableColors: boolean;
   phoneticColorClass?: string;
-  onDoubleClick: () => void;
+  onRemove: () => void;
   placeHolder: string | null;
 }
 
@@ -63,13 +63,14 @@ const DroppableSlot = ({
   id,
   letter,
   index: _index,
-  isDragOver,
   isCorrect,
   showSyllableColors,
   phoneticColorClass,
-  onDoubleClick,
+  onRemove,
   placeHolder,
 }: DroppableSlotProps) => {
+  const [lastTap, setLastTap] = useState<number>(0);
+
   const {
     attributes,
     listeners,
@@ -84,12 +85,23 @@ const DroppableSlot = ({
     transition,
   };
 
-  const getBoxStyles = () => {
-    let baseStyles = BASE_BOX_CLASSES;
+  // Mobile-friendly double tap handler
+  const handleTap = () => {
+    if (!letter) return;
 
-    if (isDragOver) {
-      baseStyles += ' ring-2 ring-blue-400 ring-offset-2';
+    const currentTime = Date.now();
+    const tapGap = currentTime - lastTap;
+
+    if (tapGap < 300 && tapGap > 0) {
+      // Double tap detected
+      onRemove();
     }
+
+    setLastTap(currentTime);
+  };
+
+  const getBoxStyles = () => {
+    let baseStyles = `${BASE_BOX_CLASSES} w-auto`;
 
     if (isDragging) {
       baseStyles += ' opacity-50';
@@ -97,7 +109,7 @@ const DroppableSlot = ({
 
     if (!letter && placeHolder) {
       baseStyles += ' italic text-gray-500';
-      letter = placeHolder;
+      letter = { letter: placeHolder, pos: _index };
     }
 
     if (showSyllableColors && phoneticColorClass) {
@@ -124,19 +136,40 @@ const DroppableSlot = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        ...style,
-        touchAction: 'none',
-      }}
-      className={getBoxStyles()}
-      onDoubleClick={onDoubleClick}
-      title={letter ? 'Double-click to remove' : 'Drop letter here'}
-      {...attributes}
-      {...(letter ? listeners : {})}
-    >
-      {letter || ''}
+    <div className={letter ? 'group relative flex-1' : ''}>
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,
+          touchAction: 'none',
+        }}
+        className={`${getBoxStyles()}`}
+        onDoubleClick={handleTap}
+        onClick={handleTap}
+        onTouchEnd={e => {
+          if (e.currentTarget === e.target) {
+            e.preventDefault();
+            handleTap();
+          }
+        }}
+        title={letter ? 'Tap twice to remove' : 'Drop letter here'}
+        {...attributes}
+        {...(letter ? listeners : {})}
+      >
+        {letter?.letter || ''}
+        {letter && (
+          <button
+            className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-60 transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
+            onClick={e => {
+              e.stopPropagation();
+              e.preventDefault();
+              onRemove();
+            }}
+          >
+            ×
+          </button>
+        )}
+      </div>
     </div>
   );
 };
@@ -144,7 +177,7 @@ const DroppableSlot = ({
 // Draggable letter component for available letters
 interface DraggableLetterProps {
   id: string;
-  letter: string;
+  letter: JumbledInputLetter;
   onClick: () => void;
   showSyllableColors?: boolean;
   phoneticColorClass?: string;
@@ -193,7 +226,7 @@ const DraggableLetter = ({
       }`}
       title="Drag to position or click to add"
     >
-      {letter}
+      {letter.letter}
     </div>
   );
 };
@@ -214,7 +247,6 @@ export const SpellingInputDragDrop = ({
     }
   });
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -260,14 +292,16 @@ export const SpellingInputDragDrop = ({
     const wordLetters = wordDef.word.split('');
     const letterPositions = wordLetters
       .map((wordLetter, pos) =>
-        wordLetter.toLowerCase() === letter.toLowerCase() ? pos : -1
+        wordLetter.toLowerCase() === letter.letter.toLowerCase() ? pos : -1
       )
       .filter(pos => pos !== -1);
 
     // Count how many of this letter we've seen before this available index
     const letterOccurrenceIndex = availableLetters
       .slice(0, availableIndex)
-      .filter(l => l.toLowerCase() === letter.toLowerCase()).length;
+      .filter(
+        l => l.letter.toLowerCase() === letter.letter.toLowerCase()
+      ).length;
 
     // Get the syllable index for this occurrence of the letter
     const wordPosition =
@@ -290,7 +324,6 @@ export const SpellingInputDragDrop = ({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
-    setDragOverId(null);
 
     if (!over) return;
 
@@ -319,7 +352,7 @@ export const SpellingInputDragDrop = ({
       const letter = userInput[activeIndex];
       if (letter) {
         const newUserInput = [...userInput];
-        newUserInput[activeIndex] = '';
+        newUserInput[activeIndex] = { letter: '', pos: activeIndex };
         onUserInputChange(newUserInput);
       }
     }
@@ -330,13 +363,15 @@ export const SpellingInputDragDrop = ({
     if (!letter) return;
 
     const newUserInput = [...userInput];
-    newUserInput[index] = '';
+    newUserInput[index] = { letter: '', pos: index };
 
     onUserInputChange(newUserInput);
   };
 
-  const handleAvailableLetterClick = (letter: string) => {
-    const firstEmptyIndex = userInput.findIndex(slot => slot === '');
+  const handleAvailableLetterClick = (letter: JumbledInputLetter) => {
+    const firstEmptyIndex = userInput.findIndex(
+      slot => slot === null || slot.letter === ''
+    );
     if (firstEmptyIndex === -1) return;
 
     const newUserInput = [...userInput];
@@ -347,7 +382,7 @@ export const SpellingInputDragDrop = ({
 
   return (
     <DndContext
-      key={`${userInput.join('')}-${availableLetters.join('')}`}
+      key={`${userInput.map(item => item.letter).join('')}-${availableLetters.map(item => item.letter).join('')}`}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
@@ -366,14 +401,13 @@ export const SpellingInputDragDrop = ({
                 id={item.id}
                 letter={item.letter}
                 index={index}
-                isDragOver={dragOverId === item.id}
                 isCorrect={isCorrect}
                 placeHolder={
                   showPlaceHolders && !item.letter ? wordDef.word[index] : null
                 }
                 showSyllableColors={showSyllableColors}
                 phoneticColorClass={phoneticGrouping[index]}
-                onDoubleClick={() => handleInputLetterDoubleClick(index)}
+                onRemove={() => handleInputLetterDoubleClick(index)}
               />
             ))}
           </div>
@@ -410,8 +444,9 @@ export const SpellingInputDragDrop = ({
         {activeId ? (
           <div className="flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-dark-600/30 bg-gradient-to-r from-dark-700/70 to-dark-800/70 text-sm font-semibold text-gray-200 opacity-75 shadow-sm">
             {String(activeId).startsWith('input-')
-              ? userInput[parseInt(String(activeId).split('-')[1])]
-              : availableLetters[parseInt(String(activeId).split('-')[1])]}
+              ? userInput[parseInt(String(activeId).split('-')[1])].letter
+              : availableLetters[parseInt(String(activeId).split('-')[1])]
+                  .letter}
           </div>
         ) : null}
       </DragOverlay>
