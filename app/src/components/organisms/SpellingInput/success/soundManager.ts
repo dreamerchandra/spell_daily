@@ -5,6 +5,7 @@ export const SuccessAnimationType = {
   CONFETTI_BURST: 'confetti-burst',
   TYPEWRITER: 'typewriter',
   COLOR_FLOW: 'color-flow',
+  FIRE_ANIMATION: 'fire-animation',
 } as const;
 
 export type SuccessAnimationTypeValue =
@@ -31,6 +32,10 @@ const SOUND_CONFIGS = {
   [SuccessAnimationType.COLOR_FLOW]: {
     path: '/sounds/success/magic.wav',
     fallback: { frequency: 900, duration: 0.6, type: 'triangle' as const },
+  },
+  [SuccessAnimationType.FIRE_ANIMATION]: {
+    path: '/sounds/success/magic.wav',
+    fallback: { frequency: 750, duration: 0.8, type: 'sawtooth' as const },
   },
 };
 

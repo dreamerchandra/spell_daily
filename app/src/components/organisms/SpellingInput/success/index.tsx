@@ -3,6 +3,7 @@ import { RippleEffect } from './RippleEffect';
 import { ConfettiBurst } from './ConfettiBurst';
 import { Typewriter } from './Typewriter';
 import { ColorFlow } from './ColorFlow';
+import { FireAnimation } from './FireAnimation';
 import { triggerSpellingSuccess } from '../../../../util/success-vibrations';
 import { memo, useState, useEffect } from 'react';
 import type { AnimationInputProps } from './type';
@@ -13,6 +14,7 @@ const ANIMATION_COMPONENTS = [
   RippleEffect,
   ConfettiBurst,
   ColorFlow,
+  FireAnimation,
 ] as const;
 
 const ANIMATION_NAMES = [
@@ -21,6 +23,7 @@ const ANIMATION_NAMES = [
   'Ripple Effect',
   'Confetti Burst',
   'Color Flow',
+  'Fire Animation',
 ] as const;
 
 const InternalSuccessAnimation = (props: AnimationInputProps) => {
@@ -45,4 +48,11 @@ const InternalSuccessAnimation = (props: AnimationInputProps) => {
 
 export const SuccessAnimation = memo(InternalSuccessAnimation, () => true); // Never re-render
 
-export { SequentialBounce, RippleEffect, ConfettiBurst, Typewriter, ColorFlow };
+export {
+  SequentialBounce,
+  RippleEffect,
+  ConfettiBurst,
+  Typewriter,
+  ColorFlow,
+  FireAnimation,
+};
