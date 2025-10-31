@@ -10,4 +10,28 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Separate PostHog into its own chunk
+          if (id.includes('posthog-js')) {
+            return 'posthog';
+          }
+          // Separate Rive into its own chunk
+          if (id.includes('rive')) {
+            return 'rive';
+          }
+          // Bundle all DnD Kit packages into single chunk
+          if (id.includes('@dnd-kit')) {
+            return 'dndkit';
+          }
+          // Automatically split other vendor chunks for node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });
