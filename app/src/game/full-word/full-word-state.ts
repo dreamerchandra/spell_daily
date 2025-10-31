@@ -10,7 +10,7 @@ import { showSyllable } from '../../components/organisms/SpellingInput/utils';
 import { useSpellingSpeech } from '../../hooks';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 
-type FullWordState = {
+export type FullWordState = {
   userInput: string[];
   isCorrect: boolean | null;
   incorrectAttempts: number;
