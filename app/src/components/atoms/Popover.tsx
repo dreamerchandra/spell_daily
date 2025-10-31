@@ -1,4 +1,5 @@
 import { type ReactNode, useRef, useEffect } from 'react';
+import { ThemeButton } from './ThemeButton';
 
 interface PopoverProps {
   trigger: ReactNode;
@@ -48,9 +49,23 @@ export const Popover = ({
       {isOpen && (
         <div
           ref={popoverRef}
-          className="absolute left-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-dark-600/30 bg-gradient-to-b from-dark-700/95 to-dark-800/95 p-2 shadow-xl backdrop-blur-lg"
+          className="absolute left-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border p-2 shadow-xl backdrop-blur-lg"
+          style={{
+            borderColor: 'var(--ui-border)',
+            backgroundColor: 'var(--bg-surface)',
+            boxShadow: 'var(--ui-shadow)',
+          }}
         >
-          {children}
+          <ThemeButton />
+          {children && (
+            <>
+              <div
+                className="my-2 h-px"
+                style={{ backgroundColor: 'var(--ui-border)' }}
+              />
+              {children}
+            </>
+          )}
         </div>
       )}
     </div>

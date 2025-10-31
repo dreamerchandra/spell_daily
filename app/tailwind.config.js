@@ -13,6 +13,18 @@ export default {
           600: '#4f4560', // Even lighter purple
           500: '#64748b', // neutral gray
         },
+        // Dynamic theme colors using CSS custom properties
+        theme: {
+          primary: 'var(--color-primary)',
+          'primary-light': 'var(--color-primary-light)',
+          'primary-dark': 'var(--color-primary-dark)',
+          secondary: 'var(--color-secondary)',
+          'secondary-light': 'var(--color-secondary-light)',
+          'secondary-dark': 'var(--color-secondary-dark)',
+          accent: 'var(--color-accent)',
+          'accent-light': 'var(--color-accent-light)',
+          'accent-dark': 'var(--color-accent-dark)',
+        },
         // Game specific colors
         game: {
           primary: {
@@ -68,6 +80,8 @@ export default {
       backgroundImage: {
         'dark-gradient':
           'linear-gradient(to bottom right, #1a1625, #2a2438, #1a1625)',
+        'theme-gradient': 'var(--bg-gradient)',
+        'theme-main': 'var(--bg-main)',
         'game-gradient': 'linear-gradient(to right, var(--tw-gradient-stops))',
         'primary-gradient': 'linear-gradient(135deg, #a855f7, #9333ea)',
         'secondary-gradient': 'linear-gradient(135deg, #f59e0b, #d97706)',

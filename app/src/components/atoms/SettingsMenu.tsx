@@ -52,7 +52,10 @@ export const SettingsMenu = ({
       isOpen={isOpen}
       onToggle={() => setIsOpen(!isOpen)}
       trigger={
-        <button className="" aria-label="Settings menu">
+        <button
+          className="text-theme-primary hover:text-theme-primary-light transition-colors"
+          aria-label="Settings menu"
+        >
           <svg
             width="20"
             height="20"
@@ -73,17 +76,30 @@ export const SettingsMenu = ({
       <div className="flex w-60 flex-col gap-2 p-2">
         {/* Game Mode Section */}
         <div className="mb-6 flex items-center justify-between">
-          <span className="text-lg font-light text-white">Game Mode</span>
+          <span
+            className="text-lg font-light"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Game Mode
+          </span>
           <select
             value={currentMode}
             onChange={e => handleModeChange(e.target.value as GameMode)}
-            className="rounded-lg border-2 border-white/30 bg-dark-800/80 px-3 py-1 text-white backdrop-blur-sm transition-colors hover:border-white/50 focus:border-white/70 focus:outline-none"
+            className="rounded-lg border-2 px-3 py-1 backdrop-blur-sm transition-colors focus:outline-none"
+            style={{
+              borderColor: 'var(--ui-border)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+            }}
           >
             {gameModes.map(mode => (
               <option
                 key={mode.value}
                 value={mode.value}
-                className="bg-dark-800 text-white"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                }}
               >
                 {mode.label}
               </option>
@@ -110,19 +126,29 @@ export const SettingsMenu = ({
           </button>
         </div> */}
         <div className="flex items-center justify-between">
-          <span className="text-lg font-light text-white">Test Mode</span>
+          <span
+            className="text-lg font-light"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Test Mode
+          </span>
           <button
             onClick={handleTestModeToggle}
-            className={`relative h-8 w-16 rounded-full border-2 border-white/30 p-1 transition-colors ${
-              testMode ? 'bg-red-400' : 'bg-transparent'
-            }`}
+            className="relative h-8 w-16 rounded-full border-2 p-1 transition-colors"
+            style={{
+              borderColor: 'var(--ui-border)',
+              backgroundColor: testMode ? 'var(--ui-error)' : 'transparent',
+            }}
           >
             <div
-              className={`h-5 w-5 rounded-full border border-white/50 bg-white shadow-sm transition-transform ${
-                testMode
-                  ? 'translate-x-7 bg-white'
-                  : 'translate-x-0 bg-white/20'
-              }`}
+              className="h-5 w-5 rounded-full shadow-sm transition-transform"
+              style={{
+                borderColor: 'var(--ui-border)',
+                backgroundColor: testMode
+                  ? 'var(--text-inverse)'
+                  : 'var(--text-muted)',
+                transform: testMode ? 'translateX(1.75rem)' : 'translateX(0)',
+              }}
             />
           </button>
         </div>

@@ -8,13 +8,20 @@ import {
 
 const Progress = ({ score, total }: { score: number; total: number }) => {
   return (
-    <div className="w-[80vw] max-w-[200px] rounded-full border border-dark-700/30 bg-dark-800/40 p-1">
+    <div
+      className="w-[80vw] max-w-[200px] rounded-full border p-1"
+      style={{
+        borderColor: 'var(--ui-border)',
+        backgroundColor: 'var(--bg-surface)',
+      }}
+    >
       <div
-        className="h-1.5 rounded-full bg-gradient-to-r from-game-primary-300 to-game-primary-500 transition-all duration-500"
+        className="h-1.5 rounded-full transition-all duration-500"
         style={{
           width: `${(score / total) * 100}%`,
+          background: 'var(--bg-gradient)',
         }}
-      ></div>
+      />
     </div>
   );
 };
@@ -91,13 +98,21 @@ export const CountdownTimer = forwardRef<
     <div className={`flex items-center justify-center ${className}`}>
       {/* Simple Countdown Timer */}
       <div
-        className={`rounded-lg border px-3 py-1 text-center transition-all duration-300 ${
-          timeLeft <= 5 && isActive
-            ? 'border-red-500 text-red-400'
-            : timeLeft <= 10 && isActive
-              ? 'border-yellow-500 text-yellow-400'
-              : 'border-gray-500 text-white/80'
-        }`}
+        className="rounded-lg border px-3 py-1 text-center transition-all duration-300"
+        style={{
+          borderColor:
+            timeLeft <= 5 && isActive
+              ? 'var(--ui-error)'
+              : timeLeft <= 10 && isActive
+                ? 'var(--ui-warning)'
+                : 'var(--ui-border)',
+          color:
+            timeLeft <= 5 && isActive
+              ? 'var(--ui-error)'
+              : timeLeft <= 10 && isActive
+                ? 'var(--ui-warning)'
+                : 'var(--text-primary)',
+        }}
       >
         <span className="text-sm font-medium">{formatTime(timeLeft)}</span>
       </div>

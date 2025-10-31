@@ -4,13 +4,16 @@ import './index.css';
 import { App } from './App.tsx';
 import { HintContextProvider } from './context/hint-context/index.tsx';
 import { PostHog } from './context/posthog/index';
+import { ThemeProvider } from './context/theme-context';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PostHog>
-      <HintContextProvider>
-        <App />
-      </HintContextProvider>
-    </PostHog>
+    <ThemeProvider>
+      <PostHog>
+        <HintContextProvider>
+          <App />
+        </HintContextProvider>
+      </PostHog>
+    </ThemeProvider>
   </StrictMode>
 );

@@ -8,13 +8,104 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1625;
+  color: var(--text-primary, rgba(255, 255, 255, 0.87));
+  background: var(--bg-main, #1a1625);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Default theme colors (Dark Magic theme) */
+  --color-primary: #a855f7;
+  --color-primary-light: #c084fc;
+  --color-primary-dark: #9333ea;
+  --color-secondary: #f59e0b;
+  --color-secondary-light: #fbbf24;
+  --color-secondary-dark: #d97706;
+  --color-accent: #10b981;
+  --color-accent-light: #34d399;
+  --color-accent-dark: #059669;
+  --bg-main: linear-gradient(to bottom right, #1a1625, #2a2438, #1a1625);
+  --bg-surface: rgba(45, 52, 74, 0.95);
+  --bg-overlay: rgba(26, 22, 37, 0.9);
+  --bg-gradient: linear-gradient(135deg, #a855f7, #9333ea);
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-inverse: #1a1625;
+  --text-muted: #94a3b8;
+  --ui-border: #4f4560;
+  --ui-shadow: rgba(0, 0, 0, 0.4);
+  --ui-success: #10b981;
+  --ui-warning: #f59e0b;
+  --ui-error: #ef4444;
+  --ui-info: #3b82f6;
+  --interactive-hover: rgba(168, 85, 247, 0.15);
+  --interactive-active: rgba(168, 85, 247, 0.25);
+  --interactive-disabled: rgba(148, 163, 184, 0.3);
+  --interactive-focus: rgba(168, 85, 247, 0.3);
+}
+
+/* Themed component classes */
+.themed-success-box {
+  border-color: var(--ui-success);
+  background-color: color-mix(in srgb, var(--ui-success) 20%, transparent);
+  color: var(--ui-success);
+}
+
+.themed-error-box {
+  border-color: var(--ui-error);
+  background-color: color-mix(in srgb, var(--ui-error) 20%, transparent);
+  color: var(--ui-error);
+}
+
+.themed-primary-box {
+  border-color: var(--color-primary);
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  color: var(--color-primary);
+}
+
+.themed-empty-box {
+  border-color: var(--ui-border);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.themed-active-ring {
+  box-shadow: 0 0 0 2px var(--interactive-focus);
+}
+
+.themed-primary-text {
+  color: var(--text-primary);
+}
+
+.themed-secondary-text {
+  color: var(--text-secondary);
+}
+
+/* Utility classes for quick theming */
+.theme-bg-main {
+  background: var(--bg-main);
+}
+
+.theme-bg-surface {
+  background: var(--bg-surface);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-border {
+  border-color: var(--ui-border);
+}
+
+.theme-shadow {
+  box-shadow: var(--ui-shadow);
 }
 
 body,
