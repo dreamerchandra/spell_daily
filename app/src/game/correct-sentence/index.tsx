@@ -3,6 +3,10 @@ import type { GameComponent } from '../../common/game-type';
 import type { WordUsage } from '../../words';
 import { useSpellingSpeech } from '../../hooks';
 import { useCorrectSentenceState } from './correct-sentence-state';
+import {
+  successSoundManager,
+  SuccessAnimationType,
+} from '../../util/soundManager';
 
 export const CorrectSentenceGame: GameComponent<WordUsage> = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
@@ -20,6 +24,9 @@ export const CorrectSentenceGame: GameComponent<WordUsage> = forwardRef(
           const isAnswerCorrect =
             state.selectedAnswer === state.currentQuestion.correctAnswer;
           setIsCorrect(isAnswerCorrect);
+          if (isAnswerCorrect) {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+          }
           return isAnswerCorrect;
         },
       };

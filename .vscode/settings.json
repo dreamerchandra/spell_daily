@@ -6,7 +6,7 @@
   },
   "eslint.validate": [
     "javascript",
-    "javascriptreact", 
+    "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
@@ -16,5 +16,6 @@
   "tailwindCSS.includeLanguages": {
     "typescript": "typescript",
     "typescriptreact": "typescriptreact"
-  }
+  },
+  "liveServer.settings.port": 5501
 }

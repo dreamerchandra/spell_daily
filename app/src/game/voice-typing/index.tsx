@@ -113,6 +113,7 @@ export const VoiceTypingGame: GameComponent = forwardRef(
           const isWordCorrect =
             userWord.toLocaleLowerCase() === wordDef.word.toLocaleLowerCase();
           setIsCorrect(isWordCorrect);
+
           return isWordCorrect;
         },
       };
