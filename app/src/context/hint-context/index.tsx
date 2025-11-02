@@ -99,6 +99,23 @@ export const useIsTestMode = () => {
   return state.testMode;
 };
 
+export const useOnTestModeChange = (cb: (enabled: boolean) => void) => {
+  const { state } = useHintContext();
+  const ref = useRef(cb);
+  const prevTestModeRef = useRef(state.testMode);
+
+  useEffect(() => {
+    ref.current = cb;
+  }, [cb]);
+
+  useEffect(() => {
+    if (state.testMode !== prevTestModeRef.current) {
+      ref.current(state.testMode);
+    }
+    prevTestModeRef.current = state.testMode;
+  }, [state.testMode]);
+};
+
 export const useSetTestMode = () => {
   const { dispatch } = useHintContext();
   return useCallback(

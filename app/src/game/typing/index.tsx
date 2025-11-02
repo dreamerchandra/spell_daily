@@ -78,25 +78,7 @@ export const TypingGame: GameComponent = forwardRef(
             className="mb-8"
           />
 
-          <Keyboard onKeyPress={handleKeyPress} className="mb-6 p-2" />
-
-          {state.isCorrect !== null && (
-            <div className="mt-6 text-center">
-              {state.isCorrect ? (
-                <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-lg font-semibold text-game-success-300">
-                    🎉 Awesome! That's correct! 🎉
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-base font-medium text-game-error-300">
-                    😊 Try again! You've got this! 💪
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+          <Keyboard onKeyPress={handleKeyPress} />
         </div>
       </div>
     );

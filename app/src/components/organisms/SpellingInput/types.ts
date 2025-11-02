@@ -15,3 +15,8 @@ export interface SpellingInputBaseProps extends SpellingInputProps {
 export interface SpellingInputWithHintsProps extends SpellingInputProps {
   currentEmptyIndex: number;
 }
+
+export type JumbledInputLetter = {
+  letter: string;
+  pos: number;
+};

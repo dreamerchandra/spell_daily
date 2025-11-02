@@ -11,7 +11,10 @@ import {
   GRAY_TEXT,
 } from '../styles';
 import { findActiveIndex } from '../utils';
-import { successSoundManager, SuccessAnimationType } from './soundManager';
+import {
+  successSoundManager,
+  SuccessAnimationType,
+} from '../../../../util/soundManager';
 import { slow } from '../../../../config/animation-knobs';
 import type { AnimationInputProps } from './type';
 

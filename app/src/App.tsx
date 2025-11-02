@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameRef } from './common/game-ref';
 import { type GameComponent, type GameMode } from './common/game-type';
-import { Button } from './components/atoms/Button';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
 import { ProgressWithTimer, type TimerRef } from './components/atoms/Progress';
@@ -20,6 +19,8 @@ import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
 import { ContextGame } from './game/context';
 import { CorrectSentenceGame } from './game/correct-sentence';
+import { CheckButton } from './components/atoms/check-button';
+import { useOnTestModeChange } from './context/hint-context/index';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ComponentMap: Record<GameMode, GameComponent<any>> = {
@@ -67,25 +68,32 @@ export const App = () => {
   const Component = ComponentMap[gameMode];
   const [start, setStart] = useState(false);
   const onCheckAnswer = useCallback(() => {
-    if (gameRef.current?.isCorrect()) {
+    const answer = gameRef.current?.isCorrect();
+    if (answer) {
       timerRef.current?.stopTimer();
       setCanContinue(true);
     }
+    return answer ?? null;
   }, []);
 
-  useEffect(() => {
-    if (isTestMode) {
+  useOnTestModeChange(enabled => {
+    if (enabled) {
       timerRef.current?.startTimer(words[currentWordIndex].word.length * 2);
+    } else {
+      timerRef.current?.stopTimer();
     }
-  }, [currentWordIndex, isTestMode, words]);
+  });
 
   const moveToNextWord = useCallback(() => {
     setCurrentWordIndex(prev => {
       const nextIndex = prev < words.length - 1 ? prev + 1 : prev;
+      if (isTestMode) {
+        timerRef.current?.startTimer(words[nextIndex].word.length * 2);
+      }
       return nextIndex;
     });
     setCanContinue(false);
-  }, [words]);
+  }, [isTestMode, words]);
 
   useShortcut('Enter', () => {
     if (canContinue) {
@@ -152,21 +160,15 @@ export const App = () => {
         />
       }
       footer={
-        <Footer>
-          <div className="text-center">
-            {canContinue ? (
-              <Continue disabled={!canContinue} onClick={moveToNextWord} />
-            ) : (
-              <Button
-                onClick={onCheckAnswer}
-                disabled={disableChecking}
-                variant="primary"
-                size="lg"
-              >
-                CHECK
-              </Button>
-            )}
-          </div>
+        <Footer isSuccess={canContinue}>
+          {canContinue ? (
+            <Continue disabled={!canContinue} onClick={moveToNextWord} />
+          ) : (
+            <CheckButton
+              onCheckAnswer={onCheckAnswer}
+              disableChecking={disableChecking}
+            />
+          )}
         </Footer>
       }
     >

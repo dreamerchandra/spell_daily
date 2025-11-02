@@ -25,6 +25,10 @@ import type { WordDef } from '../../words';
 import { useMultiChoiceState } from './multiple-choice-state';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
 import { pubSub } from '../../util/pub-sub';
+import {
+  successSoundManager,
+  SuccessAnimationType,
+} from '../../util/soundManager';
 
 interface DroppableSlotProps {
   id: string;
@@ -188,6 +192,9 @@ const MultiOptionGame = forwardRef<
         const isWordCorrect =
           state.droppedOption.toLowerCase() === wordDef.word.toLowerCase();
         setIsCorrect(isWordCorrect);
+        if (isWordCorrect) {
+          successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+        }
         return isWordCorrect;
       },
     };
@@ -284,24 +291,6 @@ const MultiOptionGame = forwardRef<
               ))}
             </div>
           </div>
-
-          {state.isCorrect !== null && (
-            <div className="mt-6 text-center">
-              {state.isCorrect ? (
-                <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-lg font-semibold text-game-success-300">
-                    🎉 Awesome! That's correct! 🎉
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-base font-medium text-game-error-300">
-                    😊 Try again! You've got this! 💪
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

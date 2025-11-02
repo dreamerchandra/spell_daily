@@ -3,6 +3,11 @@ import { DroppableSlot } from './droppable-slot';
 import type { WordDef } from '../../../words';
 import { pubSub } from '../../../util/pub-sub';
 import { useSetTimeout } from '../../../hooks/use-setTimeout';
+import {
+  successSoundManager,
+  SuccessAnimationType,
+} from '../../../util/soundManager';
+import { useOnCorrect } from '../../../hooks/use-on-correct';
 
 export const SyllableInput: FC<{
   wordDef: WordDef;
@@ -24,6 +29,15 @@ export const SyllableInput: FC<{
       timer(() => setShowFinalResult(true), 200);
     }
   }, [timer, totalSyllables]);
+
+  useOnCorrect(state.isCorrect, isCorrect => {
+    if (isCorrect) {
+      successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+    } else {
+      setShowFinalResult(false);
+      completedAnimations.current = 0;
+    }
+  });
 
   return (
     <div className="mb-6 rounded-xl border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800">

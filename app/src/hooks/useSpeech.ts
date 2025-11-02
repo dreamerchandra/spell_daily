@@ -61,7 +61,7 @@ export const useSpeech = (
     };
   }, [isSupported]);
 
-  const findBestVoice = useCallback(
+  const bestVoice = useMemo(
     (targetLang: string = 'en'): SpeechSynthesisVoice | null => {
       if (!voices.length) return null;
 
@@ -119,15 +119,13 @@ export const useSpeech = (
       stop();
 
       const finalConfig = { ...config, ...overrideConfig };
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(text.toLocaleLowerCase());
 
       // Apply configuration
       utterance.rate = finalConfig.rate!;
       utterance.pitch = finalConfig.pitch!;
       utterance.volume = finalConfig.volume!;
 
-      // Set the best available voice
-      const bestVoice = findBestVoice(finalConfig.lang);
       if (bestVoice) {
         utterance.voice = bestVoice;
       }
@@ -154,7 +152,7 @@ export const useSpeech = (
       }, 150);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [config, findBestVoice, isSupported, stop]
+    [config, bestVoice, isSupported, stop]
   );
 
   return {

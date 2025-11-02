@@ -10,4 +10,25 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Separate PostHog into its own chunk
+          if (id.includes('posthog-js')) {
+            return 'posthog';
+          }
+          // Bundle all DnD Kit packages into single chunk
+          if (id.includes('@dnd-kit')) {
+            return 'dndkit';
+          }
+          // Automatically split other vendor chunks for node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });

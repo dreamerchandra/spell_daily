@@ -21,7 +21,9 @@ export const JumbledWordGame: GameComponent = forwardRef(
     useImperativeHandle(ref, () => {
       return {
         isCorrect: () => {
-          const userWord = state.userInput.join('');
+          const userWord = state.userInput
+            .map(letterObj => letterObj.letter)
+            .join('');
           const isWordCorrect = userWord === wordDef.word;
           setIsCorrect(isWordCorrect);
           return isWordCorrect;
@@ -34,7 +36,7 @@ export const JumbledWordGame: GameComponent = forwardRef(
     }, [setNewWord, wordDef]);
 
     useEffect(() => {
-      setDisableChecking(state.userInput.includes(''));
+      setDisableChecking(state.userInput.some(l => l.letter === ''));
     }, [setDisableChecking, state.userInput]);
 
     const playAudio = () => {
@@ -42,7 +44,7 @@ export const JumbledWordGame: GameComponent = forwardRef(
     };
 
     return (
-      <div className="relative w-full max-w-md px-4 text-center">
+      <div className="relative w-full max-w-md px-2 text-center">
         <div className="mb-4">
           <div className="mb-6 text-center">
             {!isSupported && (
@@ -70,24 +72,6 @@ export const JumbledWordGame: GameComponent = forwardRef(
             showSyllableColors={showSyllable(hintState.currentHint)}
             onUserInputChange={updateInputAndAvailable}
           />
-
-          {state.isCorrect !== null && (
-            <div className="mt-6 text-center">
-              {state.isCorrect ? (
-                <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-lg font-semibold text-game-success-300">
-                    🎉 Awesome! That's correct! 🎉
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-base font-medium text-game-error-300">
-                    😊 Try again! You've got this! 💪
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     );
