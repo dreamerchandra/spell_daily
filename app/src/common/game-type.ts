@@ -14,9 +14,11 @@ export type SpellingGameMode =
 export type UsageGameMode = 'context' | 'correctSentence';
 
 export type GameMode = SpellingGameMode | UsageGameMode;
+export type GameRefProps<T = WordDef> = {
+  wordDef: T;
+  setDisableChecking: (disable: boolean) => void;
+} & RefAttributes<GameRef>;
+
 export type GameComponent<T = WordDef> = ForwardRefExoticComponent<
-  {
-    wordDef: T;
-    setDisableChecking: (disable: boolean) => void;
-  } & RefAttributes<GameRef>
+  GameRefProps<T>
 >;

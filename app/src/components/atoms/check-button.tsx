@@ -1,28 +1,58 @@
-import { useState, type FC } from 'react';
+import { useCallback, useState, type FC } from 'react';
 import { Button } from './Button';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
+import type { GameState } from '../../common/game-ref';
+import { useShortcut } from '../../hooks/use-shortcut';
 
 export const CheckButton: FC<{
-  onCheckAnswer: () => boolean | null;
+  onCheckAnswer: () => GameState;
   disableChecking: boolean;
 }> = ({ onCheckAnswer, disableChecking }) => {
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [gameState, setGameState] = useState<GameState>('UNANSWERED');
   const timer = useSetTimeout();
 
+  const onClick = useCallback(() => {
+    if (disableChecking) return;
+    const gameState = onCheckAnswer();
+    setGameState(gameState);
+    if (gameState === 'SO_CLOSE') {
+      return;
+    }
+    timer(() => {
+      setGameState('UNANSWERED');
+    }, 2000);
+  }, [disableChecking, onCheckAnswer, timer]);
+
+  useShortcut('Enter', onClick);
+
   return (
-    <Button
-      onClick={() => {
-        setIsCorrect(onCheckAnswer());
-        timer(() => {
-          setIsCorrect(null);
-        }, 2000);
-      }}
-      className="m-auto w-[80%]"
-      disabled={disableChecking}
-      variant={isCorrect === null ? 'primary' : isCorrect ? 'success' : 'error'}
-      size="lg"
-    >
-      {isCorrect === null ? 'CHECK' : isCorrect ? 'CORRECT' : 'WRONG'}
-    </Button>
+    <div className="m-auto flex w-[80%] flex-col justify-center">
+      {gameState === 'SO_CLOSE' && (
+        <p className="mb-2 text-center text-lg text-yellow-400">
+          So close! Try again.
+        </p>
+      )}
+      <Button
+        onClick={onClick}
+        className="m-auto w-[80%]"
+        disabled={disableChecking}
+        variant={
+          gameState === 'UNANSWERED'
+            ? 'primary'
+            : gameState === 'CORRECT'
+              ? 'success'
+              : 'error'
+        }
+        size="lg"
+      >
+        {gameState === 'UNANSWERED'
+          ? 'CHECK'
+          : gameState === 'CORRECT'
+            ? 'CORRECT'
+            : gameState === 'SO_CLOSE'
+              ? 'SO CLOSE'
+              : 'WRONG'}
+      </Button>
+    </div>
   );
 };

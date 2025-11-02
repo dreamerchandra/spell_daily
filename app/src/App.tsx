@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { GameRef } from './common/game-ref';
+import type { GameRef, GameState } from './common/game-ref';
 import { type GameComponent, type GameMode } from './common/game-type';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
@@ -13,7 +13,6 @@ import { SyllableGame } from './game/syllabi';
 import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import { useShortcut } from './hooks/use-shortcut';
 import { sampleSpellingWords, sampleWordUsage } from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
@@ -67,13 +66,13 @@ export const App = () => {
 
   const Component = ComponentMap[gameMode];
   const [start, setStart] = useState(false);
-  const onCheckAnswer = useCallback(() => {
-    const answer = gameRef.current?.isCorrect();
-    if (answer) {
+  const onCheckAnswer = useCallback((): GameState => {
+    const answer = gameRef.current?.getCorrectState();
+    if (answer === 'CORRECT') {
       timerRef.current?.stopTimer();
       setCanContinue(true);
     }
-    return answer ?? null;
+    return answer ?? 'UNANSWERED';
   }, []);
 
   useOnTestModeChange(enabled => {
@@ -94,16 +93,6 @@ export const App = () => {
     });
     setCanContinue(false);
   }, [isTestMode, words]);
-
-  useShortcut('Enter', () => {
-    if (canContinue) {
-      moveToNextWord();
-      return;
-    }
-    if (!disableChecking) {
-      onCheckAnswer();
-    }
-  });
 
   const onTimeUp = useCallback(() => {
     Avatar.show({

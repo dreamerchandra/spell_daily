@@ -2,6 +2,7 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  type FC,
   type ReactNode,
 } from 'react';
 import {
@@ -16,12 +17,11 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import type { GameComponent } from '../../common/game-type';
+import type { GameComponent, GameRefProps } from '../../common/game-type';
 import { Syllable } from '../../components/atoms/hints/syllable';
 import { Speaker } from '../../components/atoms/speaker';
 import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
-import type { WordDef } from '../../words';
 import { useMultiChoiceState } from './multiple-choice-state';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
 import { pubSub } from '../../util/pub-sub';
@@ -29,6 +29,7 @@ import {
   successSoundManager,
   SuccessAnimationType,
 } from '../../util/soundManager';
+import type { GameState } from '../../common/game-ref';
 
 interface DroppableSlotProps {
   id: string;
@@ -160,148 +161,145 @@ const UsageSentence = ({
   );
 };
 
-interface MultiOptionGameProps {
-  wordDef: WordDef;
-  setDisableChecking: (disabled: boolean) => void;
+interface MultiOptionGameProps extends GameRefProps {
   numberOfOptions: number;
 }
 
-const MultiOptionGame = forwardRef<
-  { isCorrect: () => boolean },
-  MultiOptionGameProps
->(({ wordDef, setDisableChecking, numberOfOptions }, ref) => {
-  const { state, setDroppedOption, setIsCorrect, setNewWord } =
-    useMultiChoiceState(numberOfOptions);
-  const hintState = useHintState();
-  const { speak, isPlaying, isSupported } = useSpellingSpeech();
+const MultiOptionGame: FC<MultiOptionGameProps> = forwardRef(
+  ({ wordDef, setDisableChecking, numberOfOptions }, ref) => {
+    const { state, setDroppedOption, setIsCorrect, setNewWord } =
+      useMultiChoiceState(numberOfOptions);
+    const hintState = useHintState();
+    const { speak, isPlaying, isSupported } = useSpellingSpeech();
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor),
-    useSensor(TouchSensor)
-  );
-
-  useImperativeHandle(ref, () => {
-    return {
-      isCorrect: () => {
-        if (!state.droppedOption || !wordDef) {
-          setIsCorrect(false);
-          return false;
-        }
-
-        const isWordCorrect =
-          state.droppedOption.toLowerCase() === wordDef.word.toLowerCase();
-        setIsCorrect(isWordCorrect);
-        if (isWordCorrect) {
-          successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
-        }
-        return isWordCorrect;
-      },
-    };
-  });
-
-  useEffect(() => {
-    if (wordDef) {
-      setNewWord(wordDef);
-    }
-  }, [setNewWord, wordDef]);
-
-  useEffect(() => {
-    setDisableChecking(!state.droppedOption);
-  }, [setDisableChecking, state.droppedOption]);
-
-  const playAudio = () => {
-    if (wordDef) {
-      speak(wordDef.word);
-    }
-  };
-
-  const handleOptionSelect = (option: string) => {
-    setDroppedOption(option);
-  };
-
-  const handleDragStart = (_event: DragStartEvent) => {
-    // Handle drag start if needed
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      // Handle drop logic
-      const droppedOption = active.id as string;
-      setDroppedOption(droppedOption);
-    }
-  };
-
-  if (!wordDef || !state.selectedUsage) {
-    return (
-      <div className="relative w-full max-w-md px-4 text-center">
-        <p className="text-game-secondary-600 dark:text-game-secondary-400">
-          Loading word options...
-        </p>
-      </div>
+    const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(KeyboardSensor),
+      useSensor(TouchSensor)
     );
-  }
 
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="relative w-full max-w-2xl px-4 text-center">
-        <div className="mb-4">
-          <div className="mb-6 text-center">
-            {!isSupported && (
-              <p className="mb-2 text-sm text-game-secondary-400">
-                ⚠️ Audio not supported in this browser
-              </p>
-            )}
-            <div className="flex justify-center gap-3">
-              <Speaker onSpeak={playAudio} isPlaying={isPlaying} />
+    useImperativeHandle(ref, () => {
+      return {
+        getCorrectState: () => {
+          if (!state.droppedOption || !wordDef) {
+            setIsCorrect(false);
+            return 'INCORRECT';
+          }
+
+          const isWordCorrect =
+            state.droppedOption.toLowerCase() === wordDef.word.toLowerCase();
+          setIsCorrect(isWordCorrect);
+          if (isWordCorrect) {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+          }
+          return isWordCorrect ? 'CORRECT' : 'INCORRECT';
+        },
+      };
+    });
+
+    useEffect(() => {
+      if (wordDef) {
+        setNewWord(wordDef);
+      }
+    }, [setNewWord, wordDef]);
+
+    useEffect(() => {
+      setDisableChecking(!state.droppedOption);
+    }, [setDisableChecking, state.droppedOption]);
+
+    const playAudio = () => {
+      if (wordDef) {
+        speak(wordDef.word);
+      }
+    };
+
+    const handleOptionSelect = (option: string) => {
+      setDroppedOption(option);
+    };
+
+    const handleDragStart = (_event: DragStartEvent) => {
+      // Handle drag start if needed
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (over && active.id !== over.id) {
+        // Handle drop logic
+        const droppedOption = active.id as string;
+        setDroppedOption(droppedOption);
+      }
+    };
+
+    if (!wordDef || !state.selectedUsage) {
+      return (
+        <div className="relative w-full max-w-md px-4 text-center">
+          <p className="text-game-secondary-600 dark:text-game-secondary-400">
+            Loading word options...
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="relative w-full max-w-2xl px-4 text-center">
+          <div className="mb-4">
+            <div className="mb-6 text-center">
+              {!isSupported && (
+                <p className="mb-2 text-sm text-game-secondary-400">
+                  ⚠️ Audio not supported in this browser
+                </p>
+              )}
+              <div className="flex justify-center gap-3">
+                <Speaker onSpeak={playAudio} isPlaying={isPlaying} />
+              </div>
             </div>
-          </div>
 
-          {hintState.currentHint > 0 ? <Syllable wordDef={wordDef} /> : null}
+            {hintState.currentHint > 0 ? <Syllable wordDef={wordDef} /> : null}
 
-          <div className="mb-8">
-            <UsageSentence
-              usage={state.selectedUsage}
-              droppedOption={state.droppedOption}
-              isCorrect={state.isCorrect}
-            />
-          </div>
+            <div className="mb-8">
+              <UsageSentence
+                usage={state.selectedUsage}
+                droppedOption={state.droppedOption}
+                isCorrect={state.isCorrect}
+              />
+            </div>
 
-          <div className="mb-8">
-            <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
-              Choose the correct spelling:
-            </h4>
-            <div className="flex flex-wrap justify-start gap-4">
-              {state.options.map((option, idx) => (
-                <DraggableOption
-                  key={idx}
-                  disabled={state.isCorrect === true}
-                  id={option}
-                  option={option}
-                  isDragging={false}
-                  onSelect={() => handleOptionSelect(option)}
-                />
-              ))}
+            <div className="mb-8">
+              <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
+                Choose the correct spelling:
+              </h4>
+              <div className="flex flex-wrap justify-start gap-4">
+                {state.options.map((option, idx) => (
+                  <DraggableOption
+                    key={idx}
+                    disabled={state.isCorrect === true}
+                    id={option}
+                    option={option}
+                    isDragging={false}
+                    onSelect={() => handleOptionSelect(option)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <DragOverlay>{/* Render dragging overlay if needed */}</DragOverlay>
-    </DndContext>
-  );
-});
+        <DragOverlay>{/* Render dragging overlay if needed */}</DragOverlay>
+      </DndContext>
+    );
+  }
+);
 
 const withOptionHoc = (numberOfOptions: number): GameComponent => {
   return forwardRef<
-    { isCorrect: () => boolean },
+    { getCorrectState: () => GameState },
     Omit<MultiOptionGameProps, 'numberOfOptions'>
   >((props, ref) => (
     <MultiOptionGame {...props} numberOfOptions={numberOfOptions} ref={ref} />
