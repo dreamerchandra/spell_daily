@@ -36,6 +36,7 @@ import {
 } from './styles';
 import { useOnHintIncrease } from '../../../context/hint-context';
 import type { JumbledInputLetter } from './types';
+import { TapAnimation } from '../../atoms/tap-animation';
 
 export interface SpellingInputDragDropProps {
   userInput: JumbledInputLetter[];
@@ -79,6 +80,7 @@ const DroppableSlot = ({
     transition,
     isDragging,
   } = useSortable({ id, disabled: !letter });
+  const [showHint, setShowHint] = useState(false);
 
   const style = {
     transform: dndCSS.Transform.toString(transform),
@@ -87,7 +89,10 @@ const DroppableSlot = ({
 
   // Mobile-friendly double tap handler
   const handleTap = () => {
-    if (!letter) return;
+    if (!letter || letter.letter === '') {
+      console.log('Showing hint for empty slot');
+      setShowHint(true);
+    }
 
     const currentTime = Date.now();
     const tapGap = currentTime - lastTap;
@@ -137,6 +142,7 @@ const DroppableSlot = ({
 
   return (
     <div className={letter ? 'group relative flex-1' : ''}>
+      {showHint && <TapAnimation isShown={_index === 0} />}
       <div
         ref={setNodeRef}
         style={{
@@ -181,12 +187,14 @@ interface DraggableLetterProps {
   onClick: () => void;
   showSyllableColors?: boolean;
   phoneticColorClass?: string;
+  index: number;
 }
 
 const DraggableLetter = ({
   id,
   letter,
   onClick,
+  index,
   showSyllableColors = false,
   phoneticColorClass,
 }: DraggableLetterProps) => {
@@ -225,6 +233,7 @@ const DraggableLetter = ({
         isDragging ? 'opacity-50' : ''
       }`}
       title="Drag to position or click to add"
+      id={`jumbled_letter-${index}`}
     >
       {letter.letter}
     </div>
@@ -424,10 +433,11 @@ export const SpellingInputDragDrop = ({
               strategy={horizontalListSortingStrategy}
             >
               <div className="flex flex-wrap justify-center gap-2">
-                {availableItems.map(item => (
+                {availableItems.map((item, index) => (
                   <DraggableLetter
                     key={item.id}
                     id={item.id}
+                    index={index}
                     letter={item.letter}
                     onClick={() => handleAvailableLetterClick(item.letter)}
                     showSyllableColors={showSyllableColors}
