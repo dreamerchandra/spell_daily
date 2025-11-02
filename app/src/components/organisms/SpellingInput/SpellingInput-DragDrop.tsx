@@ -37,6 +37,7 @@ import {
 import { useOnHintIncrease } from '../../../context/hint-context';
 import type { JumbledInputLetter } from './types';
 import { TapAnimation } from '../../atoms/tap-animation';
+import { useSetTimeout } from '../../../hooks/use-setTimeout';
 
 export interface SpellingInputDragDropProps {
   userInput: JumbledInputLetter[];
@@ -71,6 +72,7 @@ const DroppableSlot = ({
   placeHolder,
 }: DroppableSlotProps) => {
   const [lastTap, setLastTap] = useState<number>(0);
+  const timer = useSetTimeout();
 
   const {
     attributes,
@@ -92,6 +94,8 @@ const DroppableSlot = ({
     if (!letter || letter.letter === '') {
       console.log('Showing hint for empty slot');
       setShowHint(true);
+      timer(() => setShowHint(false), 1000);
+      return;
     }
 
     const currentTime = Date.now();
@@ -142,7 +146,7 @@ const DroppableSlot = ({
 
   return (
     <div className={letter ? 'group relative flex-1' : ''}>
-      {showHint && <TapAnimation isShown={_index === 0} />}
+      {showHint && <TapAnimation isShown={showHint} />}
       <div
         ref={setNodeRef}
         style={{

@@ -1,9 +1,9 @@
 import { Alignment, Fit, Layout, useRive } from '@rive-app/react-canvas';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 export const RiveTapAnimation = ({ isShown }: { isShown: boolean }) => {
-  const { RiveComponent } = useRive({
+  const { RiveComponent, rive } = useRive({
     src: '/rive/tap_animation.riv',
     autoplay: true,
     autoBind: true,
@@ -19,6 +19,13 @@ export const RiveTapAnimation = ({ isShown }: { isShown: boolean }) => {
       ?.getBoundingClientRect()!;
     return [rect.left, rect.top];
   }, []);
+  useEffect(() => {
+    if (isShown) {
+      rive?.play();
+    } else {
+      rive?.pause();
+    }
+  }, [isShown, rive]);
   if (!isShown) {
     return null;
   }
@@ -56,5 +63,6 @@ export const TapAnimation = ({ isShown }: { isShown: boolean }) => {
       ),
     [isShown]
   );
+
   return portal;
 };
