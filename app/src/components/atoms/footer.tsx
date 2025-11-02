@@ -1,9 +1,34 @@
-import type { ReactNode } from 'react';
+import { Alignment, Fit, Layout, useRive } from '@rive-app/react-canvas';
+import { type ReactNode } from 'react';
 
-export const Footer = ({ children }: { children: ReactNode }) => {
+export const RiveFooter = ({ isSuccess }: { isSuccess: boolean }) => {
+  const { RiveComponent } = useRive({
+    src: '/rive/footer_animation.riv',
+    autoplay: true,
+    autoBind: true,
+    layout: new Layout({
+      fit: Fit.FitWidth,
+      alignment: Alignment.BottomCenter,
+    }),
+  });
+  if (!isSuccess) {
+    return null;
+  }
+  return <RiveComponent />;
+};
+export const Footer = ({
+  children,
+  isSuccess,
+}: {
+  children: ReactNode;
+  isSuccess: boolean;
+}) => {
   return (
-    <div className="w-full bg-dark-950 bg-gradient-to-r p-6 text-center text-sm text-dark-500">
-      {children}
+    <div className="relative w-full pb-6 text-center text-sm text-dark-500">
+      <div className="relative z-10">{children}</div>
+      <div className="absolute bottom-0 h-[200px] w-full text-center text-sm text-dark-500">
+        <RiveFooter isSuccess={isSuccess} />
+      </div>
     </div>
   );
 };

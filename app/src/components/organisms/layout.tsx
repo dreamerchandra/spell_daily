@@ -12,7 +12,7 @@ export const Layout = ({
   return (
     <div className="h-screen w-screen overflow-hidden bg-dark-gradient">
       <div className="sticky top-0 z-[1000]">{header}</div>
-      <main className="flex h-[calc(100vh-200px)] items-center justify-center">
+      <main className="flex h-[calc(100vh-175px)] items-center justify-center">
         {children}
       </main>
       <div className="sticky bottom-0">{footer}</div>

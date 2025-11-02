@@ -4,6 +4,7 @@ export const SuccessAnimationType = {
   RIPPLE_EFFECT: 'ripple-effect',
   CONFETTI_BURST: 'confetti-burst',
   TYPEWRITER: 'typewriter',
+  GENERIC: 'generic',
   COLOR_FLOW: 'color-flow',
   FIRE_ANIMATION: 'fire-animation',
 } as const;
@@ -27,6 +28,10 @@ const SOUND_CONFIGS = {
   },
   [SuccessAnimationType.TYPEWRITER]: {
     path: '/sounds/success/typewriter.wav',
+    fallback: { frequency: 1200, duration: 0.2, type: 'sine' as const },
+  },
+  [SuccessAnimationType.GENERIC]: {
+    path: '/sounds/success/generic.wav',
     fallback: { frequency: 1200, duration: 0.2, type: 'sine' as const },
   },
   [SuccessAnimationType.COLOR_FLOW]: {

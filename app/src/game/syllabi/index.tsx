@@ -88,7 +88,6 @@ export const SyllableGame: GameComponent = forwardRef(
           <Definition definition={wordDef.definition} />
 
           <SyllableInput
-            key={wordDef.word}
             wordDef={wordDef}
             state={state}
             selectSyllable={selectSyllable}
