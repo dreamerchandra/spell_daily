@@ -19,11 +19,12 @@ export const FullWordGame: GameComponent = forwardRef(
     const { speak, isPlaying, isSupported } = useSpellingSpeech();
 
     const wordLength = wordDef.word.length;
+    const lastAttempt = state.attempts[state.attempts.length - 1];
 
     useImperativeHandle(ref, () => {
       return {
         isCorrect: () => {
-          const userWord = state.userInput.join('');
+          const userWord = lastAttempt.userInput.join('');
           const isWordCorrect = userWord === wordDef.word;
           setIsCorrect(isWordCorrect);
           return isWordCorrect;
@@ -36,18 +37,19 @@ export const FullWordGame: GameComponent = forwardRef(
     }, [setNewWord, wordDef]);
 
     useEffect(() => {
-      setDisableChecking(state.userInput.includes(''));
-    }, [setDisableChecking, state.userInput]);
+      const lastAttempt = state.attempts[state.attempts.length - 1];
+      setDisableChecking(lastAttempt.userInput.includes(''));
+    }, [setDisableChecking, state.attempts]);
 
     const handleKeyPress = (key: string) => {
-      let newWord = state.userInput.join('');
+      let newWord = lastAttempt.userInput.join('');
       if (key === '⌫') {
         newWord = newWord.slice(0, newWord.length - 1);
         const newArr = makeArray(newWord, wordLength);
         setUserInput(newArr);
         return;
       }
-      if (newWord.length === state.userInput.length) return;
+      if (newWord.length === lastAttempt.userInput.length) return;
       newWord += key;
       const newArr = makeArray(newWord, wordLength);
       setUserInput(newArr);
@@ -57,6 +59,7 @@ export const FullWordGame: GameComponent = forwardRef(
       speak(wordDef.word);
     };
 
+    const lastTwoAttempts = state.attempts.slice(-2);
     return (
       <div className="relative w-full max-w-md px-4 text-center">
         <div className="mb-4">
@@ -77,33 +80,19 @@ export const FullWordGame: GameComponent = forwardRef(
             <Definition definition={wordDef.definition} />
           )}
 
-          <SpellingInput
-            userInput={state.userInput}
-            isCorrect={state.isCorrect}
-            className="mb-8"
-            wordDef={wordDef}
-            disableTalkBack={false}
-          />
-
+          <div className="mb-4 flex flex-col items-center gap-2">
+            {lastTwoAttempts.map((attempt, index) => (
+              <div key={index}>
+                <SpellingInput
+                  userInput={attempt.userInput}
+                  isCorrect={attempt.isCorrect}
+                  wordDef={wordDef}
+                  disableTalkBack={true}
+                />
+              </div>
+            ))}
+          </div>
           <Keyboard onKeyPress={handleKeyPress} />
-
-          {state.isCorrect !== null && (
-            <div className="mt-6 text-center">
-              {state.isCorrect ? (
-                <div className="rounded-xl border border-game-success-500/40 bg-game-success-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-lg font-semibold text-game-success-300">
-                    🎉 Awesome! That's correct! 🎉
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-game-error-500/40 bg-game-error-500/10 p-4 backdrop-blur-sm">
-                  <p className="text-base font-medium text-game-error-300">
-                    😊 Try again! You've got this! 💪
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     );

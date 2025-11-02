@@ -11,8 +11,10 @@ import { useSpellingSpeech } from '../../hooks';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 
 export type FullWordState = {
-  userInput: string[];
-  isCorrect: boolean | null;
+  attempts: {
+    userInput: string[];
+    isCorrect: boolean | null;
+  }[];
   incorrectAttempts: number;
   wordDef: WordDef | null;
 };
@@ -50,23 +52,50 @@ export const fullWordReducer = (
     case 'NEW_WORD':
       return {
         wordDef: action.action.wordDef,
-        userInput: new Array(action.action.wordDef.word.length).fill(''),
-        isCorrect: null,
+        attempts: [
+          {
+            userInput: new Array(action.action.wordDef.word.length).fill(''),
+            isCorrect: null,
+          },
+        ],
         incorrectAttempts: 0,
       };
-    case 'SET_USER_INPUT':
+    case 'SET_USER_INPUT': {
+      const lastAttempt = state.attempts[state.attempts.length - 1];
       return {
         ...state,
-        userInput: action.action.userInput,
+        attempts: [
+          ...state.attempts.slice(0, -1),
+          {
+            ...lastAttempt,
+            userInput: action.action.userInput,
+          },
+        ],
       };
-    case 'SET_IS_CORRECT':
+    }
+    case 'SET_IS_CORRECT': {
+      const lastAttempt = state.attempts[state.attempts.length - 1];
       return {
         ...state,
-        isCorrect: action.action.isCorrect,
+        attempts: [
+          ...state.attempts.slice(0, -1),
+          {
+            ...lastAttempt,
+            isCorrect: action.action.isCorrect,
+          },
+        ],
       };
+    }
     case 'SET_INCORRECT_ATTEMPTS':
       return {
         ...state,
+        attempts: [
+          ...state.attempts,
+          {
+            userInput: new Array(state.wordDef?.word.length ?? 0).fill(''),
+            isCorrect: null,
+          },
+        ],
         incorrectAttempts: state.incorrectAttempts + 1,
       };
     default:
@@ -76,8 +105,12 @@ export const fullWordReducer = (
 
 export const useFullWordState = () => {
   const [state, dispatch] = useReducer(fullWordReducer, {
-    userInput: [],
-    isCorrect: null,
+    attempts: [
+      {
+        userInput: [],
+        isCorrect: null,
+      },
+    ],
     incorrectAttempts: 0,
     wordDef: null,
   });
@@ -143,9 +176,9 @@ export const useFullWordState = () => {
   useEffect(() => {
     if (!ref.current.wordDef) return;
     if (showSyllable(hintState.currentHint)) {
-      const firstWrongIndex = ref.current.userInput.findIndex(
-        (l, i) => l !== ref.current.wordDef?.word[i]
-      );
+      const firstWrongIndex = ref.current.attempts[
+        ref.current.attempts.length - 1
+      ].userInput.findIndex((l, i) => l !== ref.current.wordDef?.word[i]);
       const correctLetters = ref.current.wordDef?.word
         .split('')
         .splice(0, firstWrongIndex)

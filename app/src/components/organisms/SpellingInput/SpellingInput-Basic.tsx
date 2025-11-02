@@ -51,7 +51,9 @@ export const SpellingInputBasic = ({
         return `${BASE_BOX_CLASSES} ${SUCCESS_STYLES}`;
       }
       if (isCorrect === false) {
-        return `${BASE_BOX_CLASSES} ${ERROR_STYLES}`;
+        const letterStyle =
+          letter === wordDef.word[index] ? SUCCESS_STYLES : ERROR_STYLES;
+        return `${BASE_BOX_CLASSES} ${letterStyle}`;
       }
       return `${BASE_BOX_CLASSES} ${PRIMARY_STYLES}`;
     }
