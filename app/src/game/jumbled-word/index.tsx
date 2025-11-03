@@ -8,6 +8,11 @@ import { showSyllable } from '../../components/organisms/SpellingInput/utils';
 import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import { useJumbledWordState } from './jumbled-word-state';
+import { getGameState } from '../../common/game-ref';
+import {
+  SuccessAnimationType,
+  successSoundManager,
+} from '../../util/soundManager';
 
 export const JumbledWordGame: GameComponent = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
@@ -20,13 +25,18 @@ export const JumbledWordGame: GameComponent = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
-          const userWord = state.userInput
-            .map(letterObj => letterObj.letter)
-            .join('');
-          const isWordCorrect = userWord === wordDef.word;
-          setIsCorrect(isWordCorrect);
-          return isWordCorrect;
+        getCorrectState: () => {
+          const gameState = getGameState(
+            state.userInput.map(letterObj => letterObj.letter),
+            wordDef.actualSyllable
+          );
+          if (gameState === 'CORRECT') {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+            setIsCorrect(true);
+          } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+            setIsCorrect(false);
+          }
+          return gameState;
         },
       };
     });

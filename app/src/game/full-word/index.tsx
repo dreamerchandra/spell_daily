@@ -8,6 +8,7 @@ import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import { makeArray, useFullWordState } from './full-word-state';
 import type { GameComponent } from '../../common/game-type';
+import { getGameState } from '../../common/game-ref';
 
 export const FullWordGame: GameComponent = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
@@ -23,11 +24,17 @@ export const FullWordGame: GameComponent = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
-          const userWord = lastAttempt.userInput.join('');
-          const isWordCorrect = userWord === wordDef.word;
-          setIsCorrect(isWordCorrect);
-          return isWordCorrect;
+        getCorrectState: () => {
+          const gameState = getGameState(
+            lastAttempt.userInput,
+            wordDef.actualSyllable
+          );
+          if (gameState === 'CORRECT') {
+            setIsCorrect(true);
+          } else if (gameState === 'INCORRECT') {
+            setIsCorrect(false);
+          }
+          return gameState;
         },
       };
     });

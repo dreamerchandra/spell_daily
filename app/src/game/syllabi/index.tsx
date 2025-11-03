@@ -7,6 +7,11 @@ import { useOnHintIncrease } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import { SyllableGroup } from './syllable-group';
 import { useSyllableState } from './syllable-state';
+import { getGameState } from '../../common/game-ref';
+import {
+  SuccessAnimationType,
+  successSoundManager,
+} from '../../util/soundManager';
 
 export const SyllableGame: GameComponent = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
@@ -31,12 +36,18 @@ export const SyllableGame: GameComponent = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
-          const selectedWord = state.selectedSyllables.join('');
-          const correctWord = wordDef.actualSyllable.join('');
-          const isWordCorrect = selectedWord === correctWord;
-          setIsCorrect(isWordCorrect);
-          return isWordCorrect;
+        getCorrectState: () => {
+          const gameState = getGameState(
+            state.selectedSyllables,
+            wordDef.actualSyllable
+          );
+          if (gameState === 'CORRECT') {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+            setIsCorrect(true);
+          } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+            setIsCorrect(false);
+          }
+          return gameState;
         },
       };
     });

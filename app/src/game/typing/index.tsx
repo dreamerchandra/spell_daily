@@ -8,6 +8,11 @@ import { useSpellingSpeech } from '../../hooks';
 import { useTypingState } from './typing-state';
 import type { GameComponent } from '../../common/game-type';
 import { TypingInput } from '../../components/organisms/SpellingInput/TypingInput';
+import { getGameState } from '../../common/game-ref';
+import {
+  SuccessAnimationType,
+  successSoundManager,
+} from '../../util/soundManager';
 
 export const TypingGame: GameComponent = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
@@ -19,10 +24,18 @@ export const TypingGame: GameComponent = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
-          const isWordCorrect = state.userInput === wordDef.word;
-          setIsCorrect(isWordCorrect);
-          return isWordCorrect;
+        getCorrectState: () => {
+          const gameState = getGameState(
+            state.userInput.split(''),
+            wordDef.actualSyllable
+          );
+          if (gameState === 'CORRECT') {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+            setIsCorrect(true);
+          } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+            setIsCorrect(false);
+          }
+          return gameState;
         },
       };
     });

@@ -16,9 +16,9 @@ export const ContextGame: GameComponent<WordUsage> = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
+        getCorrectState: () => {
           if (!state.selectedAnswer || !state.currentQuestion) {
-            return false;
+            return 'INCORRECT';
           }
           const isAnswerCorrect =
             state.selectedAnswer === state.currentQuestion.correctAnswer;
@@ -26,7 +26,7 @@ export const ContextGame: GameComponent<WordUsage> = forwardRef(
           if (isAnswerCorrect) {
             successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
           }
-          return isAnswerCorrect;
+          return isAnswerCorrect ? 'CORRECT' : 'INCORRECT';
         },
       };
     });

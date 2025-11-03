@@ -6,6 +6,7 @@ import {
   DELAY_NEXT_WORD_MS_FAST,
 } from '../../config/animation-knobs';
 import { useIsTestMode } from '../../context/hint-context';
+import { useShortcut } from '../../hooks/use-shortcut';
 
 export const Continue = ({
   onClick,
@@ -17,6 +18,7 @@ export const Continue = ({
   const setTimer = useSetTimeout();
   const isTestMode = useIsTestMode();
   const [isProgressing, setIsProgressing] = useState(false);
+  useShortcut('Enter', onClick);
 
   useSubscribe('Animation:End', () => {
     if (!disabled) {

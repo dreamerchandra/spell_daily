@@ -7,6 +7,11 @@ import { SpellingInput } from '../../components/organisms/SpellingInput/Keyboard
 import { useHintState } from '../../context/hint-context/index';
 import { useSpeechRecognition, useSpellingSpeech } from '../../hooks';
 import { useVoiceTypingState } from './voice-typing-state';
+import { getGameState } from '../../common/game-ref';
+import {
+  SuccessAnimationType,
+  successSoundManager,
+} from '../../util/soundManager';
 
 const VoiceWaveAnimation = ({ isActive }: { isActive: boolean }) => {
   if (!isActive) return null;
@@ -108,13 +113,18 @@ export const VoiceTypingGame: GameComponent = forwardRef(
 
     useImperativeHandle(ref, () => {
       return {
-        isCorrect: () => {
-          const userWord = state.userInput.join('');
-          const isWordCorrect =
-            userWord.toLocaleLowerCase() === wordDef.word.toLocaleLowerCase();
-          setIsCorrect(isWordCorrect);
-
-          return isWordCorrect;
+        getCorrectState: () => {
+          const gameState = getGameState(
+            state.userInput,
+            wordDef.actualSyllable
+          );
+          if (gameState === 'CORRECT') {
+            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
+            setIsCorrect(true);
+          } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+            setIsCorrect(false);
+          }
+          return gameState;
         },
       };
     });
