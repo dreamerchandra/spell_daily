@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+"use-client";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 export interface SpeechConfig {
   rate?: number;
@@ -21,7 +22,7 @@ const defaultConfig: SpeechConfig = {
   rate: 0.8,
   pitch: 1.1,
   volume: 1,
-  lang: 'en',
+  lang: "en",
 };
 
 const arrayShuffle = <T>(array: T[]): T[] => {
@@ -32,7 +33,6 @@ const arrayShuffle = <T>(array: T[]): T[] => {
   }
   return shuffledArray;
 };
-
 
 export const useSpeech = (
   initialConfig: SpeechConfig = {}
@@ -45,11 +45,12 @@ export const useSpeech = (
     () => ({ ...defaultConfig, ...initialConfig }),
     [initialConfig]
   );
-  const isSupported = 'speechSynthesis' in window;
+  const isSupported =
+    typeof window !== "undefined" && "speechSynthesis" in window;
 
   // Initialize voices
   useEffect(() => {
-    if (!isSupported) return;
+    if (!isSupported || typeof window === "undefined") return;
 
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
@@ -63,38 +64,32 @@ export const useSpeech = (
     loadVoices();
 
     // Listen for voiceschanged event (needed for Chrome)
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
 
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
     };
   }, [isSupported]);
 
   const bestVoice = useMemo(
-    (targetLang: string = 'en'): SpeechSynthesisVoice | null => {
+    (targetLang: string = "en"): SpeechSynthesisVoice | null => {
       if (!voices.length) return null;
 
       const preferredVoiceNames = initialConfig.voice
         ? arrayShuffle([
-          initialConfig.voice,
-          ...[
-            'Google',
-            'Microsoft',
-            'Alex',
-            'Samantha',
-            'Daniel',
-          ],
-        ])
-        : arrayShuffle(['Google', 'Microsoft', 'Alex', 'Samantha', 'Daniel']);
+            initialConfig.voice,
+            ...["Google", "Microsoft", "Alex", "Samantha", "Daniel"],
+          ])
+        : arrayShuffle(["Google", "Microsoft", "Alex", "Samantha", "Daniel"]);
 
       // Find voices that match the language
-      const matchingVoices = voices.filter(voice =>
+      const matchingVoices = voices.filter((voice) =>
         voice.lang.toLowerCase().startsWith(targetLang.toLowerCase())
       );
 
       // Try to find a preferred voice
       for (const preferredName of preferredVoiceNames) {
-        const preferredVoice = matchingVoices.find(voice =>
+        const preferredVoice = matchingVoices.find((voice) =>
           voice.name.includes(preferredName)
         );
         if (preferredVoice) return preferredVoice;
@@ -107,7 +102,11 @@ export const useSpeech = (
   );
 
   const stop = useCallback(() => {
-    if (isSupported && window.speechSynthesis.speaking) {
+    if (
+      isSupported &&
+      typeof window !== "undefined" &&
+      window.speechSynthesis.speaking
+    ) {
       window.speechSynthesis.cancel();
       setIsPlaying(false);
     }
@@ -115,12 +114,12 @@ export const useSpeech = (
 
   const speak = useCallback(
     (text: string, overrideConfig: SpeechConfig = {}) => {
-      if (!isSupported) {
-        console.warn('Speech synthesis not supported');
+      if (!isSupported || typeof window === "undefined") {
+        console.warn("Speech synthesis not supported");
         return;
       }
       if (!voicesLoaded || voices.length === 0) {
-        console.warn('Voices not loaded yet, skipping speech');
+        console.warn("Voices not loaded yet, skipping speech");
         return;
       }
 
@@ -142,17 +141,17 @@ export const useSpeech = (
       // Event listeners
       utterance.onstart = () => {
         setIsPlaying(true);
-        console.log('🔊 Speaking:', text);
+        console.log("🔊 Speaking:", text);
       };
 
       utterance.onend = () => {
         setIsPlaying(false);
-        console.log('✅ Finished speaking');
+        console.log("✅ Finished speaking");
       };
 
-      utterance.onerror = event => {
+      utterance.onerror = (event) => {
         setIsPlaying(false);
-        console.error('❌ Speech error:', event.error);
+        console.error("❌ Speech error:", event.error);
       };
 
       // Start speaking
@@ -195,6 +194,6 @@ export const useSyllabiSpeech = () => {
     rate: 1,
     pitch: 1.2,
     volume: 1,
-    voice: 'Google US English',
+    voice: "Google US English",
   });
 };
