@@ -4,16 +4,19 @@ import { useState, useRef, useEffect } from 'react';
 import { WordData } from '../types';
 import ReactMarkdown from 'react-markdown';
 import { WordsForm } from '@/components/words-form';
+import { useSpeech } from '@/components/use-speech';
 
 export default function WordProcessorPage() {
   const [loading, setLoading] = useState(false);
   const [wordDataList, setWordDataList] = useState<WordData[]>([]);
+  const [originalWordDataList, setOriginalWordDataList] = useState<WordData[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState('');
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [editedJson, setEditedJson] = useState('');
   const codeRef = useRef<HTMLDivElement>(null);
   const isEditingRef = useRef(false);
+  const { speak } = useSpeech()
 
   const handleSubmit = async (words: string) => {
     setLoading(true);
@@ -32,6 +35,7 @@ export default function WordProcessorPage() {
 
       if (data?.data && Array.isArray(data.data)) {
         setWordDataList(data.data || []);
+        setOriginalWordDataList(data.data || []);
         setActiveWordIndex(0);
         setEditedJson(JSON.stringify(data.data[0] || {}, null, 2));
         setShowConfirmation(true);
@@ -62,8 +66,8 @@ export default function WordProcessorPage() {
   };
 
   const handleReset = () => {
-    const originalData = wordDataList[activeWordIndex];
-    const updated = [...wordDataList];
+    const originalData = originalWordDataList[activeWordIndex];
+    const updated = [...originalWordDataList];
     updated[activeWordIndex] = JSON.parse(JSON.stringify(originalData));
     setWordDataList(updated);
     setEditedJson(JSON.stringify(originalData, null, 2));
@@ -105,6 +109,22 @@ export default function WordProcessorPage() {
       setLoading(false);
     }
   };
+
+  const onSpeak = (text: 'syllable' | 'word') => {
+    const updated = saveCurrentEdit() || [];
+    const currentWord = updated[activeWordIndex];
+    if (text === 'word') {
+      speak(currentWord?.word || '');
+      return;
+    }
+
+    if (text === 'syllable') {
+      (currentWord?.syllable || []).map((syllable: string) => {
+        speak(syllable);
+      });
+      return;
+    }
+  }
 
   useEffect(() => {
     if (codeRef.current && !isEditingRef.current) {
@@ -159,8 +179,20 @@ ${editedJson}
             <div className="space-y-6">
               <div className="flex justify-end mb-2">
                 <button
+                  onClick={() => onSpeak('syllable')}
+                  className="mr-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                >
+                  Speak Syllable
+                </button>
+                <button
+                  onClick={() => onSpeak('word')}
+                  className="mr-4 px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
+                >
+                  Speak word
+                </button>
+                <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 cursor-pointer"
                 >
                   Reset to Original
                 </button>
