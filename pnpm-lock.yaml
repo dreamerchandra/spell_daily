@@ -116,12 +116,18 @@ importers:
       node-telegram-bot-api:
         specifier: ^0.66.0
         version: 0.66.0(request@2.88.2)
+      telegram-inline-calendar:
+        specifier: ^1.10.0
+        version: 1.10.0
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
       winston:
         specifier: ^3.18.3
         version: 3.18.3
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@eslint/js':
         specifier: ^9.36.0
@@ -165,6 +171,9 @@ importers:
       prisma:
         specifier: ^6.18.0
         version: 6.18.0(typescript@5.9.3)
+      telegram-inline-calendar-types:
+        specifier: ^1.0.1
+        version: 1.0.1
       tsx:
         specifier: ^4.19.2
         version: 4.20.6
@@ -1949,6 +1958,9 @@ packages:
   date-format@4.0.14:
     resolution: {integrity: sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==}
     engines: {node: '>=4.0'}
+
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -3975,6 +3987,13 @@ packages:
   tar-stream@2.2.0:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
+
+  telegram-inline-calendar-types@1.0.1:
+    resolution: {integrity: sha512-OjjGBIPWOJ9GGSaBCsg40iZzUoSDNPy8Mi9O7yRyJjLdZ5nS0a415SlBWZc19Gv773MapPeqexNv/B6DqcsIvQ==}
+
+  telegram-inline-calendar@1.10.0:
+    resolution: {integrity: sha512-DX/NmtwONPkAZG7/fwpRw2hSHVyLhYVblBPRFEJoRPxpv+Qvp/LCxLK0F94ep54gKgAZpRXxYucSSBkVE8lwTw==}
+    engines: {node: '>=0.12'}
 
   text-hex@1.0.0:
     resolution: {integrity: sha512-uuVGNWzgJ4yhRaNSiubPY7OjISw4sw4E5Uv0wbjp+OzcbmVU/rsT8ujgcXJhn9ypzsgr5vlzpPqP+MBBKcGvbg==}
@@ -6081,6 +6100,8 @@ snapshots:
       is-data-view: 1.0.2
 
   date-format@4.0.14: {}
+
+  dayjs@1.11.19: {}
 
   debug@2.6.9:
     dependencies:
@@ -8637,6 +8658,12 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
     optional: true
+
+  telegram-inline-calendar-types@1.0.1: {}
+
+  telegram-inline-calendar@1.10.0:
+    dependencies:
+      dayjs: 1.11.19
 
   text-hex@1.0.0: {}
 

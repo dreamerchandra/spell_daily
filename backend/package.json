@@ -22,8 +22,10 @@
     "express": "^4.21.2",
     "newrelic": "^13.6.2",
     "node-telegram-bot-api": "^0.66.0",
+    "telegram-inline-calendar": "^1.10.0",
     "uuid": "^13.0.0",
-    "winston": "^3.18.3"
+    "winston": "^3.18.3",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -40,6 +42,7 @@
     "globals": "^16.4.0",
     "prettier": "^3.6.2",
     "prisma": "^6.18.0",
+    "telegram-inline-calendar-types": "^1.0.1",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1"

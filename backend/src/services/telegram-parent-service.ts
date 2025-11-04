@@ -1,18 +1,17 @@
 import { parentModel, ParentUser } from '../model/parent-model.js';
 import { UniqueConstraintError } from '../types/unique-constrain-error.js';
-import { bot } from './telegram-service.js';
-
 import TelegramBot from 'node-telegram-bot-api';
 import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
 import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
+import { sendTelegramMessage } from './telegram-bot-service.js';
 class TelegramParentService {
   public hintMessage = '/show_parent_hint';
   private parentMessageInfo =
     'Ok! Send me parent details in this format: \n \n Parent \n 8754xxxx \n Name \n other details \n';
 
   async showAddParentInfo(chatId: number) {
-    bot.sendMessage(chatId, this.parentMessageInfo);
+    await sendTelegramMessage(chatId, this.parentMessageInfo);
   }
 
   canHandleCallback = (
@@ -63,11 +62,11 @@ class TelegramParentService {
         const parent = await parentModel.findByPhoneNumber(parentDetails.phoneNumber);
         telegramUpdateLeadService.triggerFlow(body, parent);
       } else {
-        bot.sendMessage(chatId, 'Failed to add parent. Please try again later.');
+        await sendTelegramMessage(chatId, 'Failed to add parent. Please try again later.');
       }
       return;
     }
-    bot.sendMessage(
+    await sendTelegramMessage(
       chatId,
       `Parent added successfully!\n\nPhone: ${parentDetails.phoneNumber}\nName: ${parentDetails.name || 'N/A'}\nDetails: ${parentDetails.details || 'N/A'}`
     );

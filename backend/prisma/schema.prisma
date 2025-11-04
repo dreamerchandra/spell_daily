@@ -24,13 +24,14 @@ model AdminUser {
 }
 
 model ParentUser {
-  id          String   @id @default(cuid())
-  phoneNumber String   @unique
+  id          String     @id @default(cuid())
+  phoneNumber String     @unique
   name        String?
   details     String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   Leads       Leads[]
+  Students    Students[]
 }
 
 enum LeadStatus {
@@ -50,4 +51,27 @@ model Leads {
   parent    ParentUser @relation(fields: [parentId], references: [id])
   status    LeadStatus
   createdAt DateTime   @default(now())
+}
+
+model Students {
+  testCode      String          @id
+  parentId      String?
+  parent        ParentUser?     @relation(fields: [parentId], references: [id])
+  name          String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  DailyActivity DailyActivity[]
+}
+
+enum ActivityStatus {
+  STARTED
+  COMPLETED
+}
+
+model DailyActivity {
+  studentTestCode String         @id
+  student         Students       @relation(fields: [studentTestCode], references: [testCode])
+  activityDate    DateTime       @default(now())
+  status          ActivityStatus
+  createdAt       DateTime       @default(now())
 }

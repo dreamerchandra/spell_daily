@@ -55,6 +55,7 @@ class ParentModel {
       ...parent,
       details: parent.details || [],
       status: status.status,
+      statusCreatedAt: status.createdAt,
     };
   }
 }

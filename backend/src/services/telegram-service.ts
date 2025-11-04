@@ -1,12 +1,10 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { env } from '../config/env.js';
 import { telegramParentService } from './telegram-parent-service.js';
 import { telegramPhoneNumberService } from './telegram-phone-number-service.js';
 import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
-
-export const bot = new TelegramBot(env.TELEGRAM_BOT_TOKEN, {
-  polling: false,
-});
+import { sendTelegramMessage } from './telegram-bot-service.js';
+import { telegramAttachTestCodeService } from './telegram-attach-test-code-service.js';
+import { telegramCalenderService } from './telegram-calender-service.js';
 
 class TelegramService {
   getUserId(body: TelegramBot.Update): number | null {
@@ -34,24 +32,43 @@ class TelegramService {
   async handleMessage(body: TelegramBot.Update) {
     if (body.message?.text?.startsWith('/add')) {
       await this.handleAddMessage(body.message);
-    } else if (telegramParentService.canHandleCallback(body)) {
+    }
+    if (telegramParentService.canHandleCallback(body)) {
       await telegramParentService.showAddParentInfo(body.callback_query.from.id);
-    } else if (telegramParentService.canHandleAddParent(body)) {
+    }
+    if (telegramParentService.canHandleAddParent(body)) {
       await telegramParentService.handleAddParent(body);
-    } else if (telegramPhoneNumberService.canHandleMessage(body)) {
+    }
+    if (telegramPhoneNumberService.canHandleMessage(body)) {
       await telegramPhoneNumberService.handleMessage(body);
-    } else if (telegramUpdateLeadService.canHandle(body)) {
+    }
+    if (telegramUpdateLeadService.canHandle(body)) {
       await telegramUpdateLeadService.handleUpdateLead(body);
+    }
+    if (telegramAttachTestCodeService.canHandleMessage(body)) {
+      await telegramAttachTestCodeService.handleMessage(body);
+    }
+    if (telegramAttachTestCodeService.canHandleHintMessage(body)) {
+      await telegramAttachTestCodeService.showAddTestCodeInfo(body.callback_query.from.id);
+    }
+    if (telegramCalenderService.canHandle(body)) {
+      telegramCalenderService.handleCalender(body.message!);
+    }
+    if (telegramCalenderService.canHandleNextButton(body)) {
+      telegramCalenderService.handleNextButton(body);
+    }
+    if (telegramCalenderService.canHandleBackButton(body)) {
+      telegramCalenderService.handleBackButton(body);
     }
   }
 
   async handleAddMessage(message: TelegramBot.Message) {
-    bot.sendMessage(message.chat.id, 'Message added successfully!', {
+    await sendTelegramMessage(message.chat.id, 'Message added successfully!', {
       reply_markup: {
         inline_keyboard: [
           [
             { text: 'Parent', callback_data: telegramParentService.hintMessage },
-            { text: 'Admin', callback_data: '/add_admin' },
+            { text: 'Test Code', callback_data: telegramAttachTestCodeService.hintMessage },
           ],
         ],
       },

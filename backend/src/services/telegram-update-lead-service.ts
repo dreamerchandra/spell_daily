@@ -1,11 +1,12 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { ParentUserResponse } from '../model/parent-model.js';
-import { bot, telegramService } from './telegram-service.js';
 import { ensure } from '../types/ensure.js';
 import { LeadStatus } from '../model/parent-lead-model.js';
 import { leadStatusConverter } from '../model/parent-lead-model.js';
 import { parentLeadStatusModel } from '../model/parent-lead-model.js';
 import { getRandomCelebrationGif } from '../config/success-sticker.js';
+import { sendTelegramMessage, sendTelegramSticker } from './telegram-bot-service.js';
+import { telegramService } from './telegram-service.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -159,7 +160,7 @@ class TelegramUpdateLeadService {
   async triggerFlow(body: TelegramBot.Update, parent: ParentUserResponse) {
     const chatId = telegramService.getUserId(body);
     ensure(chatId, 'Chat ID could not be determined from the message');
-    bot.sendMessage(chatId, `Parent found: ${parent.name}`, {
+    await sendTelegramMessage(chatId, `Parent found: ${parent.name}`, {
       reply_markup: {
         inline_keyboard: [
           [
@@ -200,10 +201,10 @@ class TelegramUpdateLeadService {
     const leadStatus = await parentLeadStatusModel.updateLeadStatus(parentId, requestedStatus);
 
     if (leadStatus.status === LeadStatus.PAID_REQUESTED) {
-      await bot.sendSticker(chatId, getRandomCelebrationGif());
-      await bot.sendMessage(chatId, '🎉 Payment requested! Great job! 💪');
+      await sendTelegramSticker(chatId, getRandomCelebrationGif());
+      await sendTelegramMessage(chatId, '🎉 Payment requested! Great job! 💪');
     } else {
-      await bot.sendMessage(
+      await sendTelegramMessage(
         chatId,
         `✅ Update Done \n Status Changed: ${leadStatusConverter.toString(leadStatus.status)} \n Parent: ${leadStatus.name}`
       );

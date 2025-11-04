@@ -3,7 +3,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { handleMessage } from './bot.js';
 import { logger } from '../../lib/logger.js';
 import { telegramAdminMiddleware } from '../../middleware/admin_middleware.js';
-import { bot } from '../../services/telegram-service.js';
+import { bot } from '../../services/telegram-bot-service.js';
 
 const telegramRouter = Router();
 const baseVersion = '/v1';

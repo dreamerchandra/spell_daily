@@ -2,12 +2,13 @@ import { env } from './config/env.js';
 if (env.isProduction) {
   await import('newrelic');
 }
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import { PrismaClient } from './generated/prisma/client.js';
 import { requestIdMiddleware } from './middleware/requestId.js';
 import { requestLoggerMiddleware } from './middleware/requestLogger.js';
 import { logger } from './lib/logger.js';
 import router from './router/index.js';
+import { errorMiddleware } from './middleware/error-middleware.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -25,17 +26,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 app.use('/api', router);
 
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  logger.error('Unhandled error', err, {
-    path: req.path,
-    method: req.method,
-  });
-  res.status(500).json({
-    status: 'error',
-    message: 'Internal server error',
-    requestId: req.requestId,
-  });
-});
+app.use(errorMiddleware);
 
 app.listen(env.PORT, () => {
   logger.log(`Server is running on port ${env.PORT}`);
