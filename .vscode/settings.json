@@ -17,5 +17,8 @@
     "typescript": "typescript",
     "typescriptreact": "typescriptreact"
   },
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5501,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }
