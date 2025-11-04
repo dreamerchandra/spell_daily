@@ -1,0 +1,214 @@
+import TelegramBot from 'node-telegram-bot-api';
+import { ParentUserResponse } from '../model/parent-model.js';
+import { bot, telegramService } from './telegram-service.js';
+import { ensure } from '../types/ensure.js';
+import { LeadStatus } from '../model/parent-lead-model.js';
+import { leadStatusConverter } from '../model/parent-lead-model.js';
+import { parentLeadStatusModel } from '../model/parent-lead-model.js';
+import { getRandomCelebrationGif } from '../config/success-sticker.js';
+
+const groupSplitter = '&&';
+const keyValueSplitter = ':';
+
+const prefixParentId = (parentId: string, suffix: string): string =>
+  `parent_id${keyValueSplitter}${parentId}${groupSplitter}${suffix}`;
+
+const requestedStatusPrefix = 'requested';
+
+const prefixRequestedStatus = (status: LeadStatus): string =>
+  `${requestedStatusPrefix}${keyValueSplitter}${status}`;
+
+const suggestNextTwoStatus = (
+  parentId: string,
+  currentStatus: LeadStatus
+): TelegramBot.InlineKeyboardButton[][] => {
+  switch (currentStatus) {
+    case LeadStatus.LEAD:
+      return [
+        [
+          {
+            text: 'Mark: Dictation Requested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.DICTATION_REQUESTED)
+            ),
+          },
+          {
+            text: 'Mark: Free Trial Requested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
+            ),
+          },
+        ],
+        [
+          {
+            text: 'Mark: Dictation Done',
+            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.DICTATION)),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    case LeadStatus.DICTATION_REQUESTED:
+      return [
+        [
+          {
+            text: 'Mark: Dictation Done',
+            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.DICTATION)),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    case LeadStatus.DICTATION:
+      return [
+        [
+          {
+            text: 'Mark: Free Trial Requested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
+            ),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    case LeadStatus.FREE_TRIAL_REQUESTED:
+      return [
+        [
+          {
+            text: 'Mark: Free Trial',
+            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.FREE_TRIAL)),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    case LeadStatus.FREE_TRIAL:
+      return [
+        [
+          {
+            text: 'Mark: Paid Requested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.PAID_REQUESTED)
+            ),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    case LeadStatus.PAID_REQUESTED:
+      return [
+        [
+          {
+            text: 'Mark: Paid',
+            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.PAID)),
+          },
+          {
+            text: 'Mark: Not Interested',
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
+            ),
+          },
+        ],
+      ];
+    default:
+      return [];
+  }
+};
+
+class TelegramUpdateLeadService {
+  canHandle(body: TelegramBot.Update): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } {
+    if (body.callback_query?.data && body.callback_query.data.startsWith('parent_id')) {
+      return true;
+    }
+    return false;
+  }
+
+  async triggerFlow(body: TelegramBot.Update, parent: ParentUserResponse) {
+    const chatId = telegramService.getUserId(body);
+    ensure(chatId, 'Chat ID could not be determined from the message');
+    bot.sendMessage(chatId, `Parent found: ${parent.name}`, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: 'Follow up in 1 hour',
+              callback_data: `parent_id:${parent.id}:follow:1_hour:`,
+            },
+            {
+              text: 'Schedule a followup',
+              callback_data: `pick_date_time:${parent.id}`,
+            },
+          ],
+          ...suggestNextTwoStatus(parent.id, parent.status),
+        ],
+      },
+    });
+  }
+
+  handleUpdateLead = async (body: TelegramBot.Update) => {
+    const chatId = telegramService.getUserId(body);
+    ensure(chatId, 'Chat ID could not be determined from the message');
+
+    const data = body.callback_query!.data!;
+    const segments = data.split(groupSplitter);
+    const parentIdSegment = segments.find((segment) => segment.startsWith('parent_id'));
+    const requestedStatusSegment = segments.find((segment) =>
+      segment.startsWith(requestedStatusPrefix)
+    );
+
+    ensure(parentIdSegment, 'Parent ID segment not found in callback data');
+    ensure(requestedStatusSegment, 'Requested status segment not found in callback data');
+
+    const parentId = parentIdSegment.split(keyValueSplitter)[1];
+    const requestedStatus = leadStatusConverter.fromTelegram(
+      requestedStatusSegment.split(keyValueSplitter)[1]
+    );
+
+    const leadStatus = await parentLeadStatusModel.updateLeadStatus(parentId, requestedStatus);
+
+    if (leadStatus.status === LeadStatus.PAID_REQUESTED) {
+      await bot.sendSticker(chatId, getRandomCelebrationGif());
+      await bot.sendMessage(chatId, '🎉 Payment requested! Great job! 💪');
+    } else {
+      await bot.sendMessage(
+        chatId,
+        `✅ Update Done \n Status Changed: ${leadStatusConverter.toString(leadStatus.status)} \n Parent: ${leadStatus.name}`
+      );
+    }
+  };
+}
+
+export const telegramUpdateLeadService = new TelegramUpdateLeadService();

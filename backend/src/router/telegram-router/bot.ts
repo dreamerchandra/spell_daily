@@ -1,11 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { env } from '../../config/env.js';
 import { logger } from '../../lib/logger.js';
 import { Request } from 'express';
-
-export const bot = new TelegramBot(env.TELEGRAM_BOT_TOKEN, {
-  polling: false,
-});
+import { telegramService } from '../../services/telegram-service.js';
 
 export const asTelegramRequest = (req: Request): TelegramBot.Update | null => {
   if (typeof req !== 'object' || req === null) {
@@ -14,28 +10,31 @@ export const asTelegramRequest = (req: Request): TelegramBot.Update | null => {
 
   const update = req.body as TelegramBot.Update;
 
-  if (update.message) {
+  if (
+    update.message ||
+    update.callback_query ||
+    update.inline_query ||
+    update.chosen_inline_result ||
+    update.shipping_query ||
+    update.pre_checkout_query ||
+    update.poll ||
+    update.poll_answer
+  ) {
     return update;
   }
   return null;
 };
 
-export const handleMessage = async (message: TelegramBot.Message) => {
-  const chatId = message.chat.id;
-  const text = message.text;
+export const handleMessage = async (body: TelegramBot.Update) => {
+  const chatId = telegramService.getUserId(body);
 
   logger.log('Received Telegram message', {
     chatId,
-    text,
-    from: message.from?.username,
-    userId: message.from?.id,
   });
 
-  const fromUser = message.from?.first_name;
   try {
-    const response = `Hello ${fromUser || 'Admin'}! You said: ${text}`;
-    await bot.sendMessage(chatId, response);
-    logger.debug('Sent reply to admin', { chatId, adminId: message.from?.id });
+    await telegramService.handleMessage(body);
+    logger.debug('Sent reply to admin', { chatId });
   } catch (error) {
     logger.error('Failed to send Telegram message', error, { chatId });
   }

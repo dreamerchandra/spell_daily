@@ -22,3 +22,32 @@ model AdminUser {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model ParentUser {
+  id          String   @id @default(cuid())
+  phoneNumber String   @unique
+  name        String?
+  details     String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Leads       Leads[]
+}
+
+enum LeadStatus {
+  LEAD
+  DICTATION_REQUESTED
+  DICTATION
+  FREE_TRIAL_REQUESTED
+  FREE_TRIAL
+  PAID_REQUESTED
+  PAID
+  NOT_INTERESTED
+}
+
+model Leads {
+  id        String     @id @default(cuid())
+  parentId  String
+  parent    ParentUser @relation(fields: [parentId], references: [id])
+  status    LeadStatus
+  createdAt DateTime   @default(now())
+}

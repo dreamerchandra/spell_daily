@@ -1,8 +1,9 @@
 import { Router, type Router as RouterType } from 'express';
 import TelegramBot from 'node-telegram-bot-api';
-import { bot, handleMessage } from './bot.js';
+import { handleMessage } from './bot.js';
 import { logger } from '../../lib/logger.js';
 import { telegramAdminMiddleware } from '../../middleware/admin_middleware.js';
+import { bot } from '../../services/telegram-service.js';
 
 const telegramRouter = Router();
 const baseVersion = '/v1';
@@ -15,9 +16,7 @@ telegramRouter.post(
     try {
       const update = req.body as TelegramBot.Update;
 
-      if (update.message) {
-        await handleMessage(update.message);
-      }
+      await handleMessage(update);
 
       res.status(200).json({ ok: true });
     } catch (error) {
