@@ -1,14 +1,19 @@
 import { bot } from './telegram-bot-service.js';
 import Calendar from 'telegram-inline-calendar';
 import type TelegramBot from 'node-telegram-bot-api';
+import { TelegramBaseService } from './telegram-base-service.js';
 
 const calendar = new Calendar(bot, {
   date_format: 'DD-MM-YYYY',
   language: 'en',
   start_date: 'now',
+  time_step: '1h',
 });
 
-class TelegramCalenderService {
+class TelegramCalenderService extends TelegramBaseService {
+  isAuthRequired(): boolean {
+    return false;
+  }
   canHandle = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { message: TelegramBot.Message } => {
@@ -52,6 +57,27 @@ class TelegramCalenderService {
     return false;
   };
 
+  canHandleDateSelection = (
+    body: TelegramBot.Update
+  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+    if (body.callback_query?.data?.startsWith('n_') && body.callback_query?.data.endsWith('_0')) {
+      return true;
+    }
+    return false;
+  };
+
+  canHandleTimeBackButton = (
+    body: TelegramBot.Update
+  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+    if (
+      body.callback_query?.data?.startsWith('t_') &&
+      body.callback_query?.data.endsWith('_back')
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   handleCalender(message: TelegramBot.Message) {
     calendar.startNavCalendar(message);
   }
@@ -73,6 +99,31 @@ class TelegramCalenderService {
     const jsDate = new Date();
     jsDate.setFullYear(year);
     jsDate.setMonth(month - 2);
+    bot.editMessageReplyMarkup(calendar.createNavigationKeyboard('en', jsDate), {
+      chat_id: body.callback_query.message!.chat.id,
+      message_id: body.callback_query.message!.message_id,
+    });
+  }
+
+  handleDateSelection(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, date] = body.callback_query.data?.split('_') || [];
+    const [year, month, day] = date.split('-').map(Number);
+    const jsDate = new Date(year, month - 1, day);
+    bot.editMessageReplyMarkup(calendar.createTimeSelector('en', jsDate, true), {
+      chat_id: body.callback_query.message!.chat.id,
+      message_id: body.callback_query.message!.message_id,
+    });
+  }
+
+  handleTimeBackButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, date] = body.callback_query.data?.split('_') || [];
+    const [year, month, day] = date.split('-').map(Number);
+    const jsDate = new Date();
+    jsDate.setFullYear(year);
+    jsDate.setMonth(month - 1);
+    jsDate.setDate(day);
     bot.editMessageReplyMarkup(calendar.createNavigationKeyboard('en', jsDate), {
       chat_id: body.callback_query.message!.chat.id,
       message_id: body.callback_query.message!.message_id,

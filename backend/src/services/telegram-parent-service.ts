@@ -5,7 +5,8 @@ import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
 import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
-class TelegramParentService {
+import { TelegramBaseService } from './telegram-base-service.js';
+class TelegramParentService extends TelegramBaseService {
   public hintMessage = '/show_parent_hint';
   private parentMessageInfo =
     'Ok! Send me parent details in this format: \n \n Parent \n 8754xxxx \n Name \n other details \n';
@@ -19,6 +20,10 @@ class TelegramParentService {
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
     return !!body.callback_query?.data && body.callback_query.data === this.hintMessage;
   };
+
+  isAuthRequired(): boolean {
+    return true;
+  }
 
   canHandleAddParent(body: TelegramBot.Update) {
     if (body.message?.text) {

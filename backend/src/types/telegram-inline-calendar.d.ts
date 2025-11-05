@@ -139,7 +139,11 @@ declare module 'telegram-inline-calendar' {
     /**
      * Create the start time selector UI
      */
-    createStartTimeSelector(msg: any): void;
+    createTimeSelector(
+      msg: any,
+      date: Date,
+      from_calendar: boolean
+    ): TelegramBot.InlineKeyboardMarkup;
 
     /**
      * Check current language for a chat

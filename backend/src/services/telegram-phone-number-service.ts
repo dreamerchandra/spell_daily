@@ -5,8 +5,12 @@ import { ensure } from '../types/ensure.js';
 import { NotFoundError } from '../types/not-found-error.js';
 import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
+import { TelegramBaseService } from './telegram-base-service.js';
 
-class TelegramPhoneNumber {
+class TelegramPhoneNumber extends TelegramBaseService {
+  isAuthRequired(): boolean {
+    return true;
+  }
   canHandleMessage(body: TelegramBot.Update): boolean {
     return getPhoneNumber(body.message?.text || '') !== null;
   }

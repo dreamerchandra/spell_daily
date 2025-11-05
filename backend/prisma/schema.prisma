@@ -75,3 +75,7 @@ model DailyActivity {
   status          ActivityStatus
   createdAt       DateTime       @default(now())
 }
+
+model Otp {
+  code String @id
+}

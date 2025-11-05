@@ -5,14 +5,18 @@ import { ensure } from '../types/ensure.js';
 import { NotFoundError } from '../types/not-found-error.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { testCodeModel } from '../model/test-code-model.js';
+import { TelegramBaseService } from './telegram-base-service.js';
 
-class TelegramAttachTestCodeService {
+class TelegramAttachTestCodeService extends TelegramBaseService {
   hintMessage = '/add_test_code';
   canHandleMessage(body: TelegramBot.Update): boolean {
     const [phoneNumber, testCode] = body.message?.text?.split(' ') || ['', ''];
     return (
       getPhoneNumber(phoneNumber) !== null && typeof testCode === 'string' && testCode.length === 6
     );
+  }
+  isAuthRequired(): boolean {
+    return true;
   }
   async handleMessage(body: TelegramBot.Update) {
     ensure(body.message, 'Message body is missing');

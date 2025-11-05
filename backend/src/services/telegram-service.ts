@@ -5,8 +5,10 @@ import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { telegramAttachTestCodeService } from './telegram-attach-test-code-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
+import { telegramAddAdminService } from './telegram-add-admin-service.js';
+import { TelegramBaseService } from './telegram-base-service.js';
 
-class TelegramService {
+class TelegramService extends TelegramBaseService {
   getUserId(body: TelegramBot.Update): number | null {
     if (body.message) {
       return body.message.from?.id || null;
@@ -27,6 +29,49 @@ class TelegramService {
       return body.pre_checkout_query.from?.id || null;
     }
     return null;
+  }
+
+  isAuthRequired(body: TelegramBot.Update): boolean {
+    if (telegramAddAdminService.canHandleAddAdmin(body)) {
+      return telegramAddAdminService.isAuthRequired();
+    }
+    if (telegramParentService.canHandleCallback(body)) {
+      return telegramParentService.isAuthRequired();
+    }
+    if (telegramParentService.canHandleAddParent(body)) {
+      return telegramParentService.isAuthRequired();
+    }
+    if (telegramPhoneNumberService.canHandleMessage(body)) {
+      return telegramPhoneNumberService.isAuthRequired();
+    }
+    if (telegramUpdateLeadService.canHandle(body)) {
+      return telegramUpdateLeadService.isAuthRequired();
+    }
+    if (telegramAttachTestCodeService.canHandleMessage(body)) {
+      return telegramAttachTestCodeService.isAuthRequired();
+    }
+    if (telegramAttachTestCodeService.canHandleHintMessage(body)) {
+      return telegramAttachTestCodeService.isAuthRequired();
+    }
+    if (telegramCalenderService.canHandle(body)) {
+      return telegramCalenderService.isAuthRequired();
+    }
+    if (telegramCalenderService.canHandleNextButton(body)) {
+      return telegramCalenderService.isAuthRequired();
+    }
+    if (telegramCalenderService.canHandleBackButton(body)) {
+      return telegramCalenderService.isAuthRequired();
+    }
+    if (telegramCalenderService.canHandleDateSelection(body)) {
+      return telegramCalenderService.isAuthRequired();
+    }
+    if (telegramCalenderService.canHandleTimeBackButton(body)) {
+      return telegramCalenderService.isAuthRequired();
+    }
+    if (telegramAddAdminService.canHandleAddAdmin(body)) {
+      return telegramAddAdminService.isAuthRequired();
+    }
+    return false;
   }
 
   async handleMessage(body: TelegramBot.Update) {
@@ -60,10 +105,19 @@ class TelegramService {
     if (telegramCalenderService.canHandleBackButton(body)) {
       telegramCalenderService.handleBackButton(body);
     }
+    if (telegramCalenderService.canHandleDateSelection(body)) {
+      telegramCalenderService.handleDateSelection(body);
+    }
+    if (telegramCalenderService.canHandleTimeBackButton(body)) {
+      telegramCalenderService.handleTimeBackButton(body);
+    }
+    if (telegramAddAdminService.canHandleAddAdmin(body)) {
+      await telegramAddAdminService.handleAddAdmin(body);
+    }
   }
 
   async handleAddMessage(message: TelegramBot.Message) {
-    await sendTelegramMessage(message.chat.id, 'Message added successfully!', {
+    await sendTelegramMessage(message.chat.id, 'Choose one!', {
       reply_markup: {
         inline_keyboard: [
           [

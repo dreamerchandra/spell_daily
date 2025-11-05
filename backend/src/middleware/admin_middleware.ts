@@ -11,6 +11,9 @@ export const telegramAdminMiddleware = async (req: Request, res: Response, next:
     ensure(botRequest, 'Request is not a Telegram request');
     const userId = telegramService.getUserId(botRequest);
     ensure(userId, 'Telegram user ID is missing in the request');
+    if (!telegramService.isAuthRequired(botRequest)) {
+      return next();
+    }
     const userModel = await adminUserModel.findByTelegramId(userId);
     if (!userModel) {
       return res.status(200).json({ error: 'Forbidden: Admin access required' });

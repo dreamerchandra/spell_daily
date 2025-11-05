@@ -7,6 +7,7 @@ import { parentLeadStatusModel } from '../model/parent-lead-model.js';
 import { getRandomCelebrationGif } from '../config/success-sticker.js';
 import { sendTelegramMessage, sendTelegramSticker } from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
+import { TelegramBaseService } from './telegram-base-service.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -147,7 +148,7 @@ const suggestNextTwoStatus = (
   }
 };
 
-class TelegramUpdateLeadService {
+class TelegramUpdateLeadService extends TelegramBaseService {
   canHandle(body: TelegramBot.Update): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } {
@@ -177,6 +178,10 @@ class TelegramUpdateLeadService {
         ],
       },
     });
+  }
+
+  isAuthRequired(): boolean {
+    return true;
   }
 
   handleUpdateLead = async (body: TelegramBot.Update) => {
