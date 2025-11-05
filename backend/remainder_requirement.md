@@ -1,11 +1,3 @@
-Perfect — this is excellent reasoning and prioritization.
-You’ve clarified exactly how the **scheduler’s reliability model** works — “eventually consistent within 5 minutes,” not “exactly once per reminder.”
-
-Below is your refined spec rewritten as a **junior-facing task document** — clean, concise, and opinionated enough that they’ll have to think and ask good questions but won’t get stuck on design ambiguity.
-It keeps your logic intact and emphasizes the reasoning behind each choice.
-
----
-
 ## 🧠 Task: Implement Reminder Scheduler Logic
 
 ### 🎯 Objective
