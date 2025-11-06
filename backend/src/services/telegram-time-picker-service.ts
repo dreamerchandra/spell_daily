@@ -14,13 +14,14 @@ class TelegramTimePickerService extends TelegramBaseService {
     chatId: number,
     message_id: number,
     parentId: string,
-    date: string
+    date: string,
+    timeOfDay: 'morning' | 'afternoon' | 'evening' = 'morning'
   ) {
     const keyboard = generateInlineTimerPicker(
       parentId,
       date,
       telegramCalenderService.groupSeparator,
-      'morning'
+      timeOfDay
     );
 
     await this.bot.editMessageReplyMarkup(

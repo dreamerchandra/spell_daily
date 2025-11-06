@@ -252,12 +252,41 @@ class TelegramCalenderService extends TelegramBaseService {
     const formattedYear = jsDate.getFullYear();
     const formattedMonth = (jsDate.getMonth() + 1).toString().padStart(2, '0');
     const formattedDay = jsDate.getDate().toString().padStart(2, '0');
+    const strDate = `${formattedYear}-${formattedMonth}-${formattedDay}`;
+    const timeOfDay = this.pickTimeOfDay(strDate);
     await telegramTimePickerService.triggerTime(
       chatId,
       message_id,
       parentId,
-      `${formattedYear}-${formattedMonth}-${formattedDay}`
+      strDate,
+      timeOfDay
     );
+  }
+
+  pickTimeOfDay(selectedDate: string) {
+    // Normalize today's date
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const selected = new Date(selectedDate);
+
+    // Past day → none available
+    if (selected < new Date(todayStr)) {
+      return 'evening';
+    }
+
+    // Future day → default to morning (first active section)
+    if (selectedDate > todayStr) {
+      return 'morning';
+    }
+
+    // ✅ Today → pick based on current time
+    const hour = now.getHours();
+
+    if (hour < 12) return 'morning';
+    if (hour < 16) return 'afternoon';
+    if (hour < 22) return 'evening';
+
+    return 'evening';
   }
 
   async handleTimeBackButton(

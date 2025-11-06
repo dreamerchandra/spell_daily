@@ -2,15 +2,13 @@ import TelegramBot from 'node-telegram-bot-api';
 
 export const generateInlineTimerPicker = (
   parentId: string,
-  selectedDate: string,
+  selectedDate: string, // YYYY-MM-DD
   groupSplitter: string,
   timeOfDay: 'morning' | 'afternoon' | 'evening'
 ): TelegramBot.InlineKeyboardButton[][] => {
-  // [back, date, empty]
-  // [evening, morning, afternoon] // [morning, afternoon, evening] // [afternoon, evening, morning]
-  // [time1, time2] x 2
-
   const keyboard: TelegramBot.InlineKeyboardButton[][] = [];
+
+  // Build UI sections
   keyboard.push(...generateHeaders(parentId, selectedDate, groupSplitter));
   keyboard.push(...generateEmumCycles(parentId, selectedDate, groupSplitter));
 
@@ -28,8 +26,61 @@ export const generateInlineTimerPicker = (
     );
   }
 
-  return keyboard;
+  // ✅ Final filter to disable past dates & times
+  return sanitizeKeyboard(keyboard, selectedDate);
 };
+
+function sanitizeKeyboard(
+  keyboard: TelegramBot.InlineKeyboardButton[][],
+  selectedDate: string
+) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const selDate = new Date(selectedDate);
+  selDate.setHours(0, 0, 0, 0);
+
+  const isPastDate = selDate < today;
+
+  return keyboard.map(row =>
+    row.map(cell => {
+      // Disable everything for past dates
+      if (isPastDate) {
+        return { text: ' ', callback_data: ' ' };
+      }
+
+      // Only sanitize buttons with times: t_HH:MM_YYYY-MM-DD
+      if (!cell.callback_data?.startsWith('t_')) return cell;
+
+      const parts = cell.callback_data.split('_'); // ["t", "HH:MM", "YYYY-MM-DD" ]
+      if (parts.length < 3) return cell;
+
+      const time = parts[1];
+      const date = parts[2];
+
+      // If callback date != selectedDate → leave it
+      if (date !== selectedDate) return cell;
+
+      // Parse time
+      const [h, m] = time.split(':').map(Number);
+      if (isNaN(h) || isNaN(m)) return cell;
+
+      const now = new Date();
+
+      // If today and time < now → disable
+      if (selDate.getTime() === today.getTime()) {
+        const buttonDateTime = new Date();
+        buttonDateTime.setHours(h, m, 0, 0);
+
+        if (buttonDateTime < now) {
+          return { text: ' ', callback_data: ' ' };
+        }
+      }
+
+      return cell;
+    })
+  );
+}
 
 const generateHeaders = (
   parentId: string,
