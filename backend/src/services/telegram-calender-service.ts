@@ -151,14 +151,13 @@ class TelegramCalenderService extends TelegramBaseService {
 
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
-    const stateDate = getNowIST();
     const calendar = new Calendar(bot, {
       date_format: 'DD-MM-YYYY',
       language: 'en',
       start_date: 'now',
       time_step: '1h',
     });
-    const inlineKeyboard = calendar.createNavigationKeyboard('en', stateDate);
+    const inlineKeyboard = calendar.createNavigationKeyboard('en', new Date());
     const modifiedKeyboard = this.injectParentId(
       inlineKeyboard.inline_keyboard,
       parentId
