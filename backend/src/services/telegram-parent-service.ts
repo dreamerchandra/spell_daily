@@ -111,6 +111,16 @@ class TelegramParentService extends TelegramBaseService {
           inline_keyboard: [
             [
               {
+                text: 'Follow up in 1 hour',
+                callback_data: `quick_scheduler:${parent.id}:follow:1_hour:`,
+              },
+              {
+                text: 'Schedule a followup',
+                callback_data: `pick_date_time:${parent.id}`,
+              },
+            ],
+            [
+              {
                 text: 'Mark: Dictation Requested',
                 callback_data: prefixParentId(
                   parent.phoneNumber,
