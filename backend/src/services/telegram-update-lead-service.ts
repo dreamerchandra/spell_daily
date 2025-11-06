@@ -5,7 +5,10 @@ import { LeadStatus } from '../model/parent-lead-model.js';
 import { leadStatusConverter } from '../model/parent-lead-model.js';
 import { parentLeadStatusModel } from '../model/parent-lead-model.js';
 import { getRandomCelebrationGif } from '../config/success-sticker.js';
-import { sendTelegramMessage, sendTelegramSticker } from './telegram-bot-service.js';
+import {
+  sendTelegramMessage,
+  sendTelegramSticker,
+} from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
@@ -47,7 +50,10 @@ const suggestNextTwoStatus = (
         [
           {
             text: 'Mark: Dictation Done',
-            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.DICTATION)),
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.DICTATION)
+            ),
           },
           {
             text: 'Mark: Not Interested',
@@ -63,7 +69,10 @@ const suggestNextTwoStatus = (
         [
           {
             text: 'Mark: Dictation Done',
-            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.DICTATION)),
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.DICTATION)
+            ),
           },
           {
             text: 'Mark: Not Interested',
@@ -98,7 +107,10 @@ const suggestNextTwoStatus = (
         [
           {
             text: 'Mark: Free Trial',
-            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.FREE_TRIAL)),
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.FREE_TRIAL)
+            ),
           },
           {
             text: 'Mark: Not Interested',
@@ -133,7 +145,10 @@ const suggestNextTwoStatus = (
         [
           {
             text: 'Mark: Paid',
-            callback_data: prefixParentId(parentId, prefixRequestedStatus(LeadStatus.PAID)),
+            callback_data: prefixParentId(
+              parentId,
+              prefixRequestedStatus(LeadStatus.PAID)
+            ),
           },
           {
             text: 'Mark: Not Interested',
@@ -153,7 +168,10 @@ class TelegramUpdateLeadService extends TelegramBaseService {
   canHandle(body: TelegramBot.Update): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } {
-    if (body.callback_query?.data && body.callback_query.data.startsWith('parent_id')) {
+    if (
+      body.callback_query?.data &&
+      body.callback_query.data.startsWith('parent_id')
+    ) {
       return true;
     }
     if (this.canHandleScheduleLaterButton(body)) {
@@ -161,7 +179,9 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     }
     return false;
   }
-  canHandleScheduleLaterButton(body: TelegramBot.Update): body is TelegramBot.Update & {
+  canHandleScheduleLaterButton(
+    body: TelegramBot.Update
+  ): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } {
     const [text, parentId] = body.callback_query?.data?.split(':') || [];
@@ -174,7 +194,10 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     }
   ) {
     const [, parentId] = body.callback_query.data?.split(':') || [];
-    return telegramCalenderService.handleCalendar(body.callback_query.message!.chat.id, parentId);
+    return telegramCalenderService.handleCalendar(
+      body.callback_query.message!.chat.id,
+      parentId
+    );
   }
 
   async handle(
@@ -182,7 +205,10 @@ class TelegramUpdateLeadService extends TelegramBaseService {
       callback_query: TelegramBot.CallbackQuery;
     }
   ) {
-    if (body.callback_query?.data && body.callback_query.data.startsWith('parent_id')) {
+    if (
+      body.callback_query?.data &&
+      body.callback_query.data.startsWith('parent_id')
+    ) {
       return await this.handleUpdateLead(body);
     } else if (this.canHandleScheduleLaterButton(body)) {
       return await this.handleScheduleLaterButton(body);
@@ -222,20 +248,28 @@ class TelegramUpdateLeadService extends TelegramBaseService {
 
     const data = body.callback_query!.data!;
     const segments = data.split(groupSplitter);
-    const parentIdSegment = segments.find((segment) => segment.startsWith('parent_id'));
-    const requestedStatusSegment = segments.find((segment) =>
+    const parentIdSegment = segments.find(segment =>
+      segment.startsWith('parent_id')
+    );
+    const requestedStatusSegment = segments.find(segment =>
       segment.startsWith(requestedStatusPrefix)
     );
 
     ensure(parentIdSegment, 'Parent ID segment not found in callback data');
-    ensure(requestedStatusSegment, 'Requested status segment not found in callback data');
+    ensure(
+      requestedStatusSegment,
+      'Requested status segment not found in callback data'
+    );
 
     const parentId = parentIdSegment.split(keyValueSplitter)[1];
     const requestedStatus = leadStatusConverter.fromTelegram(
       requestedStatusSegment.split(keyValueSplitter)[1]
     );
 
-    const leadStatus = await parentLeadStatusModel.updateLeadStatus(parentId, requestedStatus);
+    const leadStatus = await parentLeadStatusModel.updateLeadStatus(
+      parentId,
+      requestedStatus
+    );
 
     if (leadStatus.status === LeadStatus.PAID_REQUESTED) {
       await sendTelegramSticker(chatId, getRandomCelebrationGif());

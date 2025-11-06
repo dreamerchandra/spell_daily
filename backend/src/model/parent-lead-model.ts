@@ -77,7 +77,10 @@ export type ParentLead = {
 };
 
 class ParentLeadStatusModel {
-  public async updateLeadStatus(parentId: string, status: LeadStatus): Promise<ParentUserResponse> {
+  public async updateLeadStatus(
+    parentId: string,
+    status: LeadStatus
+  ): Promise<ParentUserResponse> {
     const data = await prismaClient.leads.create({
       data: {
         parentId,
@@ -103,7 +106,10 @@ class ParentLeadStatusModel {
       orderBy: { createdAt: 'desc' },
       take: 1,
     });
-    ensure(data, new NotFoundError('Lead status not found for the given parent ID'));
+    ensure(
+      data,
+      new NotFoundError('Lead status not found for the given parent ID')
+    );
     return {
       ...data,
       status: leadStatusConverter.fromDb(data.status),

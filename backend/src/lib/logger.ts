@@ -2,7 +2,7 @@ import winston from 'winston';
 import { asyncContext } from './asyncContext.js';
 import { env } from '../config/env.js';
 
-const requestIdFormat = winston.format((info) => {
+const requestIdFormat = winston.format(info => {
   const requestId = asyncContext.getRequestId();
   if (requestId) {
     info.requestId = requestId;
@@ -10,10 +10,10 @@ const requestIdFormat = winston.format((info) => {
   return info;
 });
 
-const newrelicFormat = winston.format((info) => {
+const newrelicFormat = winston.format(info => {
   if (env.isProduction) {
     try {
-      import('newrelic').then((newrelic) => {
+      import('newrelic').then(newrelic => {
         const logEvent: Record<string, unknown> = {
           message: String(info.message),
           level: String(info.level),
@@ -41,7 +41,9 @@ const formats = [
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   requestIdFormat(),
   winston.format.errors({ stack: true }),
-  winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'requestId'] }),
+  winston.format.metadata({
+    fillExcept: ['message', 'level', 'timestamp', 'requestId'],
+  }),
 ];
 
 if (env.isProduction) {
@@ -54,11 +56,16 @@ const transports: winston.transport[] = [
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
-      winston.format.printf(({ timestamp, level, message, requestId, metadata }) => {
-        const reqId = requestId ? `[${requestId}]` : '';
-        const meta = Object.keys(metadata || {}).length > 0 ? JSON.stringify(metadata) : '';
-        return `${timestamp} ${level} ${reqId}: ${message} ${meta}`;
-      })
+      winston.format.printf(
+        ({ timestamp, level, message, requestId, metadata }) => {
+          const reqId = requestId ? `[${requestId}]` : '';
+          const meta =
+            Object.keys(metadata || {}).length > 0
+              ? JSON.stringify(metadata)
+              : '';
+          return `${timestamp} ${level} ${reqId}: ${message} ${meta}`;
+        }
+      )
     ),
   }),
 ];
@@ -66,12 +73,12 @@ const transports: winston.transport[] = [
 if (env.isProduction) {
   transports.push(
     new winston.transports.File({
-      filename: 'logs/error.log',
+      filename: '/tmp/error.log',
       level: 'error',
       format: winston.format.json(),
     }),
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: '/tmp/combined.log',
       format: winston.format.json(),
     })
   );
@@ -104,8 +111,15 @@ class Logger {
     winstonLogger.warn(message, meta);
   }
 
-  error(message: string, error?: Error | unknown, meta?: Record<string, unknown>): void {
-    const errorMeta = error instanceof Error ? { error: error.message, stack: error.stack } : {};
+  error(
+    message: string,
+    error?: Error | unknown,
+    meta?: Record<string, unknown>
+  ): void {
+    const errorMeta =
+      error instanceof Error
+        ? { error: error.message, stack: error.stack }
+        : {};
     winstonLogger.error(message, { ...errorMeta, ...(meta || {}) });
   }
 }

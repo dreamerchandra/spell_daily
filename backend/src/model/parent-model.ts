@@ -30,7 +30,10 @@ class ParentModel {
           details: otherDetails ? [otherDetails] : [],
         },
       });
-      const status = await parentLeadStatusModel.updateLeadStatus(parent.id, LeadStatus.LEAD);
+      const status = await parentLeadStatusModel.updateLeadStatus(
+        parent.id,
+        LeadStatus.LEAD
+      );
       return {
         ...parent,
         createdAt: new Date(),
@@ -38,18 +41,28 @@ class ParentModel {
         statusCreatedAt: status.createdAt,
       };
     } catch (error) {
-      if (error instanceof Error && error.message.includes('Unique constraint failed')) {
-        throw new UniqueConstraintError('Parent with this phone number already exists.');
+      if (
+        error instanceof Error &&
+        error.message.includes('Unique constraint failed')
+      ) {
+        throw new UniqueConstraintError(
+          'Parent with this phone number already exists.'
+        );
       }
       throw error;
     }
   }
 
-  public async findByPhoneNumber(phoneNumber: string): Promise<ParentUserResponse> {
+  public async findByPhoneNumber(
+    phoneNumber: string
+  ): Promise<ParentUserResponse> {
     const parent = await prismaClient.parentUser.findUnique({
       where: { phoneNumber },
     });
-    ensure(parent, new NotFoundError('Parent not found with the given phone number'));
+    ensure(
+      parent,
+      new NotFoundError('Parent not found with the given phone number')
+    );
     const status = await parentLeadStatusModel.getLeadStatus(parent.id);
     return {
       ...parent,

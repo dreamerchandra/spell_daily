@@ -3,4 +3,9 @@ import healthRouter from './health-router/index.js';
 import telegramRouter from './telegram-router/index.js';
 import remainderRouter from './remainder-router/index.js';
 
-export default [...healthRouter, ...telegramRouter, ...analyticsRouter, ...remainderRouter];
+export default [
+  ...healthRouter,
+  ...telegramRouter,
+  ...analyticsRouter,
+  ...remainderRouter,
+];

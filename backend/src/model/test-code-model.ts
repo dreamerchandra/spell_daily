@@ -15,7 +15,9 @@ export type TestCodeResponse = {
 };
 
 class TestCodeModel {
-  async createTestCode(params: CreateTestCodeRequest): Promise<TestCodeResponse> {
+  async createTestCode(
+    params: CreateTestCodeRequest
+  ): Promise<TestCodeResponse> {
     const result = await prismaClient.students.create({
       data: {
         testCode: params.testCode,

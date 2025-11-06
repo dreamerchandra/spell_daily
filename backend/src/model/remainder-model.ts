@@ -4,11 +4,13 @@ import { ensure } from '../types/ensure.js';
 import { prismaClient } from '../prisma.js';
 
 export const createRemainderSchema = z.object({
-  userId: z.string().refine((id) => Number.isInteger(Number(id)) && Number(id) > 0, {
-    message: 'Invalid userId',
-  }),
+  userId: z
+    .string()
+    .refine(id => Number.isInteger(Number(id)) && Number(id) > 0, {
+      message: 'Invalid userId',
+    }),
   message: z.string().min(5).max(500),
-  dateTime: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  dateTime: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Invalid date format',
   }),
 });
@@ -51,12 +53,12 @@ class RemainderModel {
     const user = await prismaClient.adminUser.findMany({
       where: {
         id: {
-          in: remainders.map((r) => r.userId),
+          in: remainders.map(r => r.userId),
         },
       },
     });
-    return remainders.map((remainder) => {
-      const remainderUser = user.find((u) => u.id === remainder.userId);
+    return remainders.map(remainder => {
+      const remainderUser = user.find(u => u.id === remainder.userId);
       ensure(remainderUser, 'Remainder user not found');
       return {
         id: remainder.id,

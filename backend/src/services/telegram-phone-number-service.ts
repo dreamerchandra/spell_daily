@@ -31,7 +31,10 @@ class TelegramPhoneNumber extends TelegramBaseService {
       if (error instanceof NotFoundError) {
         await sendTelegramMessage(body.message.chat.id, 'Parent not found');
       }
-      await sendTelegramMessage(body.message.chat.id, 'Error retrieving parent information');
+      await sendTelegramMessage(
+        body.message.chat.id,
+        'Error retrieving parent information'
+      );
     }
   }
 }

@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../lib/logger.js';
 import { env } from '../config/env.js';
 
-export const remainderAuthMiddleware = async (_req: Request, res: Response, next: NextFunction) => {
+export const remainderAuthMiddleware = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (env.isDevelopment) {
       return next();
@@ -12,7 +16,9 @@ export const remainderAuthMiddleware = async (_req: Request, res: Response, next
       logger.warn('Unauthorized access attempt to remainder endpoint', {
         ip: _req.ip,
       });
-      return res.status(403).json({ error: 'Forbidden: Invalid remainder auth token' });
+      return res
+        .status(403)
+        .json({ error: 'Forbidden: Invalid remainder auth token' });
     }
     return next();
   } catch (error) {

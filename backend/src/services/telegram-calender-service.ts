@@ -38,19 +38,27 @@ class TelegramCalenderService extends TelegramBaseService {
         return this.handleCalendar(body.message!.chat.id);
       case 'next':
         return this.handleNextButton(
-          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
         );
       case 'back':
         return this.handleBackButton(
-          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
         );
       case 'date':
         return this.handleDateSelection(
-          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
         );
       case 'timeBack':
         return this.handleTimeBackButton(
-          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
         );
       default:
         return;
@@ -60,39 +68,51 @@ class TelegramCalenderService extends TelegramBaseService {
   // 🔹 Determines if callback belongs to this calendar
   canHandleCallback = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
     const chatId = body.callback_query?.message?.chat?.id;
     const messageId = body.callback_query?.message?.message_id;
     return (
-      chatId !== undefined && messageId !== undefined && messageId === calendar.chats.get(chatId)
+      chatId !== undefined &&
+      messageId !== undefined &&
+      messageId === calendar.chats.get(chatId)
     );
   };
 
   // 🔹 Handlers for types of callbacks
   canHandleNextButton = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
     const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
     return data?.startsWith('n_') && data.endsWith('++');
   };
 
   canHandleBackButton = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
     const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
     return data?.startsWith('n_') && data.endsWith('--');
   };
 
   canHandleDateSelection = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
     const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
     return data?.startsWith('n_') && data.endsWith('_0');
   };
 
   canHandleTimeBackButton = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
     const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
     return data?.startsWith('t_') && data.endsWith('_back');
   };
@@ -100,7 +120,10 @@ class TelegramCalenderService extends TelegramBaseService {
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
     const inlineKeyboard = calendar.createNavigationKeyboard('en', new Date());
-    const modifiedKeyboard = this.injectParentId(inlineKeyboard.inline_keyboard, parentId);
+    const modifiedKeyboard = this.injectParentId(
+      inlineKeyboard.inline_keyboard,
+      parentId
+    );
 
     await bot.sendMessage(chatId, 'Please select a date:', {
       reply_markup: { inline_keyboard: modifiedKeyboard },
@@ -108,22 +131,29 @@ class TelegramCalenderService extends TelegramBaseService {
   }
 
   // 🔹 Adds :::parentId to every button
-  private injectParentId(keyboard: TelegramBot.InlineKeyboardButton[][], parentId: string | null) {
+  private injectParentId(
+    keyboard: TelegramBot.InlineKeyboardButton[][],
+    parentId: string | null
+  ) {
     if (!parentId) return keyboard;
-    return keyboard.map((row) =>
-      row.map((button) => ({
+    return keyboard.map(row =>
+      row.map(button => ({
         ...button,
         callback_data: `${button.callback_data}${this.groupSeparator}${parentId}`,
       }))
     );
   }
 
-  async handleNextButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+  async handleNextButton(
+    body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+  ) {
+    const [calendarData, parentId] =
+      body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
     const newKeyboard = this.injectParentId(
-      calendar.createNavigationKeyboard('en', new Date(year, month)).inline_keyboard,
+      calendar.createNavigationKeyboard('en', new Date(year, month))
+        .inline_keyboard,
       parentId
     );
 
@@ -136,8 +166,11 @@ class TelegramCalenderService extends TelegramBaseService {
     );
   }
 
-  async handleBackButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+  async handleBackButton(
+    body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+  ) {
+    const [calendarData, parentId] =
+      body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 2);
@@ -160,7 +193,8 @@ class TelegramCalenderService extends TelegramBaseService {
   ) {
     const chatId = body.callback_query.message!.chat.id;
     const message_id = body.callback_query.message!.message_id;
-    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [calendarData, parentId] =
+      body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 1, day);
@@ -178,7 +212,8 @@ class TelegramCalenderService extends TelegramBaseService {
   async handleTimeBackButton(
     body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
   ) {
-    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [calendarData, parentId] =
+      body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 1, day);

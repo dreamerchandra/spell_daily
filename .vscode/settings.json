@@ -1,15 +1,14 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.requireConfig": false,
+  "prettier.resolveGlobalModules": true,
+  "prettier.useEditorConfig": false,
+  "prettier.prettierPath": "./node_modules/prettier",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.quickSuggestions": {
     "strings": "on"
   },

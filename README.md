@@ -98,6 +98,16 @@ pnpm --filter @spell-daily/backend prisma:push
 
 When adding dependencies that should be shared across packages, add them to the root `package.json`. Package-specific dependencies should be added to the individual package's `package.json`.
 
+## Code Formatting
+
+The workspace uses a unified Prettier configuration located at the root level:
+
+- Configuration: `.prettierrc.json`
+- Ignore patterns: `.prettierignore`
+- Plugin: `prettier-plugin-tailwindcss` for Tailwind CSS class sorting
+
+All packages use the same formatting rules, ensuring consistency across the codebase.
+
 ## Build Output
 
 - **app**: Static files in `app/dist/`

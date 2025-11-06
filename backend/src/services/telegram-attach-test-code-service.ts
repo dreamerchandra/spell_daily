@@ -16,14 +16,18 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
     if (this.canHandleMessage(update)) {
       return await this.handleMessage(update);
     } else if (this.canHandleHintMessage(update)) {
-      return await this.showAddTestCodeInfo(update.callback_query!.message!.chat.id);
+      return await this.showAddTestCodeInfo(
+        update.callback_query!.message!.chat.id
+      );
     }
     return Promise.resolve();
   }
   canHandleMessage(body: TelegramBot.Update): boolean {
     const [phoneNumber, testCode] = body.message?.text?.split(' ') || ['', ''];
     return (
-      getPhoneNumber(phoneNumber) !== null && typeof testCode === 'string' && testCode.length === 6
+      getPhoneNumber(phoneNumber) !== null &&
+      typeof testCode === 'string' &&
+      testCode.length === 6
     );
   }
   isAuthRequired(): boolean {
@@ -49,13 +53,19 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
       if (error instanceof NotFoundError) {
         await sendTelegramMessage(body.message.chat.id, 'Parent not found');
       }
-      await sendTelegramMessage(body.message.chat.id, 'Error retrieving parent information');
+      await sendTelegramMessage(
+        body.message.chat.id,
+        'Error retrieving parent information'
+      );
     }
   }
   canHandleHintMessage(body: TelegramBot.Update): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } {
-    return !!body.callback_query?.data && body.callback_query.data === this.hintMessage;
+    return (
+      !!body.callback_query?.data &&
+      body.callback_query.data === this.hintMessage
+    );
   }
   async showAddTestCodeInfo(chatId: number) {
     const message =
@@ -64,4 +74,5 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
   }
 }
 
-export const telegramAttachTestCodeService = new TelegramAttachTestCodeService();
+export const telegramAttachTestCodeService =
+  new TelegramAttachTestCodeService();

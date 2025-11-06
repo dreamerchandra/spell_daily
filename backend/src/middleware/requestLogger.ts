@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../lib/logger.js';
 
-export const requestLoggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const requestLoggerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const startTime = Date.now();
   const { method, url, headers } = req;
 
@@ -11,6 +15,7 @@ export const requestLoggerMiddleware = (req: Request, res: Response, next: NextF
     userAgent: headers['user-agent'],
     ip: req.ip || req.socket.remoteAddress,
     contentType: headers['content-type'],
+    body: JSON.stringify(req?.body ?? {}),
   });
 
   let requestFinished = false;
@@ -21,7 +26,8 @@ export const requestLoggerMiddleware = (req: Request, res: Response, next: NextF
 
     const duration = Date.now() - startTime;
     const { statusCode } = res;
-    const logLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warning' : 'log';
+    const logLevel =
+      statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warning' : 'log';
 
     logger[logLevel]('Request completed', {
       method,

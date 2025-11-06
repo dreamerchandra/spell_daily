@@ -10,7 +10,10 @@ import { bot } from './telegram-bot-service.js';
 
 const BATCH_PROCESSING_DELAY_MS = 2000;
 
-type RemainderByUser = Map<string, { remainder: RemainderType[]; message: string[] }>;
+type RemainderByUser = Map<
+  string,
+  { remainder: RemainderType[]; message: string[] }
+>;
 
 class RemainderService {
   isValidScheduleRequest(body: unknown): body is CreateRemainderType {
@@ -75,20 +78,25 @@ class RemainderService {
       try {
         await remainderModel.markAsAttended(remainderIds);
       } catch (err) {
-        logger.error(`Failed to mark reminders as attended for ${userId}:`, err);
+        logger.error(
+          `Failed to mark reminders as attended for ${userId}:`,
+          err
+        );
       }
     }
   }
 
-  private async processRemainderBatches(batchedRemainders: RemainderByUser): Promise<void> {
+  private async processRemainderBatches(
+    batchedRemainders: RemainderByUser
+  ): Promise<void> {
     const userBatches = this.get20UserBatch(batchedRemainders);
     for (const batch of userBatches) {
       await Promise.allSettled(
-        batch.map(async (userId) => {
+        batch.map(async userId => {
           const userRemainders = batchedRemainders.get(userId);
           if (!userRemainders) return;
 
-          const ids = userRemainders.remainder.map((r) => r.id);
+          const ids = userRemainders.remainder.map(r => r.id);
           const messages = userRemainders.message;
           await this.sendMessage(userId, messages, ids);
         })

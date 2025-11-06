@@ -37,14 +37,21 @@ class TelegramAddAdminService extends TelegramBaseService {
     return false;
   }
 
-  async handleAddAdmin(body: TelegramBot.Update & { message: TelegramBot.Message }) {
+  async handleAddAdmin(
+    body: TelegramBot.Update & { message: TelegramBot.Message }
+  ) {
     const parts = body.message.text?.split('_');
     const [, otpCode] = parts ?? [];
     const telegramId = body.message.chat.id.toString();
 
     await this.addAdmin(otpCode, telegramId);
-    logger.log(`Added new admin with Telegram ID: ${telegramId} with otp: ${otpCode}`);
-    sendTelegramMessage(body.message.chat.id, 'Welcome to spell daily! You are now an admin.');
+    logger.log(
+      `Added new admin with Telegram ID: ${telegramId} with otp: ${otpCode}`
+    );
+    sendTelegramMessage(
+      body.message.chat.id,
+      'Welcome to spell daily! You are now an admin.'
+    );
   }
 }
 

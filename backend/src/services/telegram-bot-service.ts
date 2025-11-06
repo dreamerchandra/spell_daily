@@ -18,10 +18,16 @@ export const sendTelegramMessage = async (
 
   try {
     const result = await bot.sendMessage(chatId, text, options);
-    logger.debug('Telegram message sent successfully', { chatId, messageId: result.message_id });
+    logger.debug('Telegram message sent successfully', {
+      chatId,
+      messageId: result.message_id,
+    });
     return result;
   } catch (error) {
-    logger.error('Failed to send Telegram message', error, { chatId, message: text });
+    logger.error('Failed to send Telegram message', error, {
+      chatId,
+      message: text,
+    });
     throw error;
   }
 };
@@ -35,7 +41,10 @@ export const sendTelegramSticker = async (
 
   try {
     const result = await bot.sendSticker(chatId, sticker, options);
-    logger.debug('Telegram sticker sent successfully', { chatId, messageId: result.message_id });
+    logger.debug('Telegram sticker sent successfully', {
+      chatId,
+      messageId: result.message_id,
+    });
     return result;
   } catch (error) {
     logger.error('Failed to send Telegram sticker', error, { chatId, sticker });

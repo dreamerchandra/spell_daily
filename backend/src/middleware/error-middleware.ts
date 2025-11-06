@@ -5,7 +5,12 @@ import { NotFoundError } from '../types/not-found-error.js';
 import { UniqueConstraintError } from '../types/unique-constrain-error.js';
 import { logger } from '../lib/logger.js';
 
-export const errorMiddleware = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+export const errorMiddleware = (
+  err: any,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   logger.error('💥 Error caught:', err);
 
   // Handle Zod validation errors

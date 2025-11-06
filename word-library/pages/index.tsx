@@ -9,14 +9,16 @@ import { useSpeech } from '@/components/use-speech';
 export default function WordProcessorPage() {
   const [loading, setLoading] = useState(false);
   const [wordDataList, setWordDataList] = useState<WordData[]>([]);
-  const [originalWordDataList, setOriginalWordDataList] = useState<WordData[]>([]);
+  const [originalWordDataList, setOriginalWordDataList] = useState<WordData[]>(
+    []
+  );
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState('');
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [editedJson, setEditedJson] = useState('');
   const codeRef = useRef<HTMLDivElement>(null);
   const isEditingRef = useRef(false);
-  const { speak } = useSpeech()
+  const { speak } = useSpeech();
 
   const handleSubmit = async (words: string) => {
     setLoading(true);
@@ -73,7 +75,6 @@ export default function WordProcessorPage() {
     setEditedJson(JSON.stringify(originalData, null, 2));
   };
 
-
   const saveCurrentEdit = () => {
     try {
       const parsed = JSON.parse(editedJson);
@@ -124,7 +125,7 @@ export default function WordProcessorPage() {
       });
       return;
     }
-  }
+  };
 
   useEffect(() => {
     if (codeRef.current && !isEditingRef.current) {
@@ -148,51 +149,54 @@ ${editedJson}
 \`\`\``;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 text-gray-900">
-      <div className="max-w-full mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Words Extractor</h1>
+    <div className="min-h-screen bg-gray-50 px-4 py-8 text-gray-900">
+      <div className="mx-auto max-w-full">
+        <h1 className="mb-8 text-3xl font-bold text-gray-900">
+          Words Extractor
+        </h1>
 
         {!showConfirmation ? (
           <WordsForm onSubmit={handleSubmit} loading={loading} error={error} />
         ) : (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex justify-between border border-gray-300 p-2 rounded-lg">
+          <div className="rounded-lg bg-white p-6 shadow">
+            <h2 className="mb-4 flex justify-between rounded-lg border border-gray-300 p-2 text-xl font-semibold">
               <button
                 onClick={handlePrevious}
                 disabled={activeWordIndex === 0}
-                className="px-3 py-1 cursor-pointer bg-gray-100 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer rounded-md bg-gray-100 px-3 py-1 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 &lt;
               </button>
               <span>
-                {wordDataList[activeWordIndex]?.word || ''} ({activeWordIndex + 1}/{wordDataList.length})
+                {wordDataList[activeWordIndex]?.word || ''} (
+                {activeWordIndex + 1}/{wordDataList.length})
               </span>
               <button
                 onClick={handleNext}
                 disabled={activeWordIndex === wordDataList.length - 1}
-                className="px-3 py-1 cursor-pointer bg-gray-100 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer rounded-md bg-gray-100 px-3 py-1 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 &gt;
               </button>
             </h2>
 
             <div className="space-y-6">
-              <div className="flex justify-end mb-2">
+              <div className="mb-2 flex justify-end">
                 <button
                   onClick={() => onSpeak('syllable')}
-                  className="mr-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                  className="mr-4 cursor-pointer rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                 >
                   Speak Syllable
                 </button>
                 <button
                   onClick={() => onSpeak('word')}
-                  className="mr-4 px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 cursor-pointer"
+                  className="mr-4 cursor-pointer rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
                 >
                   Speak word
                 </button>
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 cursor-pointer"
+                  className="cursor-pointer rounded-md bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700"
                 >
                   Reset to Original
                 </button>
@@ -208,7 +212,7 @@ ${editedJson}
                         suppressContentEditableWarning
                         onInput={handleInput}
                         onBlur={handleBlur}
-                        className="focus:ring-2 focus:ring-blue-500 bg-[#282a36] rounded-md p-4 text-white font-mono whitespace-pre"
+                        className="rounded-md bg-[#282a36] p-4 font-mono whitespace-pre text-white focus:ring-2 focus:ring-blue-500"
                       >
                         {children}
                       </div>
@@ -224,16 +228,16 @@ ${editedJson}
               </ReactMarkdown>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="mt-6 flex gap-3">
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                className="rounded-md bg-green-600 px-6 py-2 text-white hover:bg-green-700 disabled:bg-gray-400"
               >
                 {loading ? 'Saving...' : 'Save to Database'}
               </button>
             </div>
-            {error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </div>
         )}
       </div>

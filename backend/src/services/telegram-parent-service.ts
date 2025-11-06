@@ -17,8 +17,13 @@ class TelegramParentService extends TelegramBaseService {
 
   canHandleCallback = (
     body: TelegramBot.Update
-  ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
-    return !!body.callback_query?.data && body.callback_query.data === this.hintMessage;
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } => {
+    return (
+      !!body.callback_query?.data &&
+      body.callback_query.data === this.hintMessage
+    );
   };
   canHandle(update: TelegramBot.Update): boolean {
     return this.canHandleCallback(update) || this.canHandleAddParent(update);
@@ -40,12 +45,14 @@ class TelegramParentService extends TelegramBaseService {
   canHandleAddParent(body: TelegramBot.Update) {
     if (body.message?.text) {
       if (
-        body.message.reply_to_message?.text?.replaceAll('\n', '').replaceAll(' ', '') ===
+        body.message.reply_to_message?.text
+          ?.replaceAll('\n', '')
+          .replaceAll(' ', '') ===
         this.parentMessageInfo.replaceAll('\n', '').replaceAll(' ', '')
       ) {
         return true;
       }
-      const lines = body.message.text.split('\n').map((line) => line.trim());
+      const lines = body.message.text.split('\n').map(line => line.trim());
       return lines[0].toLowerCase() === 'parent' && lines.length >= 2;
     }
     return false;
@@ -53,8 +60,9 @@ class TelegramParentService extends TelegramBaseService {
 
   getParentDetails(body: TelegramBot.Update): ParentUser | null {
     if (body.message?.text) {
-      const lines = body.message.text.split('\n').map((line) => line.trim());
-      const trimFirstLineIfNeeded = lines[0].toLowerCase() === 'parent' ? lines.slice(1) : lines;
+      const lines = body.message.text.split('\n').map(line => line.trim());
+      const trimFirstLineIfNeeded =
+        lines[0].toLowerCase() === 'parent' ? lines.slice(1) : lines;
       if (lines.length >= 2) {
         const phoneNumber = getPhoneNumber(trimFirstLineIfNeeded[0]);
         if (!phoneNumber) return null;
@@ -76,10 +84,15 @@ class TelegramParentService extends TelegramBaseService {
       await parentModel.createParent(parentDetails);
     } catch (error: unknown) {
       if (error instanceof UniqueConstraintError) {
-        const parent = await parentModel.findByPhoneNumber(parentDetails.phoneNumber);
+        const parent = await parentModel.findByPhoneNumber(
+          parentDetails.phoneNumber
+        );
         telegramUpdateLeadService.triggerFlow(body, parent);
       } else {
-        await sendTelegramMessage(chatId, 'Failed to add parent. Please try again later.');
+        await sendTelegramMessage(
+          chatId,
+          'Failed to add parent. Please try again later.'
+        );
       }
       return;
     }

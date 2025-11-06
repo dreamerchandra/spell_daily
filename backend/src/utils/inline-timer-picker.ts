@@ -15,11 +15,17 @@ export const generateInlineTimerPicker = (
   keyboard.push(...generateEmumCycles(parentId, selectedDate, groupSplitter));
 
   if (timeOfDay === 'morning') {
-    keyboard.push(...generateMorningTimerPicker(parentId, selectedDate, groupSplitter));
+    keyboard.push(
+      ...generateMorningTimerPicker(parentId, selectedDate, groupSplitter)
+    );
   } else if (timeOfDay === 'afternoon') {
-    keyboard.push(...generateAfternoonTimerPicker(parentId, selectedDate, groupSplitter));
+    keyboard.push(
+      ...generateAfternoonTimerPicker(parentId, selectedDate, groupSplitter)
+    );
   } else if (timeOfDay === 'evening') {
-    keyboard.push(...generateEveningTimerPicker(parentId, selectedDate, groupSplitter));
+    keyboard.push(
+      ...generateEveningTimerPicker(parentId, selectedDate, groupSplitter)
+    );
   }
 
   return keyboard;

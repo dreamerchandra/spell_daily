@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { WordData } from '../../types';
 import { generateText } from 'ai';
-import { google } from '@ai-sdk/google'
+import { google } from '@ai-sdk/google';
 
-const model = google('gemini-2.5-flash')
+const model = google('gemini-2.5-flash');
 
 const getPrompt = (word: string) => {
   return `
@@ -43,21 +43,26 @@ Here's an example
 Do not include any other text or any other format.
 Do not respond in markdown format.
 Just give the JSON object.
-`
-}
+`;
+};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'POST') {
-    res.status(405).send({ error: "Method not allowed" });
-    return
+    res.status(405).send({ error: 'Method not allowed' });
+    return;
   }
 
   try {
     const { words } = req.body;
 
     if (!words || typeof words !== 'string') {
-      res.status(400).send({ error: 'Invalid input. Please provide comma-separated words.' })
-      return
+      res.status(400).send({
+        error: 'Invalid input. Please provide comma-separated words.',
+      });
+      return;
     }
 
     // Split and clean the words
@@ -67,18 +72,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .filter((w: string) => w.length > 0);
 
     if (wordList.length === 0) {
-      res.status(400).send({ error: 'No valid words provided.' })
-      return
+      res.status(400).send({ error: 'No valid words provided.' });
+      return;
     }
 
     const results: WordData[] = [];
 
     for (const word of wordList) {
-
       const { content } = await generateText({
         model,
-        prompt: getPrompt(word)
-      })
+        prompt: getPrompt(word),
+      });
 
       // Parse the AI response
       if (content?.[0]?.type === 'text') {
@@ -86,15 +90,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const parsed = JSON.parse(content[0].text);
           results.push(parsed);
         } catch (parseError) {
-          console.log(parseError)
+          console.log(parseError);
         }
       }
     }
 
-    res.status(200).send({ data: results })
+    res.status(200).send({ data: results });
   } catch (error) {
     console.error('Error processing words:', error);
-    res.status(500).send({ error: 'Failed to process words. Please try again.' })
-
+    res
+      .status(500)
+      .send({ error: 'Failed to process words. Please try again.' });
   }
 }

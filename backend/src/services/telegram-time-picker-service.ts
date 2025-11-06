@@ -10,7 +10,12 @@ import { parentModel } from '../model/parent-model.js';
 class TelegramTimePickerService extends TelegramBaseService {
   bot = bot;
 
-  async triggerTime(chatId: number, message_id: number, parentId: string, date: string) {
+  async triggerTime(
+    chatId: number,
+    message_id: number,
+    parentId: string,
+    date: string
+  ) {
     const keyboard = generateInlineTimerPicker(
       parentId,
       date,
@@ -29,7 +34,11 @@ class TelegramTimePickerService extends TelegramBaseService {
     );
   }
 
-  async sendTimePicker(chatId: number, message_id: number, keyboard: InlineKeyboardButton[][]) {
+  async sendTimePicker(
+    chatId: number,
+    message_id: number,
+    keyboard: InlineKeyboardButton[][]
+  ) {
     await this.bot.editMessageReplyMarkup(
       {
         inline_keyboard: keyboard,
@@ -47,7 +56,9 @@ class TelegramTimePickerService extends TelegramBaseService {
 
   canHandle(body: Update): boolean {
     const [payload, parentId] =
-      body.callback_query?.data?.split(telegramCalenderService.groupSeparator) ?? [];
+      body.callback_query?.data?.split(
+        telegramCalenderService.groupSeparator
+      ) ?? [];
     const [action] = payload.split('_');
     return ['t', 'pt'].includes(action) && !!parentId;
   }
@@ -63,7 +74,9 @@ class TelegramTimePickerService extends TelegramBaseService {
     ensure(chatId, 'Chat ID is required');
     ensure(data, 'Callback data is required');
 
-    const [payload, parentId] = data.split(telegramCalenderService.groupSeparator);
+    const [payload, parentId] = data.split(
+      telegramCalenderService.groupSeparator
+    );
     const [action, value, selectedDate] = payload.split('_');
 
     switch (action) {
@@ -74,7 +87,11 @@ class TelegramTimePickerService extends TelegramBaseService {
           telegramCalenderService.groupSeparator,
           value as 'morning' | 'afternoon' | 'evening'
         );
-        await this.sendTimePicker(chatId, body.callback_query!.message!.message_id, keyboard);
+        await this.sendTimePicker(
+          chatId,
+          body.callback_query!.message!.message_id,
+          keyboard
+        );
         break;
       }
       case 't': {
@@ -109,7 +126,9 @@ class TelegramTimePickerService extends TelegramBaseService {
 
       default:
         if (callbackQueryId) {
-          await this.bot.answerCallbackQuery(callbackQueryId, { text: 'Unknown action' });
+          await this.bot.answerCallbackQuery(callbackQueryId, {
+            text: 'Unknown action',
+          });
         }
     }
   }

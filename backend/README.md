@@ -5,28 +5,34 @@ Express + TypeScript backend with comprehensive logging, request tracking, and N
 ## Features
 
 ### 🎯 Request Tracking
+
 - **Request ID Middleware**: Automatically assigns unique UUID to each request
 - **Async Context**: Request ID available throughout the entire request lifecycle using `async_hooks`
 - **Request Logger**: Comprehensive logging of all incoming and completed requests
 
 ### 📊 Logging System
+
 - **Winston Logger**: Structured logging with multiple transports
 - **New Relic Integration**: Automatic log forwarding to New Relic
 - **Auto Request ID**: All logs automatically include request ID from async context
 
 ### 🗄️ Database
+
 - **Prisma ORM**: Type-safe database queries
 - **PostgreSQL**: Connected to Neon database
 
 ## Setup
 
 ### Installation
+
 ```bash
 pnpm install
 ```
 
 ### Environment Variables
+
 Create a `.env` file in the backend directory:
+
 ```env
 # Database
 DATABASE_URL="postgresql://..."
@@ -42,6 +48,7 @@ LOG_LEVEL="info"
 ```
 
 ### Scripts
+
 ```bash
 # Development
 pnpm dev              # Start dev server with hot reload
@@ -68,6 +75,7 @@ pnpm prisma:push      # Push schema to database
 ## Architecture
 
 ### Middleware Stack
+
 1. **Request ID Middleware** - Assigns unique ID and stores in async context
 2. **Request Logger Middleware** - Logs incoming and completed requests
 3. **Express JSON Parser** - Parses JSON request bodies
@@ -95,6 +103,7 @@ logger.error('Error message', error, { context: 'payment' });
 The request logger automatically logs:
 
 **On Request Start:**
+
 - HTTP method
 - URL
 - User agent
@@ -102,6 +111,7 @@ The request logger automatically logs:
 - Content type
 
 **On Request Completion:**
+
 - Status code
 - Duration (in ms)
 - Content length
@@ -111,17 +121,20 @@ The request logger automatically logs:
   - 500+: `error`
 
 **On Unhandled Exception:**
+
 - Error details
 - Request duration
 - Error name and message
 
 **On Connection Close:**
+
 - Reason for early termination
 - Request duration
 
 ### Log Destinations
 
 All logs are sent to:
+
 1. **Console** - Colorized, human-readable format (development)
 2. **Files**:
    - `logs/combined.log` - All logs
@@ -131,34 +144,43 @@ All logs are sent to:
 ## API Endpoints
 
 ### Health Check
+
 ```http
 GET /health
 ```
+
 Checks database connectivity and returns server status.
 
 ### Root
+
 ```http
 GET /
 ```
+
 Simple endpoint that returns a welcome message.
 
 ### Test Endpoints
 
 **Test Error Response:**
+
 ```http
 GET /test-error
 ```
+
 Returns a 400 error response to test error logging.
 
 **Test Unhandled Exception:**
+
 ```http
 GET /test-exception
 ```
+
 Throws an unhandled exception to test exception logging.
 
 ## Example Log Output
 
 ### Console (Development)
+
 ```
 2025-11-04 12:34:56 info [a7b3c2d1-1234-5678-abcd-123456789abc]: Incoming request {"method":"GET","url":"/health"}
 2025-11-04 12:34:56 info [a7b3c2d1-1234-5678-abcd-123456789abc]: Health check passed - database connected
@@ -166,6 +188,7 @@ Throws an unhandled exception to test exception logging.
 ```
 
 ### JSON Log File
+
 ```json
 {
   "timestamp": "2025-11-04 12:34:56",
@@ -207,6 +230,7 @@ backend/
 ## New Relic Integration
 
 The application automatically sends:
+
 - **Transaction traces** for all HTTP requests
 - **Error tracking** for exceptions
 - **Custom logs** with request ID and metadata

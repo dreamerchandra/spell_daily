@@ -25,8 +25,14 @@ class TelegramAddService extends TelegramBaseService {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: 'Parent', callback_data: telegramParentService.hintMessage },
-            { text: 'Test Code', callback_data: telegramAttachTestCodeService.hintMessage },
+            {
+              text: 'Parent',
+              callback_data: telegramParentService.hintMessage,
+            },
+            {
+              text: 'Test Code',
+              callback_data: telegramAttachTestCodeService.hintMessage,
+            },
           ],
         ],
       },

@@ -44,16 +44,16 @@ class TelegramService extends TelegramBaseService {
   }
 
   isAuthRequired(body: TelegramBot.Update): boolean {
-    const handler = handlers.find((handler) => handler.canHandle(body));
+    const handler = handlers.find(handler => handler.canHandle(body));
     return handler ? handler.isAuthRequired(body) : false;
   }
 
   canHandle(update: TelegramBot.Update): boolean {
-    return handlers.some((handler) => handler.canHandle(update));
+    return handlers.some(handler => handler.canHandle(update));
   }
 
   async handle(update: TelegramBot.Update): Promise<void> {
-    const handler = handlers.find((handler) => handler.canHandle(update));
+    const handler = handlers.find(handler => handler.canHandle(update));
     if (handler) {
       return handler.handle(update);
     }
