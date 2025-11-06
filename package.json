@@ -3,19 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "description": "Spelling game application with word library management",
+  "workspaces": [
+    "app",
+    "backend",
+    "word-library"
+  ],
   "scripts": {
-    "dev": "pnpm --parallel dev",
-    "build": "pnpm --recursive build",
-    "lint": "pnpm --recursive lint",
-    "lint:fix": "pnpm --recursive lint:fix",
+    "dev": "yarn workspaces foreach --all --parallel run dev",
+    "build": "yarn workspaces foreach --all run build",
+    "lint": "yarn workspaces foreach --all run lint",
+    "lint:fix": "yarn workspaces foreach --all run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "clean": "pnpm --recursive clean",
-    "install:all": "pnpm install",
-    "prisma:generate": "pnpm --filter @spell-daily/backend prisma:generate",
-    "prisma:migrate": "pnpm --filter @spell-daily/backend prisma:migrate",
-    "prisma:studio": "pnpm --filter @spell-daily/backend prisma:studio",
-    "prisma:push": "pnpm --filter @spell-daily/backend prisma:push"
+    "clean": "yarn workspaces foreach --all run clean",
+    "install:all": "yarn install",
+    "prisma:generate": "yarn workspace @spell-daily/backend run prisma:generate",
+    "prisma:migrate": "yarn workspace @spell-daily/backend run prisma:migrate",
+    "prisma:studio": "yarn workspace @spell-daily/backend run prisma:studio",
+    "prisma:push": "yarn workspace @spell-daily/backend run prisma:push"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
@@ -26,7 +31,7 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": ">=8"
+    "yarn": ">=4"
   },
-  "packageManager": "pnpm@8.0.0"
+  "packageManager": "yarn@4.10.3"
 }

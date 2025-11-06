@@ -1,10 +1,10 @@
-# Spell Daily - PNPM Workspace
+# Spell Daily - Yarn Workspace
 
-A spelling game application built with React, Express.js, and Next.js, organized as a pnpm workspace.
+A spelling game application built with React, Express.js, and Next.js, organized as a yarn workspace.
 
 ## Structure
 
-This repository is organized as a pnpm workspace with the following packages:
+This repository is organized as a yarn workspace with the following packages:
 
 - **`app`** (`@spell-daily/app`) - Main React application built with Vite
 - **`backend`** (`@spell-daily/backend`) - Express.js API server with Prisma ORM
@@ -15,50 +15,53 @@ This repository is organized as a pnpm workspace with the following packages:
 ### Prerequisites
 
 - Node.js 18 or higher
-- pnpm 8 or higher
+- Yarn 4 or higher (managed via corepack)
 
 ### Installation
 
 ```bash
+# Enable corepack (if not already enabled)
+corepack enable
+
 # Install all dependencies for all packages
-pnpm install
+yarn install
 ```
 
 ### Development
 
 ```bash
 # Start development servers for all packages
-pnpm dev
+yarn dev
 
 # Or run dev for a specific package
-pnpm --filter @spell-daily/app dev
-pnpm --filter @spell-daily/backend dev
-pnpm --filter @spell-daily/word-library dev
+yarn workspace @spell-daily/app dev
+yarn workspace @spell-daily/backend dev
+yarn workspace @spell-daily/word-library dev
 ```
 
 ### Building
 
 ```bash
 # Build all packages
-pnpm build
+yarn build
 
 # Build a specific package
-pnpm --filter @spell-daily/app build
-pnpm --filter @spell-daily/backend build
-pnpm --filter @spell-daily/word-library build
+yarn workspace @spell-daily/app build
+yarn workspace @spell-daily/backend build
+yarn workspace @spell-daily/word-library build
 ```
 
 ### Other Commands
 
 ```bash
 # Lint all packages
-pnpm lint
+yarn lint
 
 # Format all packages
-pnpm format
+yarn format
 
 # Clean build artifacts
-pnpm clean
+yarn clean
 ```
 
 ## Workspace Commands
@@ -67,13 +70,13 @@ You can run commands across all packages or target specific ones:
 
 ```bash
 # Run command in all packages
-pnpm --recursive <command>
+yarn workspaces foreach --all run <command>
 
 # Run command in specific package
-pnpm --filter @spell-daily/app <command>
+yarn workspace @spell-daily/app <command>
 
 # Run command in parallel
-pnpm --parallel <command>
+yarn workspaces foreach --all --parallel run <command>
 ```
 
 ## Backend Specific Commands
@@ -82,16 +85,16 @@ The backend package includes additional Prisma-related commands:
 
 ```bash
 # Generate Prisma client
-pnpm --filter @spell-daily/backend prisma:generate
+yarn workspace @spell-daily/backend run prisma:generate
 
 # Run database migrations
-pnpm --filter @spell-daily/backend prisma:migrate
+yarn workspace @spell-daily/backend run prisma:migrate
 
 # Open Prisma Studio
-pnpm --filter @spell-daily/backend prisma:studio
+yarn workspace @spell-daily/backend run prisma:studio
 
 # Push schema to database
-pnpm --filter @spell-daily/backend prisma:push
+yarn workspace @spell-daily/backend run prisma:push
 ```
 
 ## Package Dependencies
@@ -104,7 +107,6 @@ The workspace uses a unified Prettier configuration located at the root level:
 
 - Configuration: `.prettierrc.json`
 - Ignore patterns: `.prettierignore`
-- Plugin: `prettier-plugin-tailwindcss` for Tailwind CSS class sorting
 
 All packages use the same formatting rules, ensuring consistency across the codebase.
 

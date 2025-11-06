@@ -9,7 +9,6 @@
   "bracketSameLine": false,
   "arrowParens": "avoid",
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-tailwindcss"],
   "overrides": [
     {
       "files": "*.json",
