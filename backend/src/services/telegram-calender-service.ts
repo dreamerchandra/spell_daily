@@ -155,7 +155,7 @@ class TelegramCalenderService extends TelegramBaseService {
     const calendar = new Calendar(bot, {
       date_format: 'DD-MM-YYYY',
       language: 'en',
-      start_date: stateDate.toDateString(),
+      start_date: 'now',
       time_step: '1h',
     });
     const inlineKeyboard = calendar.createNavigationKeyboard('en', stateDate);
