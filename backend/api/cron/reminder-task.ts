@@ -1,7 +1,7 @@
 import { remainderService } from '../../src/services/remainder-service.js';
 
 export const config = {
-  schedule: '*/60 * * * *', // every 60 minutes
+  schedule: '*/5 * * * *', // every 5 minutes
 };
 
 export default async function handler(_req: any, res: any) {

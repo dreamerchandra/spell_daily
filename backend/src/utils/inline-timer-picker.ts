@@ -87,21 +87,21 @@ const generateMorningTimerPicker = (
   keyboard.push(
     [
       {
-        text: '08:00',
+        text: '☀️ 8a',
         callback_data: `t_08:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '09:00',
+        text: '🌤️ 9a',
         callback_data: `t_09:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ],
     [
       {
-        text: '10:00',
+        text: '🌞 10a',
         callback_data: `t_10:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '11:00',
+        text: '🕚 11a',
         callback_data: `t_11:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ]
@@ -119,21 +119,21 @@ const generateAfternoonTimerPicker = (
   keyboard.push(
     [
       {
-        text: '12:00',
+        text: '🔆 noon',
         callback_data: `t_12:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '13:00',
+        text: '🌇 1p',
         callback_data: `t_13:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ],
     [
       {
-        text: '14:00',
+        text: '🌞 2p',
         callback_data: `t_14:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '15:00',
+        text: '🕒 3p',
         callback_data: `t_15:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ]
@@ -151,22 +151,32 @@ const generateEveningTimerPicker = (
   keyboard.push(
     [
       {
-        text: '16:00',
+        text: '🌤️ 4p',
         callback_data: `t_16:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '17:00',
+        text: '🌇 5p',
         callback_data: `t_17:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ],
     [
       {
-        text: '18:00',
+        text: '🌆 6p',
         callback_data: `t_18:00_${selectedDate}${groupSplitter}${parentId}`,
       },
       {
-        text: '19:00',
+        text: '🌃 7p',
         callback_data: `t_19:00_${selectedDate}${groupSplitter}${parentId}`,
+      },
+    ],
+    [
+      {
+        text: '🌙 8p',
+        callback_data: `t_20:00_${selectedDate}${groupSplitter}${parentId}`,
+      },
+      {
+        text: '🕘 9p',
+        callback_data: `t_21:00_${selectedDate}${groupSplitter}${parentId}`,
       },
     ]
   );

@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { ParentUserResponse } from '../model/parent-model.js';
+import { parentModel, ParentUserResponse } from '../model/parent-model.js';
 import { ensure } from '../types/ensure.js';
 import { LeadStatus } from '../model/parent-lead-model.js';
 import { leadStatusConverter } from '../model/parent-lead-model.js';
@@ -12,6 +12,7 @@ import {
 import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
+import { remainderModel } from '../model/remainder-model.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -177,6 +178,9 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     if (this.canHandleScheduleLaterButton(body)) {
       return true;
     }
+    if (this.canHandleFollowUp1HourButton(body)) {
+      return true;
+    }
     return false;
   }
   canHandleScheduleLaterButton(
@@ -205,6 +209,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
       callback_query: TelegramBot.CallbackQuery;
     }
   ) {
+    console.log('Handling update lead callback');
     if (
       body.callback_query?.data &&
       body.callback_query.data.startsWith('parent_id')
@@ -212,8 +217,40 @@ class TelegramUpdateLeadService extends TelegramBaseService {
       return await this.handleUpdateLead(body);
     } else if (this.canHandleScheduleLaterButton(body)) {
       return await this.handleScheduleLaterButton(body);
+    } else if (this.canHandleFollowUp1HourButton(body)) {
+      return await this.handleFollowUp1HourButton(body);
     }
     return Promise.resolve();
+  }
+
+  canHandleFollowUp1HourButton(
+    body: TelegramBot.Update
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } {
+    const data = body.callback_query?.data || '';
+    return data.startsWith('quick_scheduler:');
+  }
+
+  async handleFollowUp1HourButton(
+    body: TelegramBot.Update & {
+      callback_query: TelegramBot.CallbackQuery;
+    }
+  ) {
+    const [, parentId] = body.callback_query?.data?.split(':') ?? [];
+    ensure(parentId, 'Parent ID is missing in callback data');
+    const chatId = body.callback_query.message!.chat.id;
+    const parent = await parentModel.getById(parentId);
+    ensure(parent, 'Parent not found');
+    await remainderModel.createRemainder({
+      dateTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      userId: chatId.toString(),
+      message: `Your Remainder to follow up with ${parent.name} \n phone Number: ${parent.phoneNumber}`,
+    });
+    sendTelegramMessage(
+      body.callback_query.message!.chat.id,
+      `✅ Remainder set to follow up with ${parent.name} in 1 hour.`
+    );
   }
 
   async triggerFlow(body: TelegramBot.Update, parent: ParentUserResponse) {
@@ -225,7 +262,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
           [
             {
               text: 'Follow up in 1 hour',
-              callback_data: `parent_id:${parent.id}:follow:1_hour:`,
+              callback_data: `quick_scheduler:${parent.id}:follow:1_hour:`,
             },
             {
               text: 'Schedule a followup',

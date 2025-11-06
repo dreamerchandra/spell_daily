@@ -4,13 +4,6 @@ import type TelegramBot from 'node-telegram-bot-api';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramTimePickerService } from './telegram-time-picker-service.js';
 
-const calendar = new Calendar(bot, {
-  date_format: 'DD-MM-YYYY',
-  language: 'en',
-  start_date: 'now',
-  time_step: '1h',
-});
-
 class TelegramCalenderService extends TelegramBaseService {
   groupSeparator = ':::';
 
@@ -71,6 +64,12 @@ class TelegramCalenderService extends TelegramBaseService {
   ): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } => {
+    const calendar = new Calendar(bot, {
+      date_format: 'DD-MM-YYYY',
+      language: 'en',
+      start_date: 'now',
+      time_step: '1h',
+    });
     const chatId = body.callback_query?.message?.chat?.id;
     const messageId = body.callback_query?.message?.message_id;
     return (
@@ -119,6 +118,12 @@ class TelegramCalenderService extends TelegramBaseService {
 
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
+    const calendar = new Calendar(bot, {
+      date_format: 'DD-MM-YYYY',
+      language: 'en',
+      start_date: 'now',
+      time_step: '1h',
+    });
     const inlineKeyboard = calendar.createNavigationKeyboard('en', new Date());
     const modifiedKeyboard = this.injectParentId(
       inlineKeyboard.inline_keyboard,
@@ -151,6 +156,12 @@ class TelegramCalenderService extends TelegramBaseService {
       body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
+    const calendar = new Calendar(bot, {
+      date_format: 'DD-MM-YYYY',
+      language: 'en',
+      start_date: 'now',
+      time_step: '1h',
+    });
     const newKeyboard = this.injectParentId(
       calendar.createNavigationKeyboard('en', new Date(year, month))
         .inline_keyboard,
@@ -174,6 +185,12 @@ class TelegramCalenderService extends TelegramBaseService {
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 2);
+    const calendar = new Calendar(bot, {
+      date_format: 'DD-MM-YYYY',
+      language: 'en',
+      start_date: 'now',
+      time_step: '1h',
+    });
     const newKeyboard = this.injectParentId(
       calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
       parentId
@@ -217,6 +234,12 @@ class TelegramCalenderService extends TelegramBaseService {
     const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 1, day);
+    const calendar = new Calendar(bot, {
+      date_format: 'DD-MM-YYYY',
+      language: 'en',
+      start_date: 'now',
+      time_step: '1h',
+    });
     const newKeyboard = this.injectParentId(
       calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
       parentId
