@@ -20,6 +20,18 @@ class TelegramParentService extends TelegramBaseService {
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
     return !!body.callback_query?.data && body.callback_query.data === this.hintMessage;
   };
+  canHandle(update: TelegramBot.Update): boolean {
+    return this.canHandleCallback(update) || this.canHandleAddParent(update);
+  }
+
+  handle(update: TelegramBot.Update): Promise<void> {
+    if (this.canHandleCallback(update)) {
+      return this.showAddParentInfo(update.callback_query!.message!.chat.id);
+    } else if (this.canHandleAddParent(update)) {
+      return this.handleAddParent(update);
+    }
+    return Promise.resolve();
+  }
 
   isAuthRequired(): boolean {
     return true;

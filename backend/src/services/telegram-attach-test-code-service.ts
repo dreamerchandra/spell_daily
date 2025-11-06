@@ -9,6 +9,17 @@ import { TelegramBaseService } from './telegram-base-service.js';
 
 class TelegramAttachTestCodeService extends TelegramBaseService {
   hintMessage = '/add_test_code';
+  canHandle(update: TelegramBot.Update): boolean {
+    return this.canHandleMessage(update) || this.canHandleHintMessage(update);
+  }
+  async handle(update: TelegramBot.Update): Promise<void> {
+    if (this.canHandleMessage(update)) {
+      return await this.handleMessage(update);
+    } else if (this.canHandleHintMessage(update)) {
+      return await this.showAddTestCodeInfo(update.callback_query!.message!.chat.id);
+    }
+    return Promise.resolve();
+  }
   canHandleMessage(body: TelegramBot.Update): boolean {
     const [phoneNumber, testCode] = body.message?.text?.split(' ') || ['', ''];
     return (

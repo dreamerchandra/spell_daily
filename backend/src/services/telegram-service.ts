@@ -2,11 +2,21 @@ import TelegramBot from 'node-telegram-bot-api';
 import { telegramParentService } from './telegram-parent-service.js';
 import { telegramPhoneNumberService } from './telegram-phone-number-service.js';
 import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
-import { sendTelegramMessage } from './telegram-bot-service.js';
 import { telegramAttachTestCodeService } from './telegram-attach-test-code-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
 import { telegramAddAdminService } from './telegram-add-admin-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
+import { telegramAddService } from './telegram-add-service.js';
+
+const handlers: TelegramBaseService[] = [
+  telegramAddService,
+  telegramParentService,
+  telegramPhoneNumberService,
+  telegramUpdateLeadService,
+  telegramAttachTestCodeService,
+  telegramCalenderService,
+  telegramAddAdminService,
+];
 
 class TelegramService extends TelegramBaseService {
   getUserId(body: TelegramBot.Update): number | null {
@@ -32,101 +42,20 @@ class TelegramService extends TelegramBaseService {
   }
 
   isAuthRequired(body: TelegramBot.Update): boolean {
-    if (telegramAddAdminService.canHandleAddAdmin(body)) {
-      return telegramAddAdminService.isAuthRequired();
-    }
-    if (telegramParentService.canHandleCallback(body)) {
-      return telegramParentService.isAuthRequired();
-    }
-    if (telegramParentService.canHandleAddParent(body)) {
-      return telegramParentService.isAuthRequired();
-    }
-    if (telegramPhoneNumberService.canHandleMessage(body)) {
-      return telegramPhoneNumberService.isAuthRequired();
-    }
-    if (telegramUpdateLeadService.canHandle(body)) {
-      return telegramUpdateLeadService.isAuthRequired();
-    }
-    if (telegramAttachTestCodeService.canHandleMessage(body)) {
-      return telegramAttachTestCodeService.isAuthRequired();
-    }
-    if (telegramAttachTestCodeService.canHandleHintMessage(body)) {
-      return telegramAttachTestCodeService.isAuthRequired();
-    }
-    if (telegramCalenderService.canHandle(body)) {
-      return telegramCalenderService.isAuthRequired();
-    }
-    if (telegramCalenderService.canHandleNextButton(body)) {
-      return telegramCalenderService.isAuthRequired();
-    }
-    if (telegramCalenderService.canHandleBackButton(body)) {
-      return telegramCalenderService.isAuthRequired();
-    }
-    if (telegramCalenderService.canHandleDateSelection(body)) {
-      return telegramCalenderService.isAuthRequired();
-    }
-    if (telegramCalenderService.canHandleTimeBackButton(body)) {
-      return telegramCalenderService.isAuthRequired();
-    }
-    if (telegramAddAdminService.canHandleAddAdmin(body)) {
-      return telegramAddAdminService.isAuthRequired();
-    }
-    return false;
+    const handler = handlers.find((handler) => handler.canHandle(body));
+    return handler ? handler.isAuthRequired(body) : false;
   }
 
-  async handleMessage(body: TelegramBot.Update) {
-    if (body.message?.text?.startsWith('/add')) {
-      await this.handleAddMessage(body.message);
-    }
-    if (telegramParentService.canHandleCallback(body)) {
-      await telegramParentService.showAddParentInfo(body.callback_query.from.id);
-    }
-    if (telegramParentService.canHandleAddParent(body)) {
-      await telegramParentService.handleAddParent(body);
-    }
-    if (telegramPhoneNumberService.canHandleMessage(body)) {
-      await telegramPhoneNumberService.handleMessage(body);
-    }
-    if (telegramUpdateLeadService.canHandle(body)) {
-      await telegramUpdateLeadService.handleUpdateLead(body);
-    }
-    if (telegramAttachTestCodeService.canHandleMessage(body)) {
-      await telegramAttachTestCodeService.handleMessage(body);
-    }
-    if (telegramAttachTestCodeService.canHandleHintMessage(body)) {
-      await telegramAttachTestCodeService.showAddTestCodeInfo(body.callback_query.from.id);
-    }
-    if (telegramCalenderService.canHandle(body)) {
-      telegramCalenderService.handleCalender(body.message!);
-    }
-    if (telegramCalenderService.canHandleNextButton(body)) {
-      telegramCalenderService.handleNextButton(body);
-    }
-    if (telegramCalenderService.canHandleBackButton(body)) {
-      telegramCalenderService.handleBackButton(body);
-    }
-    if (telegramCalenderService.canHandleDateSelection(body)) {
-      telegramCalenderService.handleDateSelection(body);
-    }
-    if (telegramCalenderService.canHandleTimeBackButton(body)) {
-      telegramCalenderService.handleTimeBackButton(body);
-    }
-    if (telegramAddAdminService.canHandleAddAdmin(body)) {
-      await telegramAddAdminService.handleAddAdmin(body);
-    }
+  canHandle(update: TelegramBot.Update): boolean {
+    return handlers.some((handler) => handler.canHandle(update));
   }
 
-  async handleAddMessage(message: TelegramBot.Message) {
-    await sendTelegramMessage(message.chat.id, 'Choose one!', {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: 'Parent', callback_data: telegramParentService.hintMessage },
-            { text: 'Test Code', callback_data: telegramAttachTestCodeService.hintMessage },
-          ],
-        ],
-      },
-    });
+  async handle(update: TelegramBot.Update): Promise<void> {
+    const handler = handlers.find((handler) => handler.canHandle(update));
+    if (handler) {
+      return handler.handle(update);
+    }
+    return Promise.resolve();
   }
 }
 

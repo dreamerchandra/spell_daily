@@ -157,6 +157,13 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     }
     return false;
   }
+  async handle(
+    body: TelegramBot.Update & {
+      callback_query: TelegramBot.CallbackQuery;
+    }
+  ) {
+    return await this.handleUpdateLead(body);
+  }
 
   async triggerFlow(body: TelegramBot.Update, parent: ParentUserResponse) {
     const chatId = telegramService.getUserId(body);

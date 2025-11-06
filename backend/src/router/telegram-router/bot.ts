@@ -2,7 +2,6 @@ import TelegramBot from 'node-telegram-bot-api';
 import { logger } from '../../lib/logger.js';
 import { Request } from 'express';
 import { telegramService } from '../../services/telegram-service.js';
-import { bot } from '../../services/telegram-bot-service.js';
 
 export const asTelegramRequest = (req: Request): TelegramBot.Update | null => {
   if (typeof req !== 'object' || req === null) {
@@ -34,8 +33,7 @@ export const handleMessage = async (body: TelegramBot.Update) => {
   });
 
   try {
-    bot.sendMessage(chatId!, 'Processing your request...');
-    await telegramService.handleMessage(body);
+    await telegramService.handle(body);
     logger.debug('Sent reply to admin', { chatId });
   } catch (error) {
     logger.error('Failed to send Telegram message', error, { chatId });

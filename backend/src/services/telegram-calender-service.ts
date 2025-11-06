@@ -14,14 +14,73 @@ class TelegramCalenderService extends TelegramBaseService {
   isAuthRequired(): boolean {
     return false;
   }
-  canHandle = (
-    body: TelegramBot.Update
-  ): body is TelegramBot.Update & { message: TelegramBot.Message } => {
+  private getHandleType(body: TelegramBot.Update): string | null {
     if (!!body.message && body.message.text === '/calendar') {
-      return true;
+      return 'calendar';
     }
-    return false;
+    if (this.canHandleCallback(body)) {
+      return 'callback';
+    }
+    if (this.canHandleNextButton(body)) {
+      return 'next';
+    }
+    if (this.canHandleBackButton(body)) {
+      return 'back';
+    }
+    if (this.canHandleDateSelection(body)) {
+      return 'date';
+    }
+    if (this.canHandleTimeBackButton(body)) {
+      return 'timeBack';
+    }
+    return null;
+  }
+
+  canHandle = (body: TelegramBot.Update): boolean => {
+    return this.getHandleType(body) !== null;
   };
+
+  async handle(body: TelegramBot.Update): Promise<void> {
+    const type = this.getHandleType(body);
+    switch (type) {
+      case 'calendar':
+        return await this.handleCalender(body.message!);
+      case 'callback':
+        return await this.handleCalender(
+          (
+            body as TelegramBot.Update & {
+              callback_query: TelegramBot.CallbackQuery;
+            }
+          ).callback_query.message!
+        );
+      case 'next':
+        return await this.handleNextButton(
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
+        );
+      case 'back':
+        return await this.handleBackButton(
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
+        );
+      case 'date':
+        return await this.handleDateSelection(
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
+        );
+      case 'timeBack':
+        return await this.handleTimeBackButton(
+          body as TelegramBot.Update & {
+            callback_query: TelegramBot.CallbackQuery;
+          }
+        );
+      default:
+        return Promise.resolve();
+    }
+  }
 
   canHandleCallback = (
     body: TelegramBot.Update

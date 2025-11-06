@@ -31,4 +31,5 @@ export const env = {
   NEW_RELIC_LOG_LEVEL: getEnvOrDefault('NEW_RELIC_LOG_LEVEL', 'info'),
 
   TELEGRAM_BOT_TOKEN: getEnv('TELEGRAM_BOT_TOKEN'),
+  REMAINDER_TOKEN_SECRET: getEnv('REMAINDER_TOKEN_SECRET', isProduction),
 };

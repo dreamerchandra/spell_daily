@@ -17,6 +17,14 @@ class TelegramAddAdminService extends TelegramBaseService {
   isAuthRequired(): boolean {
     return false;
   }
+  canHandle(update: TelegramBot.Update): boolean {
+    return this.canHandleAddAdmin(update);
+  }
+  async handle(update: TelegramBot.Update): Promise<void> {
+    if (this.canHandleAddAdmin(update)) {
+      await this.handleAddAdmin(update);
+    }
+  }
 
   canHandleAddAdmin(
     body: TelegramBot.Update

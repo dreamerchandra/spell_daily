@@ -79,3 +79,20 @@ model DailyActivity {
 model Otp {
   code String @id
 }
+
+model Remainder {
+  id            String    @id @default(cuid())
+  userId        String
+  dateTime      DateTime
+  message       String
+  isActive      Boolean   @default(true)
+  isAttended    Boolean   @default(false)
+  attemptCount  Int       @default(0)
+  maxAttempts   Int       @default(3)
+  lastAttemptAt DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+model RemainderLastProcessed {
+  lastRanAt DateTime @id
+}

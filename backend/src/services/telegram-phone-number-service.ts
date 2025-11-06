@@ -11,6 +11,12 @@ class TelegramPhoneNumber extends TelegramBaseService {
   isAuthRequired(): boolean {
     return true;
   }
+  canHandle(update: TelegramBot.Update): boolean {
+    return this.canHandleMessage(update);
+  }
+  async handle(update: TelegramBot.Update): Promise<void> {
+    return await this.handleMessage(update);
+  }
   canHandleMessage(body: TelegramBot.Update): boolean {
     return getPhoneNumber(body.message?.text || '') !== null;
   }
