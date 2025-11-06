@@ -41,7 +41,7 @@ if [ -z "$BASE_URL" ]; then
 fi
 
 BASE_URL="${BASE_URL%/}"
-WEBHOOK_URL="${BASE_URL}/api/v1/telegram/webhook"
+WEBHOOK_URL="${BASE_URL}/v1/telegram/webhook"
 
 echo "Setting webhook to: $WEBHOOK_URL"
 echo ""
