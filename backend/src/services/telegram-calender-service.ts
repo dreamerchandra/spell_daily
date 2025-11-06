@@ -116,22 +116,56 @@ class TelegramCalenderService extends TelegramBaseService {
     return data?.startsWith('t_') && data.endsWith('_back');
   };
 
+  disablePastDates(inlineKeyboard: any[][]) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize
+
+    return inlineKeyboard.map(row =>
+      row.map(cell => {
+        // No date → return as-is
+        if (!cell.callback_data || !cell.callback_data.includes('_'))
+          return cell;
+
+        // callback_data format: n_2025-11-06_0
+        const parts = cell.callback_data.split('_');
+        if (parts.length < 2) return cell;
+
+        const dateStr = parts[1]; // "2025-11-06"
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return cell;
+
+        // Check if it’s yesterday or older
+        if (date < today) {
+          return {
+            text: ' ',
+            callback_data: ' ',
+          };
+        }
+
+        // Otherwise return the valid date button
+        return cell;
+      })
+    );
+  }
+
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
+    const stateDate = new Date();
     const calendar = new Calendar(bot, {
       date_format: 'DD-MM-YYYY',
       language: 'en',
-      start_date: 'now',
+      start_date: stateDate.toDateString(),
       time_step: '1h',
     });
-    const inlineKeyboard = calendar.createNavigationKeyboard('en', new Date());
+    const inlineKeyboard = calendar.createNavigationKeyboard('en', stateDate);
     const modifiedKeyboard = this.injectParentId(
       inlineKeyboard.inline_keyboard,
       parentId
     );
+    const hidingPastDatesKeyboard = this.disablePastDates(modifiedKeyboard);
 
     await bot.sendMessage(chatId, 'Please select a date:', {
-      reply_markup: { inline_keyboard: modifiedKeyboard },
+      reply_markup: { inline_keyboard: hidingPastDatesKeyboard },
     });
   }
 
