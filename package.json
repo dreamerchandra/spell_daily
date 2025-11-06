@@ -2,10 +2,30 @@
   "name": "spell-daily",
   "version": "1.0.0",
   "private": true,
+  "description": "Spelling game application with word library management",
   "scripts": {
     "dev": "pnpm --parallel dev",
     "build": "pnpm --recursive build",
     "lint": "pnpm --recursive lint",
-    "format": "pnpm --recursive format"
-  }
+    "lint:fix": "pnpm --recursive lint:fix",
+    "format": "pnpm --recursive format",
+    "format:check": "pnpm --recursive format:check",
+    "clean": "pnpm --recursive clean",
+    "install:all": "pnpm install",
+    "prisma:generate": "pnpm --filter @spell-daily/backend prisma:generate",
+    "prisma:migrate": "pnpm --filter @spell-daily/backend prisma:migrate",
+    "prisma:studio": "pnpm --filter @spell-daily/backend prisma:studio",
+    "prisma:push": "pnpm --filter @spell-daily/backend prisma:push"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8"
+  },
+  "packageManager": "pnpm@8.0.0"
 }

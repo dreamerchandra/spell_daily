@@ -6,3 +6,4 @@ dist
 logs/
 
 /src/generated/prisma
+.vercel
