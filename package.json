@@ -30,8 +30,7 @@
     "typescript": "~5.9.3"
   },
   "engines": {
-    "node": ">=18",
-    "yarn": ">=4"
+    "node": ">=18"
   },
   "packageManager": "yarn@4.10.3"
 }
