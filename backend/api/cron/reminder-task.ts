@@ -1,4 +1,4 @@
-import { remainderService } from '../../services/remainder-service.js';
+import { remainderService } from '../../src/services/remainder-service.js';
 
 export const config = {
   schedule: '*/60 * * * *', // every 60 minutes
