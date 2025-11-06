@@ -1,5 +1,6 @@
 import { Router, type Router as RouterType } from 'express';
 import { prismaClient } from '../../prisma.js';
+import { getNowIST } from '../../utils/date.js';
 
 const healthRouter = Router();
 const baseVersion = '/v1';
@@ -19,6 +20,7 @@ healthRouter.get(`${baseVersion}${baseRoute}`, async (_req, res) => {
   return res.status(200).json({
     server: true,
     database: isDatabaseConnected,
+    timeNow: getNowIST().toISOString(),
   });
 });
 
