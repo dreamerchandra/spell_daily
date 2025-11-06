@@ -2,6 +2,7 @@ import { bot } from './telegram-bot-service.js';
 import Calendar from 'telegram-inline-calendar';
 import type TelegramBot from 'node-telegram-bot-api';
 import { TelegramBaseService } from './telegram-base-service.js';
+import { telegramTimePickerService } from './telegram-time-picker-service.js';
 
 const calendar = new Calendar(bot, {
   date_format: 'DD-MM-YYYY',
@@ -11,28 +12,18 @@ const calendar = new Calendar(bot, {
 });
 
 class TelegramCalenderService extends TelegramBaseService {
+  groupSeparator = ':::';
+
   isAuthRequired(): boolean {
     return false;
   }
+
   private getHandleType(body: TelegramBot.Update): string | null {
-    if (!!body.message && body.message.text === '/calendar') {
-      return 'calendar';
-    }
-    if (this.canHandleCallback(body)) {
-      return 'callback';
-    }
-    if (this.canHandleNextButton(body)) {
-      return 'next';
-    }
-    if (this.canHandleBackButton(body)) {
-      return 'back';
-    }
-    if (this.canHandleDateSelection(body)) {
-      return 'date';
-    }
-    if (this.canHandleTimeBackButton(body)) {
-      return 'timeBack';
-    }
+    if (body.message?.text === '/calendar') return 'calendar';
+    if (this.canHandleNextButton(body)) return 'next';
+    if (this.canHandleBackButton(body)) return 'back';
+    if (this.canHandleDateSelection(body)) return 'date';
+    if (this.canHandleTimeBackButton(body)) return 'timeBack';
     return null;
   }
 
@@ -44,149 +35,165 @@ class TelegramCalenderService extends TelegramBaseService {
     const type = this.getHandleType(body);
     switch (type) {
       case 'calendar':
-        return await this.handleCalender(body.message!);
-      case 'callback':
-        return await this.handleCalender(
-          (
-            body as TelegramBot.Update & {
-              callback_query: TelegramBot.CallbackQuery;
-            }
-          ).callback_query.message!
-        );
+        return this.handleCalendar(body.message!.chat.id);
       case 'next':
-        return await this.handleNextButton(
-          body as TelegramBot.Update & {
-            callback_query: TelegramBot.CallbackQuery;
-          }
+        return this.handleNextButton(
+          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
         );
       case 'back':
-        return await this.handleBackButton(
-          body as TelegramBot.Update & {
-            callback_query: TelegramBot.CallbackQuery;
-          }
+        return this.handleBackButton(
+          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
         );
       case 'date':
-        return await this.handleDateSelection(
-          body as TelegramBot.Update & {
-            callback_query: TelegramBot.CallbackQuery;
-          }
+        return this.handleDateSelection(
+          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
         );
       case 'timeBack':
-        return await this.handleTimeBackButton(
-          body as TelegramBot.Update & {
-            callback_query: TelegramBot.CallbackQuery;
-          }
+        return this.handleTimeBackButton(
+          body as TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
         );
       default:
-        return Promise.resolve();
+        return;
     }
   }
 
+  // 🔹 Determines if callback belongs to this calendar
   canHandleCallback = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
     const chatId = body.callback_query?.message?.chat?.id;
     const messageId = body.callback_query?.message?.message_id;
-
-    if (chatId !== undefined && messageId !== undefined) {
-      return messageId === calendar.chats.get(chatId);
-    }
-    return false;
+    return (
+      chatId !== undefined && messageId !== undefined && messageId === calendar.chats.get(chatId)
+    );
   };
 
+  // 🔹 Handlers for types of callbacks
   canHandleNextButton = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
-    //n_2025-11_++
-
-    if (body.callback_query?.data?.endsWith('++') && body.callback_query?.data.startsWith('n_')) {
-      return true;
-    }
-    return false;
+    const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
+    return data?.startsWith('n_') && data.endsWith('++');
   };
 
   canHandleBackButton = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
-    //n_2025-11_--
-
-    if (body.callback_query?.data?.endsWith('--') && body.callback_query?.data.startsWith('n_')) {
-      return true;
-    }
-    return false;
+    const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
+    return data?.startsWith('n_') && data.endsWith('--');
   };
 
   canHandleDateSelection = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
-    if (body.callback_query?.data?.startsWith('n_') && body.callback_query?.data.endsWith('_0')) {
-      return true;
-    }
-    return false;
+    const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
+    return data?.startsWith('n_') && data.endsWith('_0');
   };
 
   canHandleTimeBackButton = (
     body: TelegramBot.Update
   ): body is TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery } => {
-    if (
-      body.callback_query?.data?.startsWith('t_') &&
-      body.callback_query?.data.endsWith('_back')
-    ) {
-      return true;
-    }
-    return false;
+    const [data] = body.callback_query?.data?.split(this.groupSeparator) || [];
+    return data?.startsWith('t_') && data.endsWith('_back');
   };
 
-  handleCalender(message: TelegramBot.Message) {
-    calendar.startNavCalendar(message);
-  }
+  // 🔹 Creates calendar message (entry point)
+  async handleCalendar(chatId: number, parentId: string | null = null) {
+    const inlineKeyboard = calendar.createNavigationKeyboard('en', new Date());
+    const modifiedKeyboard = this.injectParentId(inlineKeyboard.inline_keyboard, parentId);
 
-  handleNextButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, date] = body.callback_query.data?.split('_') || [];
-    const [year, month] = date.split('-').map(Number);
-    bot.editMessageReplyMarkup(calendar.createNavigationKeyboard('en', new Date(year, month)), {
-      chat_id: body.callback_query.message!.chat.id,
-      message_id: body.callback_query.message!.message_id,
+    await bot.sendMessage(chatId, 'Please select a date:', {
+      reply_markup: { inline_keyboard: modifiedKeyboard },
     });
   }
 
-  handleBackButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, date] = body.callback_query.data?.split('_') || [];
-    const [year, month] = date.split('-').map(Number);
-    const jsDate = new Date();
-    jsDate.setFullYear(year);
-    jsDate.setMonth(month - 2);
-    bot.editMessageReplyMarkup(calendar.createNavigationKeyboard('en', jsDate), {
-      chat_id: body.callback_query.message!.chat.id,
-      message_id: body.callback_query.message!.message_id,
-    });
+  // 🔹 Adds :::parentId to every button
+  private injectParentId(keyboard: TelegramBot.InlineKeyboardButton[][], parentId: string | null) {
+    if (!parentId) return keyboard;
+    return keyboard.map((row) =>
+      row.map((button) => ({
+        ...button,
+        callback_data: `${button.callback_data}${this.groupSeparator}${parentId}`,
+      }))
+    );
   }
 
-  handleDateSelection(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, date] = body.callback_query.data?.split('_') || [];
+  async handleNextButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
+    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [, date] = calendarData.split('_');
+    const [year, month] = date.split('-').map(Number);
+    const newKeyboard = this.injectParentId(
+      calendar.createNavigationKeyboard('en', new Date(year, month)).inline_keyboard,
+      parentId
+    );
+
+    await bot.editMessageReplyMarkup(
+      { inline_keyboard: newKeyboard },
+      {
+        chat_id: body.callback_query.message!.chat.id,
+        message_id: body.callback_query.message!.message_id,
+      }
+    );
+  }
+
+  async handleBackButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
+    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [, date] = calendarData.split('_');
+    const [year, month] = date.split('-').map(Number);
+    const jsDate = new Date(year, month - 2);
+    const newKeyboard = this.injectParentId(
+      calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
+      parentId
+    );
+
+    await bot.editMessageReplyMarkup(
+      { inline_keyboard: newKeyboard },
+      {
+        chat_id: body.callback_query.message!.chat.id,
+        message_id: body.callback_query.message!.message_id,
+      }
+    );
+  }
+
+  async handleDateSelection(
+    body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+  ) {
+    const chatId = body.callback_query.message!.chat.id;
+    const message_id = body.callback_query.message!.message_id;
+    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 1, day);
-    bot.editMessageReplyMarkup(calendar.createTimeSelector('en', jsDate, true), {
-      chat_id: body.callback_query.message!.chat.id,
-      message_id: body.callback_query.message!.message_id,
-    });
+    const formattedYear = jsDate.getFullYear();
+    const formattedMonth = (jsDate.getMonth() + 1).toString().padStart(2, '0');
+    const formattedDay = jsDate.getDate().toString().padStart(2, '0');
+    await telegramTimePickerService.triggerTime(
+      chatId,
+      message_id,
+      parentId,
+      `${formattedYear}-${formattedMonth}-${formattedDay}`
+    );
   }
 
-  handleTimeBackButton(body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, date] = body.callback_query.data?.split('_') || [];
+  async handleTimeBackButton(
+    body: TelegramBot.Update & { callback_query: TelegramBot.CallbackQuery }
+  ) {
+    const [calendarData, parentId] = body.callback_query.data?.split(this.groupSeparator) || [];
+    const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
-    const jsDate = new Date();
-    jsDate.setFullYear(year);
-    jsDate.setMonth(month - 1);
-    jsDate.setDate(day);
-    bot.editMessageReplyMarkup(calendar.createNavigationKeyboard('en', jsDate), {
-      chat_id: body.callback_query.message!.chat.id,
-      message_id: body.callback_query.message!.message_id,
-    });
+    const jsDate = new Date(year, month - 1, day);
+    const newKeyboard = this.injectParentId(
+      calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
+      parentId
+    );
+
+    await bot.editMessageReplyMarkup(
+      { inline_keyboard: newKeyboard },
+      {
+        chat_id: body.callback_query.message!.chat.id,
+        message_id: body.callback_query.message!.message_id,
+      }
+    );
   }
 }
 

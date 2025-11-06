@@ -7,6 +7,7 @@ import { telegramCalenderService } from './telegram-calender-service.js';
 import { telegramAddAdminService } from './telegram-add-admin-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramAddService } from './telegram-add-service.js';
+import { telegramTimePickerService } from './telegram-time-picker-service.js';
 
 const handlers: TelegramBaseService[] = [
   telegramAddService,
@@ -16,6 +17,7 @@ const handlers: TelegramBaseService[] = [
   telegramAttachTestCodeService,
   telegramCalenderService,
   telegramAddAdminService,
+  telegramTimePickerService,
 ];
 
 class TelegramService extends TelegramBaseService {

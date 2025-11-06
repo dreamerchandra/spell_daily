@@ -58,6 +58,20 @@ class ParentModel {
       statusCreatedAt: status.createdAt,
     };
   }
+
+  async getById(id: string): Promise<ParentUserResponse> {
+    const parent = await prismaClient.parentUser.findUnique({
+      where: { id },
+    });
+    ensure(parent, new NotFoundError('Parent not found with the given id'));
+    const status = await parentLeadStatusModel.getLeadStatus(parent.id);
+    return {
+      ...parent,
+      details: parent.details || [],
+      status: status.status,
+      statusCreatedAt: status.createdAt,
+    };
+  }
 }
 
 export const parentModel = new ParentModel();

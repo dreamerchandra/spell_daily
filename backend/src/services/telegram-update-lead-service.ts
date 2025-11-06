@@ -8,6 +8,7 @@ import { getRandomCelebrationGif } from '../config/success-sticker.js';
 import { sendTelegramMessage, sendTelegramSticker } from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
+import { telegramCalenderService } from './telegram-calender-service.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -155,14 +156,38 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     if (body.callback_query?.data && body.callback_query.data.startsWith('parent_id')) {
       return true;
     }
+    if (this.canHandleScheduleLaterButton(body)) {
+      return true;
+    }
     return false;
   }
+  canHandleScheduleLaterButton(body: TelegramBot.Update): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } {
+    const [text, parentId] = body.callback_query?.data?.split(':') || [];
+    return text === 'pick_date_time' && !!parentId;
+  }
+
+  async handleScheduleLaterButton(
+    body: TelegramBot.Update & {
+      callback_query: TelegramBot.CallbackQuery;
+    }
+  ) {
+    const [, parentId] = body.callback_query.data?.split(':') || [];
+    return telegramCalenderService.handleCalendar(body.callback_query.message!.chat.id, parentId);
+  }
+
   async handle(
     body: TelegramBot.Update & {
       callback_query: TelegramBot.CallbackQuery;
     }
   ) {
-    return await this.handleUpdateLead(body);
+    if (body.callback_query?.data && body.callback_query.data.startsWith('parent_id')) {
+      return await this.handleUpdateLead(body);
+    } else if (this.canHandleScheduleLaterButton(body)) {
+      return await this.handleScheduleLaterButton(body);
+    }
+    return Promise.resolve();
   }
 
   async triggerFlow(body: TelegramBot.Update, parent: ParentUserResponse) {
