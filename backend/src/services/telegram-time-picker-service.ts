@@ -111,7 +111,7 @@ class TelegramTimePickerService extends TelegramBaseService {
         dateTime.setHours(hours, minutes, 0, 0);
         const parent = await parentModel.getById(parentId);
 
-        remainderService.scheduleReminders({
+        await remainderService.scheduleReminders({
           dateTime: dateTime.toISOString(),
           userId: chatId.toString(),
           message: `You can set a remainder for name: ${parent.name} phoneNumber: ${parent.phoneNumber}`,

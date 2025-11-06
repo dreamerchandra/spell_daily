@@ -45,7 +45,7 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
         parentId: parent.id,
         name,
       });
-      sendTelegramMessage(
+      await sendTelegramMessage(
         body.message.chat.id,
         `Test code ${result.testCode} attached to parent ${parent.name} successfully.`
       );

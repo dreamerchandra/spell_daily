@@ -26,7 +26,7 @@ class TelegramPhoneNumber extends TelegramBaseService {
     ensure(phoneNumber, 'Phone number could not be extracted');
     try {
       const parent = await parentModel.findByPhoneNumber(phoneNumber);
-      telegramUpdateLeadService.triggerFlow(body, parent);
+      await telegramUpdateLeadService.triggerFlow(body, parent);
     } catch (error) {
       if (error instanceof NotFoundError) {
         await sendTelegramMessage(body.message.chat.id, 'Parent not found');

@@ -247,7 +247,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
       userId: chatId.toString(),
       message: `Your Remainder to follow up with ${parent.name} \n phone Number: ${parent.phoneNumber}`,
     });
-    sendTelegramMessage(
+    await sendTelegramMessage(
       body.callback_query.message!.chat.id,
       `✅ Remainder set to follow up with ${parent.name} in 1 hour.`
     );

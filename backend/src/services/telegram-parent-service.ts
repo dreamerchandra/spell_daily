@@ -87,7 +87,7 @@ class TelegramParentService extends TelegramBaseService {
         const parent = await parentModel.findByPhoneNumber(
           parentDetails.phoneNumber
         );
-        telegramUpdateLeadService.triggerFlow(body, parent);
+        await telegramUpdateLeadService.triggerFlow(body, parent);
       } else {
         await sendTelegramMessage(
           chatId,

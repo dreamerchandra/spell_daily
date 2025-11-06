@@ -48,7 +48,7 @@ class TelegramAddAdminService extends TelegramBaseService {
     logger.log(
       `Added new admin with Telegram ID: ${telegramId} with otp: ${otpCode}`
     );
-    sendTelegramMessage(
+    await sendTelegramMessage(
       body.message.chat.id,
       'Welcome to spell daily! You are now an admin.'
     );

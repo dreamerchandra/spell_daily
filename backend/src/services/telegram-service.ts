@@ -55,7 +55,7 @@ class TelegramService extends TelegramBaseService {
   async handle(update: TelegramBot.Update): Promise<void> {
     const handler = handlers.find(handler => handler.canHandle(update));
     if (handler) {
-      return handler.handle(update);
+      return await handler.handle(update);
     }
     return Promise.resolve();
   }
