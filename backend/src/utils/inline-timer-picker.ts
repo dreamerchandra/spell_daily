@@ -130,36 +130,57 @@ const generateEmumCycles = (
   return keyboard;
 };
 
+function isTimePast(selectedDate: string, hhmm: string) {
+  // selectedDate is "YYYY-MM-DD"
+  const [year, month, day] = selectedDate.split('-').map(Number);
+  const [hh, mm] = hhmm.split(':').map(Number);
+
+  const candidate = new Date(year, month - 1, day, hh, mm, 0);
+  const nowIST = getNowIST();
+
+  return candidate < nowIST;
+}
+
+function timeButtonOrSkip(
+  label: string,
+  hhmm: string,
+  selectedDate: string,
+  parentId: string,
+  groupSplitter: string
+) {
+  if (isTimePast(selectedDate, hhmm))
+    return {
+      text: ' ',
+      callback_data: ' ',
+    };
+
+  return {
+    text: label,
+    callback_data: `t_${hhmm}_${selectedDate}${groupSplitter}${parentId}`,
+  };
+}
+
 const generateMorningTimerPicker = (
   parentId: string,
   selectedDate: string,
   groupSplitter: string
 ): TelegramBot.InlineKeyboardButton[][] => {
-  const keyboard: TelegramBot.InlineKeyboardButton[][] = [];
-  keyboard.push(
-    [
-      {
-        text: '☀️ 8a',
-        callback_data: `t_08:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🌤️ 9a',
-        callback_data: `t_09:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ],
-    [
-      {
-        text: '🌞 10a',
-        callback_data: `t_10:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🕚 11a',
-        callback_data: `t_11:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ]
-  );
+  const rows: TelegramBot.InlineKeyboardButton[][] = [];
 
-  return keyboard;
+  const r1 = [
+    timeButtonOrSkip('☀️ 8a', '08:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🌤️ 9a', '09:00', selectedDate, parentId, groupSplitter),
+  ];
+
+  const r2 = [
+    timeButtonOrSkip('🌞 10a', '10:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🕚 11a', '11:00', selectedDate, parentId, groupSplitter),
+  ];
+
+  if (r1.length) rows.push(r1);
+  if (r2.length) rows.push(r2);
+
+  return rows;
 };
 
 const generateAfternoonTimerPicker = (
@@ -167,31 +188,22 @@ const generateAfternoonTimerPicker = (
   selectedDate: string,
   groupSplitter: string
 ): TelegramBot.InlineKeyboardButton[][] => {
-  const keyboard: TelegramBot.InlineKeyboardButton[][] = [];
-  keyboard.push(
-    [
-      {
-        text: '🔆 noon',
-        callback_data: `t_12:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🌇 1p',
-        callback_data: `t_13:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ],
-    [
-      {
-        text: '🌞 2p',
-        callback_data: `t_14:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🕒 3p',
-        callback_data: `t_15:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ]
-  );
+  const rows: TelegramBot.InlineKeyboardButton[][] = [];
 
-  return keyboard;
+  const r1 = [
+    timeButtonOrSkip('🔆 noon', '12:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🌇 1p', '13:00', selectedDate, parentId, groupSplitter),
+  ];
+
+  const r2 = [
+    timeButtonOrSkip('🌞 2p', '14:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🕒 3p', '15:00', selectedDate, parentId, groupSplitter),
+  ];
+
+  if (r1.length) rows.push(r1);
+  if (r2.length) rows.push(r2);
+
+  return rows;
 };
 
 const generateEveningTimerPicker = (
@@ -199,39 +211,26 @@ const generateEveningTimerPicker = (
   selectedDate: string,
   groupSplitter: string
 ): TelegramBot.InlineKeyboardButton[][] => {
-  const keyboard: TelegramBot.InlineKeyboardButton[][] = [];
-  keyboard.push(
-    [
-      {
-        text: '🌤️ 4p',
-        callback_data: `t_16:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🌇 5p',
-        callback_data: `t_17:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ],
-    [
-      {
-        text: '🌆 6p',
-        callback_data: `t_18:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🌃 7p',
-        callback_data: `t_19:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ],
-    [
-      {
-        text: '🌙 8p',
-        callback_data: `t_20:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-      {
-        text: '🕘 9p',
-        callback_data: `t_21:00_${selectedDate}${groupSplitter}${parentId}`,
-      },
-    ]
-  );
+  const rows: TelegramBot.InlineKeyboardButton[][] = [];
 
-  return keyboard;
+  const r1 = [
+    timeButtonOrSkip('🌤️ 4p', '16:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🌇 5p', '17:00', selectedDate, parentId, groupSplitter),
+  ].filter(Boolean);
+
+  const r2 = [
+    timeButtonOrSkip('🌆 6p', '18:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🌃 7p', '19:00', selectedDate, parentId, groupSplitter),
+  ].filter(Boolean);
+
+  const r3 = [
+    timeButtonOrSkip('🌙 8p', '20:00', selectedDate, parentId, groupSplitter),
+    timeButtonOrSkip('🕘 9p', '21:00', selectedDate, parentId, groupSplitter),
+  ].filter(Boolean);
+
+  if (r1.length) rows.push(r1);
+  if (r2.length) rows.push(r2);
+  if (r3.length) rows.push(r3);
+
+  return rows;
 };
