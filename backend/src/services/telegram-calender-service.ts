@@ -3,6 +3,7 @@ import Calendar from 'telegram-inline-calendar';
 import type TelegramBot from 'node-telegram-bot-api';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramTimePickerService } from './telegram-time-picker-service.js';
+import { getNowIST } from '../utils/date.js';
 
 class TelegramCalenderService extends TelegramBaseService {
   groupSeparator = ':::';
@@ -117,7 +118,7 @@ class TelegramCalenderService extends TelegramBaseService {
   };
 
   disablePastDates(inlineKeyboard: any[][]) {
-    const today = new Date();
+    const today = getNowIST();
     today.setHours(0, 0, 0, 0); // normalize
 
     return inlineKeyboard.map(row =>
@@ -150,7 +151,7 @@ class TelegramCalenderService extends TelegramBaseService {
 
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
-    const stateDate = new Date();
+    const stateDate = getNowIST();
     const calendar = new Calendar(bot, {
       date_format: 'DD-MM-YYYY',
       language: 'en',
@@ -265,7 +266,7 @@ class TelegramCalenderService extends TelegramBaseService {
 
   pickTimeOfDay(selectedDate: string) {
     // Normalize today's date
-    const now = new Date();
+    const now = getNowIST();
     const todayStr = now.toISOString().split('T')[0];
     const selected = new Date(selectedDate);
 

@@ -1,4 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
+import { getNowIST } from './date.js';
 
 export const generateInlineTimerPicker = (
   parentId: string,
@@ -34,7 +35,7 @@ function sanitizeKeyboard(
   keyboard: TelegramBot.InlineKeyboardButton[][],
   selectedDate: string
 ) {
-  const today = new Date();
+  const today = getNowIST();
   today.setHours(0, 0, 0, 0);
 
   const selDate = new Date(selectedDate);
@@ -65,11 +66,11 @@ function sanitizeKeyboard(
       const [h, m] = time.split(':').map(Number);
       if (isNaN(h) || isNaN(m)) return cell;
 
-      const now = new Date();
+      const now = getNowIST();
 
       // If today and time < now → disable
       if (selDate.getTime() === today.getTime()) {
-        const buttonDateTime = new Date();
+        const buttonDateTime = getNowIST();
         buttonDateTime.setHours(h, m, 0, 0);
 
         if (buttonDateTime < now) {
