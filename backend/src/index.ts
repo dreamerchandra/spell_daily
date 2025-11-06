@@ -17,14 +17,14 @@ app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  logger.log('Root endpoint accessed');
+app.get('/hello', (req: Request, res: Response) => {
+  logger.log('Hello endpoint accessed');
   res.json({
     message: 'Hello from backend!',
     requestId: req.requestId,
   });
 });
-app.use('/api', router);
+app.use('/', router);
 
 app.use(errorMiddleware);
 
