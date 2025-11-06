@@ -35,6 +35,7 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
     },
   },
   {
@@ -46,6 +47,7 @@ export default [
       '!eslint.config.js',
       'src/generated/**',
       'prisma.config.ts',
+      'api/**',
     ],
   },
 ];

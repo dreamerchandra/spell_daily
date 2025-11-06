@@ -153,6 +153,9 @@ declare module 'telegram-inline-calendar' {
     /**
      * Check current language for a chat
      */
-    createNavigationKeyboard(lan: any, date: Date): TelegramBot.InlineKeyboardMarkup;
+    createNavigationKeyboard(
+      lan: any,
+      date: Date
+    ): TelegramBot.InlineKeyboardMarkup;
   }
 }

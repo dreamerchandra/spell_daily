@@ -13,7 +13,7 @@ const requestIdFormat = winston.format(info => {
 const newrelicFormat = winston.format(info => {
   if (env.isProduction) {
     try {
-      import('newrelic').then(newrelic => {
+      void import('newrelic').then(newrelic => {
         const logEvent: Record<string, unknown> = {
           message: String(info.message),
           level: String(info.level),

@@ -17,12 +17,12 @@ import { remainderModel } from '../model/remainder-model.js';
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
 
-const prefixParentId = (parentId: string, suffix: string): string =>
+export const prefixParentId = (parentId: string, suffix: string): string =>
   `parent_id${keyValueSplitter}${parentId}${groupSplitter}${suffix}`;
 
 const requestedStatusPrefix = 'requested';
 
-const prefixRequestedStatus = (status: LeadStatus): string =>
+export const prefixRequestedStatus = (status: LeadStatus): string =>
   `${requestedStatusPrefix}${keyValueSplitter}${status}`;
 
 const suggestNextTwoStatus = (

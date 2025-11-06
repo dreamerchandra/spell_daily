@@ -3,9 +3,15 @@ import { UniqueConstraintError } from '../types/unique-constrain-error.js';
 import TelegramBot from 'node-telegram-bot-api';
 import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
-import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
+import {
+  prefixParentId,
+  prefixRequestedStatus,
+  telegramUpdateLeadService,
+} from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
+import { LeadStatus } from '../model/parent-lead-model.js';
+import { ParentUserResponse } from '../model/parent-model.js';
 class TelegramParentService extends TelegramBaseService {
   public hintMessage = '/show_parent_hint';
   private parentMessageInfo =
@@ -80,13 +86,12 @@ class TelegramParentService extends TelegramBaseService {
     const chatId = body.message!.chat.id;
     const parentDetails = this.getParentDetails(body);
     ensure(parentDetails, 'Parent details could not be extracted');
+    let parent: ParentUserResponse | null;
     try {
-      await parentModel.createParent(parentDetails);
+      parent = await parentModel.createParent(parentDetails);
     } catch (error: unknown) {
       if (error instanceof UniqueConstraintError) {
-        const parent = await parentModel.findByPhoneNumber(
-          parentDetails.phoneNumber
-        );
+        parent = await parentModel.findByPhoneNumber(parentDetails.phoneNumber);
         await telegramUpdateLeadService.triggerFlow(body, parent);
       } else {
         await sendTelegramMessage(
@@ -96,9 +101,33 @@ class TelegramParentService extends TelegramBaseService {
       }
       return;
     }
+
+    ensure(parent, 'Parent just added could not be found');
     await sendTelegramMessage(
       chatId,
-      `Parent added successfully!\n\nPhone: ${parentDetails.phoneNumber}\nName: ${parentDetails.name || 'N/A'}\nDetails: ${parentDetails.details || 'N/A'}`
+      `Parent added successfully!\n\nPhone: ${parentDetails.phoneNumber}\nName: ${parentDetails.name || 'N/A'}\nDetails: ${parentDetails.details || 'N/A'}`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: 'Mark: Dictation Requested',
+                callback_data: prefixParentId(
+                  parent.phoneNumber,
+                  prefixRequestedStatus(LeadStatus.DICTATION_REQUESTED)
+                ),
+              },
+              {
+                text: 'Mark: Free Trial Requested',
+                callback_data: prefixParentId(
+                  parent.phoneNumber,
+                  prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
+                ),
+              },
+            ],
+          ],
+        },
+      }
     );
   };
 }
