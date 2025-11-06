@@ -4,6 +4,7 @@ import type TelegramBot from 'node-telegram-bot-api';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramTimePickerService } from './telegram-time-picker-service.js';
 import { getNowIST } from '../utils/date.js';
+import { generateInlineCalendar } from '../utils/inline-date-picker.js';
 
 class TelegramCalenderService extends TelegramBaseService {
   groupSeparator = ':::';
@@ -152,14 +153,8 @@ class TelegramCalenderService extends TelegramBaseService {
   // 🔹 Creates calendar message (entry point)
   async handleCalendar(chatId: number, parentId: string | null = null) {
     const jsDate = new Date();
-    const calendar = new Calendar(bot, {
-      date_format: 'DD-MM-YYYY',
-      language: 'en',
-      start_date: 'now',
-      time_step: '1h',
-    });
     const newKeyboard = this.injectParentId(
-      calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
+      generateInlineCalendar(jsDate.getFullYear(), jsDate.getMonth()),
       parentId
     );
     await bot.sendMessage(chatId, 'Please select a date:', {
@@ -188,15 +183,8 @@ class TelegramCalenderService extends TelegramBaseService {
       body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
-    const calendar = new Calendar(bot, {
-      date_format: 'DD-MM-YYYY',
-      language: 'en',
-      start_date: 'now',
-      time_step: '1h',
-    });
     const newKeyboard = this.injectParentId(
-      calendar.createNavigationKeyboard('en', new Date(year, month))
-        .inline_keyboard,
+      generateInlineCalendar(year, month + 1),
       parentId
     );
 
@@ -216,15 +204,9 @@ class TelegramCalenderService extends TelegramBaseService {
       body.callback_query.data?.split(this.groupSeparator) || [];
     const [, date] = calendarData.split('_');
     const [year, month] = date.split('-').map(Number);
-    const jsDate = new Date(year, month - 2);
-    const calendar = new Calendar(bot, {
-      date_format: 'DD-MM-YYYY',
-      language: 'en',
-      start_date: 'now',
-      time_step: '1h',
-    });
+    const jsDate = new Date(year, month - 1);
     const newKeyboard = this.injectParentId(
-      calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
+      generateInlineCalendar(jsDate.getFullYear(), jsDate.getMonth()),
       parentId
     );
 
@@ -295,14 +277,8 @@ class TelegramCalenderService extends TelegramBaseService {
     const [, date] = calendarData.split('_');
     const [year, month, day] = date.split('-').map(Number);
     const jsDate = new Date(year, month - 1, day);
-    const calendar = new Calendar(bot, {
-      date_format: 'DD-MM-YYYY',
-      language: 'en',
-      start_date: 'now',
-      time_step: '1h',
-    });
     const newKeyboard = this.injectParentId(
-      calendar.createNavigationKeyboard('en', jsDate).inline_keyboard,
+      generateInlineCalendar(jsDate.getFullYear(), jsDate.getMonth()),
       parentId
     );
 
