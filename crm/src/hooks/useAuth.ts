@@ -1,12 +1,12 @@
-import { env } from '../config/env'
-import { useTelegram } from '../hooks/useTelegram'
-import { useQuery } from '@tanstack/react-query'
+import { env } from '../config/env';
+import { useTelegram } from '../hooks/useTelegram';
+import { useQuery } from '@tanstack/react-query';
 
 interface User {
-  id: number
-  telegramId: number
-  name: string
-  createdAt: string
+  id: number;
+  telegramId: number;
+  name: string;
+  createdAt: string;
 }
 
 const verifyTelegramAuth = async (initData: string): Promise<User> => {
@@ -14,27 +14,31 @@ const verifyTelegramAuth = async (initData: string): Promise<User> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${initData}`
+      Authorization: `Bearer ${initData}`,
     },
-  })
-  
+  });
+
   if (!response.ok) {
-    throw new Error('Authentication failed')
+    throw new Error('Authentication failed');
   }
-  
-  return response.json()
-}
+
+  return response.json();
+};
 
 export const useAuth = () => {
-  const { initData, user: telegramUser, isReady } = useTelegram()
-  
-  const { data: user, isLoading, error } = useQuery({
+  const { initData, user: telegramUser, isReady } = useTelegram();
+
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['auth', initData],
     queryFn: () => verifyTelegramAuth(initData),
     enabled: isReady && !!initData && !!telegramUser,
     retry: false,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   return {
     user,
@@ -42,6 +46,6 @@ export const useAuth = () => {
     error,
     isAuthenticated: !!user,
     isAdmin: true,
-    telegramUser
-  }
-}
+    telegramUser,
+  };
+};

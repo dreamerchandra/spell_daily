@@ -1,5 +1,3 @@
-
-
 const getEnv = (key: string, required = true): string => {
   const value = import.meta.env[key];
   if (required && !value) {
@@ -8,9 +6,6 @@ const getEnv = (key: string, required = true): string => {
   return value || '';
 };
 
-
-
-
 export const env = {
-    BACKEND_URL: getEnv('VITE_BACKEND_URL'),
+  BACKEND_URL: getEnv('VITE_BACKEND_URL'),
 };

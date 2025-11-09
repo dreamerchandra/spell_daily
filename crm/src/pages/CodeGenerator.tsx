@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { useAuth } from '../hooks/useAuth'
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function CodeGenerator() {
-  const [code, setCode] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const { user } = useAuth()
+  const [code, setCode] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { user } = useAuth();
 
   const generateCode = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
       const response = await fetch('/api/generate-code', {
         method: 'POST',
@@ -16,29 +16,31 @@ export default function CodeGenerator() {
         },
         body: JSON.stringify({
           prompt: 'Generate a React component',
-          user_id: user?.id
-        })
-      })
-      
+          user_id: user?.id,
+        }),
+      });
+
       if (!response.ok) {
-        throw new Error('Code generation failed')
+        throw new Error('Code generation failed');
       }
-      
-      const data = await response.json()
-      setCode(data.code)
+
+      const data = await response.json();
+      setCode(data.code);
     } catch (error) {
-      console.error('Error generating code:', error)
+      console.error('Error generating code:', error);
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Code Generator</h1>
-          
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Code Generator
+          </h1>
+
           {user && (
             <div className="mb-4 p-3 bg-green-50 rounded-lg">
               <p className="text-sm text-green-700">
@@ -46,7 +48,7 @@ export default function CodeGenerator() {
               </p>
             </div>
           )}
-          
+
           <button
             onClick={generateCode}
             disabled={isGenerating}
@@ -58,7 +60,9 @@ export default function CodeGenerator() {
 
         {code && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Generated Code</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Generated Code
+            </h2>
             <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
               <code>{code}</code>
             </pre>
@@ -66,5 +70,5 @@ export default function CodeGenerator() {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -21,11 +21,14 @@
     "prisma:generate": "yarn workspace @spell-daily/backend run prisma:generate",
     "prisma:migrate": "yarn workspace @spell-daily/backend run prisma:migrate",
     "prisma:studio": "yarn workspace @spell-daily/backend run prisma:studio",
-    "prisma:push": "yarn workspace @spell-daily/backend run prisma:push"
+    "prisma:push": "yarn workspace @spell-daily/backend run prisma:push",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
     "eslint": "^9.36.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "0.7.1",
     "typescript": "~5.9.3"
@@ -33,5 +36,11 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.10.3",
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "yarn format",
+      "yarn lint:fix"
+    ]
+  }
 }

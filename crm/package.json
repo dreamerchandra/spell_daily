@@ -6,10 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "cd .. && ./node_modules/.bin/prettier --write \"app/src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "format:check": "cd .. && ./node_modules/.bin/prettier --check \"app/src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "@tanstack/react-query": "^5.90.7",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",

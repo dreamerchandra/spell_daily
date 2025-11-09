@@ -1,11 +1,11 @@
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../hooks/useAuth';
 
 interface AdminRouteProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function AdminRoute({ children }: AdminRouteProps) {
-  const { isLoading, isAuthenticated, isAdmin } = useAuth()
+  const { isLoading, isAuthenticated, isAdmin } = useAuth();
 
   if (isLoading) {
     return (
@@ -15,7 +15,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
           <p className="text-gray-600">Verifying admin access...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!isAuthenticated) {
@@ -36,7 +36,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!isAdmin) {
@@ -57,8 +57,8 @@ export default function AdminRoute({ children }: AdminRouteProps) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }
