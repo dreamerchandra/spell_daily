@@ -35,7 +35,8 @@ export const UserCard: FC<{
           <div className="flex flex-col">
             <div className="text-sm text-app-secondary">{user.status}</div>
             <div className="text-sm text-app-secondary">
-              {getRelativeTime(user.lastCompletedDate)} • {user.userAdmin}
+              {getRelativeTime(new Date(user.lastCompletedDate))} •{' '}
+              {user.userAdmin}
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ export interface UsersApiParams {
   q?: string;
   status?: string;
   userAdmin?: string;
-  lastAccess?: string;
+  lastAccess?: number | 'ALL';
 }
 
 export interface UsersApiResponse {
@@ -35,9 +35,7 @@ export const convertFiltersToParams = (
   }
 
   if (filters.lastAccess !== 'ALL') {
-    params.lastAccess = (filters.lastAccess as Date)
-      .toISOString()
-      .split('T')[0];
+    params.lastAccess = filters.lastAccess;
   }
 
   return params;
@@ -45,47 +43,9 @@ export const convertFiltersToParams = (
 
 const BASE_URL = '/crm/v1/users/dormant';
 
-const mockUsers: User[] = [
-  {
-    name: 'Arjun',
-    parentName: 'Ramesh Kumar',
-    testCode: 'SPL001',
-    lastCompletedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    phoneNumber: '+91 9876543210',
-    status: 'FREE_TRIAL',
-    userAdmin: 'Admin_kumar',
-  },
-  {
-    name: 'Priya',
-    parentName: 'Sunita Sharma',
-    testCode: 'SPL002',
-    lastCompletedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    phoneNumber: '+91 8765432109',
-    status: 'PAID',
-    userAdmin: 'Admin_sharma',
-  },
-  {
-    name: 'Rohit',
-    parentName: 'Vikash Singh',
-    testCode: 'SPL003',
-    lastCompletedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    phoneNumber: '+91 7654321098',
-    status: 'DICTATION',
-    userAdmin: 'Admin_singh',
-  },
-  {
-    name: 'Ananya',
-    parentName: 'Meera Patel',
-    testCode: 'SPL004',
-    lastCompletedDate: new Date(Date.now() - 0.5 * 24 * 60 * 60 * 1000),
-    phoneNumber: '+91 6543210987',
-    status: 'FREE_TRIAL',
-    userAdmin: 'Admin_patel',
-  },
-];
-
 export const fetchUsers = async (
-  params: UsersApiParams
+  params: UsersApiParams,
+  apiKey: string
 ): Promise<UsersApiResponse> => {
   try {
     const url = new URL(BASE_URL, env.BACKEND_URL);
@@ -100,6 +60,7 @@ export const fetchUsers = async (
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
       },
     });
 
@@ -107,34 +68,16 @@ export const fetchUsers = async (
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return {
+      users: data.data,
+      total: data.data.length,
+      page: 1,
+      limit: data.data.length,
+    };
   } catch (error) {
     console.warn('API call failed, using mock data:', error);
 
-    let filteredUsers = [...mockUsers];
-
-    if (params.q) {
-      const query = params.q.toLowerCase();
-      filteredUsers = filteredUsers.filter(
-        user =>
-          user.name.toLowerCase().includes(query) ||
-          user.parentName.toLowerCase().includes(query) ||
-          user.testCode.toLowerCase().includes(query) ||
-          user.phoneNumber.includes(params.q!)
-      );
-    }
-
-    if (params.status && params.status !== 'ALL') {
-      filteredUsers = filteredUsers.filter(
-        user => user.status === params.status
-      );
-    }
-
-    return {
-      users: filteredUsers,
-      total: filteredUsers.length,
-      page: 1,
-      limit: 20,
-    };
+    throw error;
   }
 };

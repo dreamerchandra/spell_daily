@@ -5,6 +5,7 @@ import {
   type UsersApiParams,
 } from '../api/users';
 import type { FilterOptions } from '../components/FloatingFilter';
+import { useTelegram } from './useTelegram';
 
 export interface UseUsersParams {
   filters: FilterOptions;
@@ -18,13 +19,14 @@ export const useDormantUser = ({
   enabled = true,
 }: UseUsersParams) => {
   const params = convertFiltersToParams(filters, searchQuery);
+  const { initData } = useTelegram();
 
   return useQuery({
     queryKey: ['users', 'dormant', params],
-    queryFn: () => fetchUsers(params),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    queryFn: () => fetchUsers(params, initData),
+    enabled: enabled && Boolean(initData),
+    staleTime: 0,
+    gcTime: 0,
   });
 };
 

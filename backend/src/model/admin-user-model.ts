@@ -5,6 +5,7 @@ export type AdminUserType = {
   telegramId: string;
   createdAt: Date;
   updatedAt: Date;
+  name: string | null;
 };
 
 class AdminUserModel {

@@ -15,23 +15,26 @@ datasource db {
 }
 
 model AdminUser {
-  id         String   @id @default(cuid())
-  telegramId String   @unique
-  username   String?
-  name       String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String       @id @default(cuid())
+  telegramId  String       @unique
+  username    String?
+  name        String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  parentUsers ParentUser[]
 }
 
 model ParentUser {
-  id          String     @id @default(cuid())
-  phoneNumber String     @unique
-  name        String?
-  details     String[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Leads       Leads[]
-  Students    Students[]
+  id           String     @id @default(cuid())
+  phoneNumber  String     @unique
+  name         String?
+  details      String[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  addByAdminId String
+  addByAdmin   AdminUser  @relation(fields: [addByAdminId], references: [id])
+  Leads        Leads[]
+  Students     Students[]
 }
 
 enum LeadStatus {
@@ -53,6 +56,12 @@ model Leads {
   createdAt DateTime   @default(now())
 }
 
+enum StudentStatus {
+  DICTATION
+  FREE_TRIAL
+  PAID
+}
+
 model Students {
   testCode      String          @id
   parentId      String?
@@ -60,6 +69,7 @@ model Students {
   name          String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  status        StudentStatus   @default(DICTATION)
   DailyActivity DailyActivity[]
 }
 
@@ -69,11 +79,16 @@ enum ActivityStatus {
 }
 
 model DailyActivity {
-  studentTestCode String         @id
+  id              String         @id @default(cuid())
+  studentTestCode String
   student         Students       @relation(fields: [studentTestCode], references: [testCode])
   activityDate    DateTime       @default(now())
   status          ActivityStatus
   createdAt       DateTime       @default(now())
+
+  @@unique([studentTestCode, activityDate])
+  @@index([studentTestCode])
+  @@index([activityDate])
 }
 
 model Otp {

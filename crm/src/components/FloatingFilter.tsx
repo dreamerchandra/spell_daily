@@ -6,13 +6,13 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 export type FilterOptions = {
   status: 'ALL' | 'FREE_TRIAL' | 'DICTATION' | 'PAID';
   userAdmin: 'ALL' | 'MY';
-  lastAccess: Date | 'ALL';
+  lastAccess: number | 'ALL';
 };
 
 type InternalFilterOptions = {
   status: 'ALL' | 'FREE_TRIAL' | 'DICTATION' | 'PAID';
   userAdmin: 'ALL' | 'MY';
-  lastAccess: 'ALL' | 'TODAY' | 'YESTERDAY' | '2_DAYS_AGO' | 'CUSTOM';
+  lastAccess: 'ALL' | 'YESTERDAY' | '2_DAYS_AGO' | 'CUSTOM';
   customDate?: Date;
 };
 
@@ -38,34 +38,27 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
   const convertToExternalFormat = (
     internal: InternalFilterOptions
   ): FilterOptions => {
-    const now = new Date();
-    let lastAccess: Date | 'ALL' = 'ALL';
+    let lastAccess: number | 'ALL' = 'ALL';
 
     switch (internal.lastAccess) {
-      case 'TODAY': {
-        lastAccess = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        break;
-      }
       case 'YESTERDAY': {
-        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        lastAccess = new Date(
-          yesterday.getFullYear(),
-          yesterday.getMonth(),
-          yesterday.getDate()
-        );
+        lastAccess = 0;
         break;
       }
       case '2_DAYS_AGO': {
-        const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-        lastAccess = new Date(
-          twoDaysAgo.getFullYear(),
-          twoDaysAgo.getMonth(),
-          twoDaysAgo.getDate()
-        );
+        lastAccess = 1;
         break;
       }
       case 'CUSTOM': {
-        lastAccess = internal.customDate || 'ALL';
+        const selectedDate = internal.customDate
+          ? internal.customDate
+          : new Date();
+        const now = new Date();
+        const selectDateMidnight = selectedDate.setHours(0, 0, 0, 0);
+        const nowMidnight = now.setHours(0, 0, 0, 0);
+        const diffTime = nowMidnight - selectDateMidnight;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        lastAccess = diffDays;
         break;
       }
       default:
@@ -205,7 +198,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
               className="w-full p-2 bg-app rounded border border-gray-600 text-app-primary focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="ALL">All</option>
-              <option value="TODAY">Today</option>
               <option value="YESTERDAY">Yesterday</option>
               <option value="2_DAYS_AGO">2 Days Ago</option>
               <option value="CUSTOM">Custom Date</option>

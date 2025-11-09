@@ -6,37 +6,83 @@ class AnalyticsModel {
   async markAsStarted(testCode: string): Promise<void> {
     const code = await testCodeModel.getByTestCode(testCode);
     ensure(code, 'Test code not found');
-    await prismaClient.dailyActivity.upsert({
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    // Find existing activity for today
+    const existingActivity = await prismaClient.dailyActivity.findFirst({
       where: {
         studentTestCode: code.testCode,
         activityDate: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          lt: new Date(new Date().setHours(23, 59, 59, 999)),
+          gte: today,
+          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), // Next day
         },
       },
-      create: {
-        studentTestCode: code.testCode,
-        activityDate: new Date(),
-        status: 'STARTED',
-      },
-      update: {},
     });
+
+    if (existingActivity) {
+      // Update existing activity if it's not already completed
+      if (existingActivity.status !== 'COMPLETED') {
+        await prismaClient.dailyActivity.update({
+          where: {
+            id: existingActivity.id,
+          },
+          data: {
+            status: 'STARTED',
+          },
+        });
+      }
+    } else {
+      // Create new activity for today
+      await prismaClient.dailyActivity.create({
+        data: {
+          studentTestCode: code.testCode,
+          activityDate: new Date(),
+          status: 'STARTED',
+        },
+      });
+    }
   }
+
   async markAsCompleted(testCode: string): Promise<void> {
     const code = await testCodeModel.getByTestCode(testCode);
     ensure(code, 'Test code not found');
-    await prismaClient.dailyActivity.update({
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    // Find existing activity for today
+    const existingActivity = await prismaClient.dailyActivity.findFirst({
       where: {
         studentTestCode: code.testCode,
         activityDate: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          lt: new Date(new Date().setHours(23, 59, 59, 999)),
+          gte: today,
+          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), // Next day
         },
       },
-      data: {
-        status: 'COMPLETED',
-      },
     });
+
+    if (existingActivity) {
+      // Update existing activity to completed
+      await prismaClient.dailyActivity.update({
+        where: {
+          id: existingActivity.id,
+        },
+        data: {
+          status: 'COMPLETED',
+        },
+      });
+    } else {
+      // Create new activity directly as completed
+      await prismaClient.dailyActivity.create({
+        data: {
+          studentTestCode: code.testCode,
+          activityDate: new Date(),
+          status: 'COMPLETED',
+        },
+      });
+    }
   }
 }
 

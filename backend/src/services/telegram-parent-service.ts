@@ -12,6 +12,7 @@ import { sendTelegramMessage } from './telegram-bot-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { LeadStatus } from '../model/parent-lead-model.js';
 import { ParentUserResponse } from '../model/parent-model.js';
+import { asyncContext } from '../lib/asyncContext.js';
 class TelegramParentService extends TelegramBaseService {
   public hintMessage = '/show_parent_hint';
   private parentMessageInfo =
@@ -72,10 +73,13 @@ class TelegramParentService extends TelegramBaseService {
       if (lines.length >= 2) {
         const phoneNumber = getPhoneNumber(trimFirstLineIfNeeded[0]);
         if (!phoneNumber) return null;
+        const adminUser = asyncContext.getTelegramAdminUser();
+        ensure(adminUser, 'Admin user must be present in context');
         return {
           phoneNumber: phoneNumber,
           name: trimFirstLineIfNeeded[1],
           details: trimFirstLineIfNeeded.slice(2).join(' '),
+          adminId: adminUser.id,
         };
       }
     }

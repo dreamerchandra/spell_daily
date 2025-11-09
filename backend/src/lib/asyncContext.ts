@@ -1,7 +1,9 @@
 import { AsyncLocalStorage } from 'async_hooks';
+import { AdminUserType } from '../model/admin-user-model.js';
 
 interface RequestContext {
   requestId: string;
+  telegramAdminUser: AdminUserType | null;
   [key: string]: unknown;
 }
 
@@ -23,6 +25,11 @@ class AsyncContextManager {
   getRequestId(): string | undefined {
     const context = this.getContext();
     return context?.requestId;
+  }
+
+  getTelegramAdminUser(): AdminUserType | null | undefined {
+    const context = this.getContext();
+    return context?.telegramAdminUser;
   }
 
   set(key: string, value: unknown): void {

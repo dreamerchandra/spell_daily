@@ -6,6 +6,7 @@ import { logger } from '../lib/logger.js';
 import { telegramService } from '../services/telegram-service.js';
 import crypto from 'crypto';
 import { env } from '../config/env.js';
+import { asyncContext } from '../lib/asyncContext.js';
 
 interface TelegramInitData {
   user?: {
@@ -41,7 +42,12 @@ export const telegramChatAdminMiddleware = async (
         .status(200)
         .json({ error: 'Forbidden: Admin access required' });
     }
-    return next();
+    return asyncContext.run(
+      { telegramAdminUser: userModel, requestId: req.requestId },
+      () => {
+        return next();
+      }
+    );
   } catch (error) {
     logger.error('Error in telegramAdminMiddleware', error);
     return res.status(200).json({ error: (error as Error).message });
@@ -110,7 +116,12 @@ export const telegramWebAppAdminMiddleware = async (
     const userModel = await adminUserModel.findByTelegramId(userId);
     ensure(userModel, 'Forbidden: Admin access required');
     req.telegramAdminUser = userModel;
-    return next();
+    return asyncContext.run(
+      { telegramAdminUser: userModel, requestId: req.requestId },
+      () => {
+        return next();
+      }
+    );
   } catch (error) {
     logger.error('Error in telegramWebAppAdminMiddleware', error);
     return res.status(401).json({ error: (error as Error).message });

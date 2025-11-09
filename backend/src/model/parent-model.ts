@@ -9,6 +9,7 @@ export type ParentUser = {
   phoneNumber: string;
   name?: string | null;
   details?: string;
+  adminId: string;
 };
 
 export interface ParentUserResponse extends Omit<ParentUser, 'details'> {
@@ -28,6 +29,7 @@ class ParentModel {
           phoneNumber,
           name,
           details: otherDetails ? [otherDetails] : [],
+          addByAdminId: data.adminId,
         },
       });
       const status = await parentLeadStatusModel.updateLeadStatus(
@@ -39,6 +41,7 @@ class ParentModel {
         createdAt: new Date(),
         status: status.status,
         statusCreatedAt: status.createdAt,
+        adminId: data.adminId,
       };
     } catch (error) {
       if (
@@ -69,6 +72,7 @@ class ParentModel {
       details: parent.details || [],
       status: status.status,
       statusCreatedAt: status.createdAt,
+      adminId: parent.addByAdminId,
     };
   }
 
@@ -83,6 +87,7 @@ class ParentModel {
       details: parent.details || [],
       status: status.status,
       statusCreatedAt: status.createdAt,
+      adminId: parent.addByAdminId,
     };
   }
 }

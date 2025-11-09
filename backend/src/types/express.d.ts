@@ -1,4 +1,5 @@
-import { AdminUserType } from '../model/admin-user-model';
+import { AdminUserType } from '../model/admin-user-model.ts';
+
 declare global {
   namespace Express {
     interface Request {
