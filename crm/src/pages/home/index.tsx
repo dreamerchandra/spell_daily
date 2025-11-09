@@ -9,6 +9,7 @@ import {
 import { useDormantUser } from './useDormantUsers';
 import { useDebounce } from '../../hooks/useDebounce';
 import { getTimeOfDay } from '../../utils/get-time-of-day';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const { user } = useTelegram();
@@ -19,6 +20,7 @@ export default function Home() {
     lastAccess: 'ALL',
   });
 
+  const navigate = useNavigate();
   const debouncedSearchValue = useDebounce(searchValue, 300);
   const {
     data: usersResponse,
@@ -82,7 +84,9 @@ export default function Home() {
                 <UserCard
                   user={userItem}
                   key={`${userItem.testCode}-${index}`}
-                  handleItemClick={() => {}}
+                  handleItemClick={() => {
+                    navigate(`/analytics/${userItem.testCode}`);
+                  }}
                 />
               ))
             ) : (

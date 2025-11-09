@@ -4,6 +4,7 @@ import CodeGenerator from './pages/code-generator';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Home from './pages/home/index';
+import Analytics from './pages/analytics';
 
 function App() {
   return (
@@ -22,6 +23,14 @@ function App() {
           element={
             <AdminRoute>
               <CodeGenerator />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/analytics/:testCode"
+          element={
+            <AdminRoute>
+              <Analytics />
             </AdminRoute>
           }
         />

@@ -12,6 +12,7 @@ export type CreateTestCodeRequest = z.infer<typeof testCodeSchema>;
 export type TestCodeResponse = {
   testCode: string;
   parentId?: string;
+  createdAt: Date;
 };
 
 export const dormantUserSchema = z.object({
@@ -88,6 +89,7 @@ class TestCodeModel {
     return {
       testCode: result.testCode,
       parentId: result.parentId || undefined,
+      createdAt: result.createdAt,
     };
   }
 
@@ -102,7 +104,8 @@ class TestCodeModel {
     }
     return {
       testCode: result.testCode,
-      parentId: result.parentId || undefined,
+      parentId: result.parentId ?? undefined,
+      createdAt: result.createdAt,
     };
   }
 

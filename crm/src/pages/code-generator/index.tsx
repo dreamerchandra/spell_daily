@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTelegram } from '../../hooks/useTelegram';
 import { UserCard } from '../../components/user-card';
 import { getTimeOfDay } from '../../utils/get-time-of-day';
@@ -26,6 +26,7 @@ export default function CodeGenerator() {
   const { mutateAsync: addUser } = useParentAddUsers({
     parentId: parentId!,
   });
+  const navigate = useNavigate();
 
   const handleGenerateCode = async () => {
     if (!userName.trim()) return;
@@ -105,7 +106,9 @@ export default function CodeGenerator() {
                 <UserCard
                   user={userItem}
                   key={`${userItem.testCode}-${index}`}
-                  handleItemClick={() => {}}
+                  handleItemClick={() => {
+                    navigate(`/analytics/${userItem.testCode}`);
+                  }}
                 />
               ))
             ) : (
