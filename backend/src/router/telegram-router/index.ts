@@ -2,7 +2,7 @@ import { Router, type Router as RouterType } from 'express';
 import TelegramBot from 'node-telegram-bot-api';
 import { handleMessage } from './bot.js';
 import { logger } from '../../lib/logger.js';
-import { telegramAdminMiddleware } from '../../middleware/admin_middleware.js';
+import { telegramChatAdminMiddleware } from '../../middleware/admin_middleware.js';
 import { bot } from '../../services/telegram-bot-service.js';
 
 const telegramRouter = Router();
@@ -11,7 +11,7 @@ const baseRoute = '/telegram';
 
 telegramRouter.post(
   `${baseVersion}${baseRoute}/webhook`,
-  telegramAdminMiddleware,
+  telegramChatAdminMiddleware,
   async (req, res) => {
     try {
       const update = req.body as TelegramBot.Update;

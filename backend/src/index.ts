@@ -8,11 +8,14 @@ import { requestIdMiddleware } from './middleware/requestId.js';
 import { requestLoggerMiddleware } from './middleware/requestLogger.js';
 import { logger } from './lib/logger.js';
 import router from './router/index.js';
+import crmRouter from './router/crm/index.js';
 import { errorMiddleware } from './middleware/error-middleware.js';
+import cors from 'cors';
 
 const app = express();
 const prisma = new PrismaClient();
 
+app.use(cors());
 app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
 app.use(express.json());
@@ -25,6 +28,7 @@ app.get('/hello', (req: Request, res: Response) => {
   });
 });
 app.use('/', router);
+app.use('/crm', crmRouter);
 
 app.use(errorMiddleware);
 

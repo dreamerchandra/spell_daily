@@ -15,6 +15,27 @@ export type TestCodeResponse = {
 };
 
 class TestCodeModel {
+  generateTestCode(name?: string | null): string {
+    const randomAbbreviation = [
+      'GIF',
+      'SUN',
+      'CAT',
+      'DOG',
+      'BUG',
+      'HAT',
+      'CAR',
+      'BUS',
+      'PEN',
+      'MAP',
+      'BAG',
+      'BOX',
+    ];
+    const randomIndex = Math.floor(Math.random() * randomAbbreviation.length);
+    const randomCode = randomAbbreviation[randomIndex];
+    const first3Char = name?.substring(0, 3).toUpperCase() || randomCode;
+    const randomNumber = Math.floor(100 + Math.random() * 900); // Generates a random 3-digit number
+    return `${first3Char}${randomNumber}`.toLocaleLowerCase();
+  }
   async createTestCode(
     params: CreateTestCodeRequest
   ): Promise<TestCodeResponse> {

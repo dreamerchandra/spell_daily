@@ -13,6 +13,7 @@ import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
 import { remainderModel } from '../model/remainder-model.js';
+import { env } from '../config/env.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -25,6 +26,10 @@ const requestedStatusPrefix = 'requested';
 export const prefixRequestedStatus = (status: LeadStatus): string =>
   `${requestedStatusPrefix}${keyValueSplitter}${status}`;
 
+const getGenerateTestCodeUrl = (parentId: string): string => {
+  const feUrl = env.TELEGRAM_FE_URL;
+  return `${feUrl}/generate/${parentId}`;
+};
 const suggestNextTwoStatus = (
   parentId: string,
   currentStatus: LeadStatus
@@ -34,14 +39,13 @@ const suggestNextTwoStatus = (
       return [
         [
           {
-            text: 'Mark: Dictation Requested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.DICTATION_REQUESTED)
-            ),
+            text: 'Generate Dictation Link',
+            web_app: {
+              url: getGenerateTestCodeUrl(parentId),
+            },
           },
           {
-            text: 'Mark: Free Trial Requested',
+            text: 'Move to free trial',
             callback_data: prefixParentId(
               parentId,
               prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
@@ -50,7 +54,7 @@ const suggestNextTwoStatus = (
         ],
         [
           {
-            text: 'Mark: Dictation Done',
+            text: 'Mark payment done',
             callback_data: prefixParentId(
               parentId,
               prefixRequestedStatus(LeadStatus.DICTATION)

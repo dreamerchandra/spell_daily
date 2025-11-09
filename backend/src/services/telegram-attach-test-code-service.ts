@@ -9,9 +9,30 @@ import { TelegramBaseService } from './telegram-base-service.js';
 
 class TelegramAttachTestCodeService extends TelegramBaseService {
   hintMessage = '/add_test_code';
-  canHandle(update: TelegramBot.Update): boolean {
-    return this.canHandleMessage(update) || this.canHandleHintMessage(update);
+  groupSplitter = '&&';
+  generateMoveToFreeTrialForCallbackData(parentId: string): string {
+    return `move_to_free_trial${this.groupSplitter}${parentId}`;
   }
+
+  canHandleCallbackMoveToFreeTrial(
+    body: TelegramBot.Update
+  ): body is TelegramBot.Update & {
+    callback_query: TelegramBot.CallbackQuery;
+  } {
+    const data = body.callback_query?.data;
+    if (!data) return false;
+    const [prefix] = data.split(this.groupSplitter);
+    return prefix === 'move_to_free_trial';
+  }
+
+  canHandle(update: TelegramBot.Update): boolean {
+    return (
+      this.canHandleMessage(update) ||
+      this.canHandleHintMessage(update) ||
+      this.canHandleCallbackMoveToFreeTrial(update)
+    );
+  }
+
   async handle(update: TelegramBot.Update): Promise<void> {
     if (this.canHandleMessage(update)) {
       return await this.handleMessage(update);
@@ -22,6 +43,7 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
     }
     return Promise.resolve();
   }
+
   canHandleMessage(body: TelegramBot.Update): boolean {
     const [phoneNumber, testCode] = body.message?.text?.split(' ') || ['', ''];
     return (

@@ -32,4 +32,7 @@ export const env = {
 
   TELEGRAM_BOT_TOKEN: getEnv('TELEGRAM_BOT_TOKEN'),
   REMAINDER_TOKEN_SECRET: getEnv('REMAINDER_TOKEN_SECRET', isProduction),
+  TELEGRAM_FE_URL: getEnv('TELEGRAM_FE_URL').endsWith('/')
+    ? getEnv('TELEGRAM_FE_URL').slice(0, -1)
+    : getEnv('TELEGRAM_FE_URL'),
 };
