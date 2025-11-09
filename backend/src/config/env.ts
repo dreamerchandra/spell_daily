@@ -35,4 +35,6 @@ export const env = {
   TELEGRAM_FE_URL: getEnv('TELEGRAM_FE_URL').endsWith('/')
     ? getEnv('TELEGRAM_FE_URL').slice(0, -1)
     : getEnv('TELEGRAM_FE_URL'),
+  VONAGE_API_SECRET: getEnv('VONAGE_API_SECRET'),
+  VONAGE_APP_ID: getEnv('VONAGE_APP_ID'),
 };
