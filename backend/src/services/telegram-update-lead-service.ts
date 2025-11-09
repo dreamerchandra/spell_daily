@@ -30,6 +30,7 @@ const getGenerateTestCodeUrl = (parentId: string): string => {
   const feUrl = env.TELEGRAM_FE_URL;
   return `${feUrl}/generate/${parentId}`;
 };
+
 const suggestNextTwoStatus = (
   parentId: string,
   currentStatus: LeadStatus
@@ -173,10 +174,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
   canHandle(body: TelegramBot.Update): body is TelegramBot.Update & {
     callback_query: TelegramBot.CallbackQuery;
   } {
-    if (
-      body.callback_query?.data &&
-      body.callback_query.data.startsWith('parent_id')
-    ) {
+    if (body.callback_query?.data?.startsWith('parent_id')) {
       return true;
     }
     if (this.canHandleScheduleLaterButton(body)) {
@@ -214,10 +212,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     }
   ) {
     console.log('Handling update lead callback');
-    if (
-      body.callback_query?.data &&
-      body.callback_query.data.startsWith('parent_id')
-    ) {
+    if (body.callback_query?.data?.startsWith('parent_id')) {
       return await this.handleUpdateLead(body);
     } else if (this.canHandleScheduleLaterButton(body)) {
       return await this.handleScheduleLaterButton(body);

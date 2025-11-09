@@ -125,8 +125,7 @@ class TelegramCalenderService extends TelegramBaseService {
     return inlineKeyboard.map(row =>
       row.map(cell => {
         // No date → return as-is
-        if (!cell.callback_data || !cell.callback_data.includes('_'))
-          return cell;
+        if (!cell.callback_data?.includes('_')) return cell;
 
         // callback_data format: n_2025-11-06_0
         const parts = cell.callback_data.split('_');

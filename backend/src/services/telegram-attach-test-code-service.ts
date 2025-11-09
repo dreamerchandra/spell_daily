@@ -38,7 +38,7 @@ class TelegramAttachTestCodeService extends TelegramBaseService {
       return await this.handleMessage(update);
     } else if (this.canHandleHintMessage(update)) {
       return await this.showAddTestCodeInfo(
-        update.callback_query!.message!.chat.id
+        update.callback_query.message!.chat.id
       );
     }
     return Promise.resolve();

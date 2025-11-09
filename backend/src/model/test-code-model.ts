@@ -229,6 +229,32 @@ class TestCodeModel {
       };
     });
   }
+
+  async getTestCodesByParentId(
+    parentId: string
+  ): Promise<DormantUserResponse[]> {
+    const results = await prismaClient.students.findMany({
+      where: {
+        parentId,
+      },
+      include: {
+        parent: {
+          include: {
+            addByAdmin: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return results.map(result => ({
+      testCode: result.testCode,
+      name: result.name ?? '',
+      parentName: result.parent?.name ?? '',
+      lastCompletedDate: result.createdAt,
+      status: result.status,
+      userAdmin: result.parent?.addByAdmin?.name ?? 'Unknown',
+    }));
+  }
 }
 
 export const testCodeModel = new TestCodeModel();

@@ -25,18 +25,20 @@ export const UserCard: FC<{
       <div className="flex items-center">
         <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-4">
           <span className="font-bold text-app-primary">
-            {user.name.charAt(0)}
+            {user.name?.charAt(0)}
           </span>
         </div>
         <div className="flex flex-col gap-1">
           <div className="font-medium text-app-primary">
-            {user.name} ({user.parentName})
+            {user.name ?? 'Name'} ({user.parentName ?? 'Parent Name'})
           </div>
           <div className="flex flex-col">
             <div className="text-sm text-app-secondary">{user.status}</div>
             <div className="text-sm text-app-secondary">
-              {getRelativeTime(new Date(user.lastCompletedDate))} •{' '}
-              {user.userAdmin}
+              {user.lastCompletedDate
+                ? getRelativeTime(new Date(user.lastCompletedDate))
+                : 'No Date'}{' '}
+              • {user.userAdmin}
             </div>
           </div>
         </div>

@@ -38,7 +38,7 @@ class TelegramParentService extends TelegramBaseService {
 
   handle(update: TelegramBot.Update): Promise<void> {
     if (this.canHandleCallback(update)) {
-      return this.showAddParentInfo(update.callback_query!.message!.chat.id);
+      return this.showAddParentInfo(update.callback_query.message!.chat.id);
     } else if (this.canHandleAddParent(update)) {
       return this.handleAddParent(update);
     }

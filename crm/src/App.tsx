@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import TelegramUserInfo from './components/TelegramUserInfo';
-import CodeGenerator from './pages/CodeGenerator';
+import CodeGenerator from './pages/code-generator';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Home from './pages/home/index';
@@ -13,7 +13,7 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <CodeGenerator />
+              <Home />
             </ProtectedRoute>
           }
         />
@@ -21,7 +21,7 @@ function App() {
           path="/generate/:parentId"
           element={
             <AdminRoute>
-              <Home />
+              <CodeGenerator />
             </AdminRoute>
           }
         />

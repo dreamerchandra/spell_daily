@@ -43,7 +43,7 @@ export const convertFiltersToParams = (
 
 const BASE_URL = '/crm/v1/users/dormant';
 
-export const fetchUsers = async (
+export const fetchDormantUsers = async (
   params: UsersApiParams,
   apiKey: string
 ): Promise<UsersApiResponse> => {

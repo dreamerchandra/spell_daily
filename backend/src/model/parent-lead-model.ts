@@ -95,9 +95,10 @@ class ParentLeadStatusModel {
       statusCreatedAt: data.createdAt,
       id: data.parent.id,
       phoneNumber: data.parent.phoneNumber,
-      name: data.parent.name || undefined,
+      name: data.parent.name,
       details: data.parent.details || [],
       status: leadStatusConverter.fromDb(data.status),
+      adminId: data.parent.addByAdminId,
     };
   }
   public async getLeadStatus(parentId: string) {

@@ -20,40 +20,48 @@ const makePhoneCall = async () => {
   try {
     const builder = new NCCOBuilder();
     builder.addAction(new Talk('This is a text to speech call from Vonage'));
-    vonage.voice
-      .createOutboundCall({
-        to: [
-          {
-            type: 'phone',
-            number: '+918754791569',
-          },
-        ],
-        from: {
-          number: '12345678901',
+    const response = await vonage.voice.createOutboundCall({
+      to: [
+        {
           type: 'phone',
+          number: '+918754791569',
         },
-        answerUrl: [],
-        ncco: builder.build(),
-      })
-      .then(resp => console.log(resp))
-      .catch(err => console.error(err));
+      ],
+      from: {
+        number: '12345678901',
+        type: 'phone',
+      },
+      answerUrl: [],
+      ncco: builder.build(),
+    });
+    logger.info('Phone call initiated:', response);
     return true;
-  } catch {
+  } catch (error) {
+    logger.error('Error making phone call:', error);
     return false;
   }
 };
 
-onCallRouter.post(`${baseVersion}${baseRoute}`, async (_req, res) => {
-  logger.error(
-    'On-Call route hit with request:',
-    new Error(JSON.stringify(_req.body))
-  );
-  const isPhoneCallMade = await makePhoneCall();
-  return res.status(200).json({
-    server: true,
-    phoneCall: isPhoneCallMade,
-    timeNow: getNowIST().toISOString(),
-  });
+onCallRouter.post(`${baseVersion}${baseRoute}`, (_req, res) => {
+  void (async () => {
+    try {
+      logger.error(
+        'On-Call route hit with request:',
+        new Error(JSON.stringify(_req.body))
+      );
+      const isPhoneCallMade = await makePhoneCall();
+      res.status(200).json({
+        server: true,
+        phoneCall: isPhoneCallMade,
+        timeNow: getNowIST().toISOString(),
+      });
+    } catch (error) {
+      logger.error('Error in on-call route:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+      });
+    }
+  })();
 });
 
 export default [onCallRouter] as RouterType[];

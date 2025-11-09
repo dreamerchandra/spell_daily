@@ -6,15 +6,9 @@ import {
   FloatingFilter,
   type FilterOptions,
 } from '../../components/FloatingFilter';
-import { useDormantUser } from '../../hooks/useUsers';
+import { useDormantUser } from './useDormantUsers';
 import { useDebounce } from '../../hooks/useDebounce';
-
-const getTimeOfDay = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-};
+import { getTimeOfDay } from '../../utils/get-time-of-day';
 
 export default function Home() {
   const { user } = useTelegram();

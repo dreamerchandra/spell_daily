@@ -22,6 +22,11 @@
     "prisma:migrate": "yarn workspace @spell-daily/backend run prisma:migrate",
     "prisma:studio": "yarn workspace @spell-daily/backend run prisma:studio",
     "prisma:push": "yarn workspace @spell-daily/backend run prisma:push",
+    "type-check:all": "npm run type-check:backend && npm run type-check:app && npm run type-check:crm && npm run type-check:word-library",
+    "type-check:backend": "cd backend && npm run type-check",
+    "type-check:app": "cd app && npm run type-check",
+    "type-check:crm": "cd crm && npm run type-check",
+    "type-check:word-library": "cd word-library && npm run type-check",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -39,8 +44,19 @@
   "packageManager": "yarn@4.10.3",
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "yarn format",
-      "yarn lint:fix"
+      "prettier --write"
+    ],
+    "backend/**/*.{ts,tsx}": [
+      "cd backend && npx eslint --fix"
+    ],
+    "app/**/*.{ts,tsx}": [
+      "cd app && npx eslint --fix"
+    ],
+    "crm/**/*.{ts,tsx}": [
+      "cd crm && npx eslint --fix"
+    ],
+    "word-library/**/*.{ts,tsx}": [
+      "cd word-library && npx eslint --fix"
     ]
   }
 }

@@ -13,17 +13,35 @@ crmTestCodeRouter.post(
   `${baseVersion}${baseRoute}/:parentId`,
   telegramWebAppAdminMiddleware,
   asyncErrorHandler(async (req, res) => {
-    const { parentId, kidName } = req.params;
+    const { parentId } = req.params;
+    const name = (req.body as { name?: string }).name;
+    ensure(
+      typeof name === 'string' && name.length > 0,
+      'Name is required in request body'
+    );
+    const kidName = name.trim();
     const parent = await parentModel.getById(parentId);
-    ensure(parent, 'Parent entity not found');
+    ensure(parent !== null && parent !== undefined, 'Parent entity not found');
     const testCode = testCodeModel.generateTestCode(kidName);
     const testCodeResult = await testCodeModel.createTestCode({
       testCode,
       name: kidName,
       parentId: parent.id,
     });
-    return res.status(200).json({
+    res.status(200).json({
       data: testCodeResult,
+    });
+  })
+);
+
+crmTestCodeRouter.get(
+  `${baseVersion}${baseRoute}/:parentId`,
+  telegramWebAppAdminMiddleware,
+  asyncErrorHandler(async (req, res) => {
+    const parenId = req.params.parentId;
+    const testCodes = await testCodeModel.getTestCodesByParentId(parenId);
+    return res.status(200).json({
+      data: testCodes,
     });
   })
 );
