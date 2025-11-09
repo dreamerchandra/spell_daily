@@ -11,7 +11,7 @@ export const requestIdMiddleware = (
   req.requestId = requestId;
   res.setHeader('X-Request-ID', requestId);
 
-  asyncContext.run({ requestId }, () => {
+  asyncContext.run({ requestId, telegramAdminUser: null }, () => {
     next();
   });
 };
