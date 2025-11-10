@@ -15,11 +15,17 @@ class AnalyticsService {
   };
   async markAsStarted(body: unknown) {
     ensure(this.isValidBody(body), 'Invalid CreateTestCodeRequest');
+    if (body.testCode.includes('tes')) {
+      return;
+    }
     return analyticsModel.markAsStarted(body.testCode);
   }
 
   async markAsCompleted(body: unknown) {
     ensure(this.isValidBody(body), 'Invalid CreateTestCodeRequest');
+    if (body.testCode.includes('tes')) {
+      return;
+    }
     await analyticsModel.markAsCompleted(body.testCode);
     const testCode = await testCodeModel.getByTestCode(body.testCode);
     switch (testCode?.status) {
