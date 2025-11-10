@@ -244,7 +244,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     await remainderModel.createRemainder({
       dateTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
       userId: chatId.toString(),
-      message: `Your Remainder to follow up with ${parent.name} \n phone Number: ${parent.phoneNumber}`,
+      message: `Your Remainder to follow up with ${parent.name} \n phone Number: +91${parent.phoneNumber}`,
     });
     await sendTelegramMessage(
       body.callback_query.message!.chat.id,
