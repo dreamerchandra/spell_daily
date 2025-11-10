@@ -15,6 +15,10 @@ export type DailyUsage = {
     adminId: string;
     adminName?: string;
   };
+  student?: {
+    id: string;
+    name?: string | null;
+  };
 };
 
 export interface UseAnalyticsParams {
@@ -50,6 +54,7 @@ const fetchAnalytics = async (
     const _data = await response.json();
     const data = _data.data;
     const parent = _data.testCodeDetails?.parent;
+    const student = _data.testCodeDetails?.student;
     return {
       startedAt: new Date(data.startedAt),
       partialCompletion: data.partialCompletion.map(
@@ -57,6 +62,10 @@ const fetchAnalytics = async (
       ),
       notStarted: data.notStarted.map((date: string) => new Date(date)),
       followUpDates: data.followUpDates.map((date: string) => new Date(date)),
+      student: {
+        id: student.id,
+        name: student?.name,
+      },
       parent: parent
         ? {
             id: parent.id,

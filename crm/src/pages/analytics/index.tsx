@@ -54,7 +54,7 @@ export default function Analytics() {
     if (!analyticsData) return;
     setNewMessage(
       newMessageTemplate({
-        studentName: analyticsData?.parent?.name,
+        studentName: analyticsData?.student?.name,
         link: getLink(testCode || ''),
       })
     );

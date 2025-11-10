@@ -23,6 +23,10 @@ export type TestCodeResponse = {
     adminId: string;
     adminName?: string;
   };
+  student: {
+    id: string;
+    name?: string | null;
+  };
 };
 
 export const dormantUserSchema = z.object({
@@ -110,6 +114,10 @@ class TestCodeModel {
       parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
       status: result.status,
+      student: {
+        id: result.testCode,
+        name: result.name,
+      },
       parent: parent
         ? {
             details: parent.details ?? [],
@@ -145,6 +153,10 @@ class TestCodeModel {
       parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
       status: result.status,
+      student: {
+        id: result.testCode,
+        name: result.name,
+      },
       parent: parent
         ? {
             details: parent.details ?? [],
