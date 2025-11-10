@@ -16,9 +16,9 @@ const app = express();
 const prisma = new PrismaClient();
 
 app.use(cors());
+app.use(express.json());
 app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
-app.use(express.json());
 
 app.get('/hello', (req: Request, res: Response) => {
   logger.log('Hello endpoint accessed');

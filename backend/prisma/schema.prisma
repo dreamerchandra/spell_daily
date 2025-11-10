@@ -22,6 +22,7 @@ model AdminUser {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   parentUsers ParentUser[]
+  followups   Followup[]
 }
 
 model ParentUser {
@@ -35,6 +36,7 @@ model ParentUser {
   addByAdmin   AdminUser  @relation(fields: [addByAdminId], references: [id])
   Leads        Leads[]
   Students     Students[]
+  followups    Followup[]
 }
 
 enum LeadStatus {
@@ -72,6 +74,7 @@ model Students {
   status        StudentStatus   @default(DICTATION)
   details       Json?
   DailyActivity DailyActivity[]
+  followups     Followup[]
 }
 
 enum ActivityStatus {
@@ -111,4 +114,16 @@ model Remainder {
 
 model RemainderLastProcessed {
   lastRanAt DateTime @id
+}
+
+model Followup {
+  id        String     @id @default(cuid())
+  adminId   String
+  admin     AdminUser  @relation(fields: [adminId], references: [id])
+  parentId  String
+  parent    ParentUser @relation(fields: [parentId], references: [id])
+  testCode  String?
+  student   Students?  @relation(fields: [testCode], references: [testCode])
+  notes     String
+  createdAt DateTime   @default(now())
 }

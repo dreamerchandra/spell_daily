@@ -1,43 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useAnalytics } from './useAnalytics.ts';
-import { Header } from '../../components/Header';
 import { Calendar } from '../../components/Calendar';
-import Href from '../../components/href.tsx';
-import { WhatsApp } from '@mui/icons-material';
-
-const newMessageTemplate = ({
-  studentName,
-  link,
-}: {
-  studentName?: string | null;
-  link: string;
-}) => `Day 1 spelling task 
-
-${link}
-
-
-Click start game and proceed. 
-Please notify me after completion. 
-
-
-🔥 Enjoy ${studentName ? studentName : ''}
-`;
-
-const getLink = (testCode: string) =>
-  `https://app.spelldaily.com/?code=${testCode}`;
-
-const generateWhatsAppLink = (phoneNumber: string, message: string) => {
-  const encodedMessage = encodeURIComponent(message);
-  return `https://wa.me/+91${phoneNumber}?text=${encodedMessage}`;
-};
+import { Header } from '../../components/Header';
+import { ShareWelcomeMessage } from './share-message';
+import { useAnalytics } from './useAnalytics.ts';
 
 export default function Analytics() {
   const { testCode } = useParams<{ testCode: string }>();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [searchParams] = useSearchParams();
   const isNew = searchParams.get('isNew') === 'true';
-  const [newMessage, setNewMessage] = useState('');
 
   const {
     data: analyticsData,
@@ -49,16 +21,6 @@ export default function Analytics() {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-
-  useEffect(() => {
-    if (!analyticsData) return;
-    setNewMessage(
-      newMessageTemplate({
-        studentName: analyticsData?.student?.name,
-        link: getLink(testCode || ''),
-      })
-    );
-  }, [analyticsData, testCode]);
 
   const startedDate = analyticsData?.startedAt
     ? new Date(analyticsData.startedAt)
@@ -130,30 +92,14 @@ export default function Analytics() {
       </Header>
 
       <div className="mx-auto max-w-4xl p-6 flex gap-6 flex-col">
-        {isNew && (
-          <div className="flex gap-1 flex-col">
-            <div className="bg-green-100 border border-green-200 text-green-800 rounded">
-              🎉 New test code created successfully!
-            </div>
-            <textarea
-              className="mt-2 w-full p-2 border border-gray-300 rounded bg-gray-50 text-black h-auto field-sizing-content"
-              value={newMessage}
-              onChange={e => {
-                setNewMessage(e.target.value);
-              }}
-            />
-            <Href
-              variant="secondary"
-              href={generateWhatsAppLink(
-                analyticsData?.parent?.phoneNumber || '',
-                newMessage
-              )}
-              icon={<WhatsApp />}
-            >
-              Send WhatsApp Message
-            </Href>
-          </div>
-        )}
+        {analyticsData ? (
+          <ShareWelcomeMessage
+            currentMonth={currentDate.getMonth()}
+            dailyUsage={analyticsData}
+            isNew={isNew}
+            testCode={testCode!}
+          />
+        ) : null}
         <Calendar
           currentDate={currentDate}
           onNavigateMonth={navigateMonth}
