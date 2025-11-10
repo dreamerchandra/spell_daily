@@ -4,7 +4,7 @@
       "maxDuration": 300
     },
     "api/cron/dict-dormant-users-task.ts": {
-      "maxDuration": 301
+      "maxDuration": 300
     },
     "api/cron/free-trail-dormant-users-task.ts": {
       "maxDuration": 300
