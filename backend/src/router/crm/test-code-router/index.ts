@@ -15,6 +15,8 @@ crmTestCodeRouter.post(
   asyncErrorHandler(async (req, res) => {
     const { parentId } = req.params;
     const name = (req.body as { name?: string }).name;
+    const _grade = Number((req.body as { grade?: string }).grade);
+    const grade = isNaN(_grade) ? undefined : _grade;
     ensure(
       typeof name === 'string' && name.length > 0,
       'Name is required in request body'
@@ -27,6 +29,7 @@ crmTestCodeRouter.post(
       testCode,
       name: kidName,
       parentId: parent.id,
+      grade,
     });
     res.status(200).json({
       data: testCodeResult,
@@ -38,10 +41,11 @@ crmTestCodeRouter.get(
   `${baseVersion}${baseRoute}/:parentId`,
   telegramWebAppAdminMiddleware,
   asyncErrorHandler(async (req, res) => {
-    const parenId = req.params.parentId;
-    const testCodes = await testCodeModel.getTestCodesByParentId(parenId);
+    const parentId = req.params.parentId;
+    const parentDetails = await parentModel.getById(parentId);
+    const testCodes = await testCodeModel.getTestCodesByParentId(parentId);
     return res.status(200).json({
-      data: testCodes,
+      data: { testCodes, parentDetails },
     });
   })
 );

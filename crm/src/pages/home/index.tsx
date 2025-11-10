@@ -6,10 +6,11 @@ import {
   FloatingFilter,
   type FilterOptions,
 } from '../../components/FloatingFilter';
-import { useDormantUser } from './useDormantUsers';
 import { useDebounce } from '../../hooks/useDebounce';
 import { getTimeOfDay } from '../../utils/get-time-of-day';
+import { Header } from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+import { useDormantUser } from './useDormantUsers';
 
 export default function Home() {
   const { user } = useTelegram();
@@ -34,22 +35,19 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-app text-app-primary">
-      <div className="mx-auto">
-        <div className="py-4 px-6">
-          <div className="flex items-start space-x-4">
-            <div className="text-4xl">👋</div>
-
-            <div className="flex-1">
-              <div className="text-sm font-medium text-white-50">
-                {getTimeOfDay()}
-              </div>
-              <div className="text-lg font-semibold text-white-70">
-                Hi, {user?.first_name || 'User'}
-              </div>
+      <Header>
+        <div className="flex items-center space-x-3">
+          <div className="text-2xl">👋</div>
+          <div>
+            <div className="text-sm text-gray-400">{getTimeOfDay()}</div>
+            <div className="text-lg font-semibold text-app-primary">
+              Hi, {user?.first_name || 'User'}
             </div>
           </div>
         </div>
+      </Header>
 
+      <div className="mx-auto">
         <div className="sticky top-0 z-10 bg-app">
           <Search onChange={value => setSearchValue(value || '')} />
         </div>

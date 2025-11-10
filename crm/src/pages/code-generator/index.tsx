@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTelegram } from '../../hooks/useTelegram';
 import { UserCard } from '../../components/user-card';
 import { getTimeOfDay } from '../../utils/get-time-of-day';
 import { useParentUsers, useParentAddUsers } from './useParentUsers';
 import Button from '../../components/Button';
 import { AddCircleOutline, Close } from '@mui/icons-material';
+import { Header } from '../../components/Header';
 
 export default function CodeGenerator() {
-  const { user } = useTelegram();
   const { parentId } = useParams<{ parentId: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userName, setUserName] = useState('');
+  const [studentDetails, setStudentDetails] = useState<{
+    name: string;
+    grade: number | null;
+  }>({
+    name: '',
+    grade: null,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -29,13 +34,17 @@ export default function CodeGenerator() {
   const navigate = useNavigate();
 
   const handleGenerateCode = async () => {
-    if (!userName.trim()) return;
+    if (!studentDetails.name.trim() || studentDetails.grade === null) return;
 
     setIsSubmitting(true);
     try {
-      await addUser({ name: userName.trim() });
+      const response = await addUser({
+        name: studentDetails.name.trim(),
+        grade: studentDetails.grade,
+      });
       setIsModalOpen(false);
-      setUserName('');
+      setStudentDetails({ name: '', grade: null });
+      navigate(`/analytics/${response.testCode}?isNew=true`);
     } catch (error) {
       console.error('Failed to generate test code:', error);
     } finally {
@@ -45,36 +54,41 @@ export default function CodeGenerator() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setUserName('');
+    setStudentDetails({ name: '', grade: null });
   };
 
   return (
     <div className="min-h-screen bg-app text-app-primary">
-      <div className="mx-auto">
-        <div className="py-4 px-6">
-          <div className="flex items-start space-x-4">
-            <div className="text-4xl">📝</div>
-
-            <div className="flex-1">
-              <div className="text-sm font-medium text-white-50">
-                {getTimeOfDay()}
-              </div>
-              <div className="text-lg font-semibold text-white-70">
-                {user?.first_name ? `${user.first_name}'s Kids` : 'Parent Name'}
-              </div>
+      <Header>
+        <div className="flex items-center space-x-3">
+          <div className="text-2xl">📝</div>
+          <div>
+            <div className="text-sm text-gray-400">{getTimeOfDay()}</div>
+            <div className="text-lg font-semibold text-app-primary">
+              {usersResponse?.users[0]
+                ? `${usersResponse.users[0].parentName}'s Kids`
+                : 'Parent Name'}
             </div>
           </div>
         </div>
+      </Header>
 
+      <div className="mx-auto">
         <div className="px-6">
-          <h2 className="text-lg font-semibold mb-4 text-app-primary">
-            Test Codes
-            {usersResponse && (
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                ({usersResponse.users.length} of {usersResponse.total})
-              </span>
-            )}
-          </h2>
+          <div className="flex items-start  py-3 flex-col mb-4">
+            <h2 className="text-lg font-semibold text-app-primary">
+              Test Codes
+              {usersResponse && (
+                <span className="text-sm font-normal text-gray-400 ml-2">
+                  ({usersResponse.users.length} of {usersResponse.total})
+                </span>
+              )}
+            </h2>
+            <p className="text-sm text-gray-400">
+              {usersResponse?.parentDetails.details &&
+                ` (${usersResponse.parentDetails.details})`}
+            </p>
+          </div>
           <div className="flex items-center  py-3 ">
             <Button
               fullWidth
@@ -135,18 +149,44 @@ export default function CodeGenerator() {
                 </button>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-app-primary mb-2">
-                  Student Name
-                </label>
-                <input
-                  type="text"
-                  value={userName}
-                  onChange={e => setUserName(e.target.value)}
-                  placeholder="Enter student name"
-                  className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  autoFocus
-                />
+              <div className="mb-6 flex flex-col gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-app-primary mb-2">
+                    Student Name
+                  </label>
+                  <input
+                    type="text"
+                    value={studentDetails.name}
+                    onChange={e =>
+                      setStudentDetails({
+                        ...studentDetails,
+                        name: e.target.value,
+                      })
+                    }
+                    placeholder="Enter student name"
+                    className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-app-primary mb-2">
+                    Grade Name
+                  </label>
+                  <input
+                    type="number"
+                    value={studentDetails.grade || ''}
+                    onChange={e =>
+                      setStudentDetails({
+                        ...studentDetails,
+                        grade: e.target.value ? Number(e.target.value) : null,
+                      })
+                    }
+                    placeholder="Enter grade name"
+                    className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
               </div>
 
               <div className="flex gap-3">
@@ -158,7 +198,11 @@ export default function CodeGenerator() {
                 </button>
                 <button
                   onClick={handleGenerateCode}
-                  disabled={!userName.trim() || isSubmitting}
+                  disabled={
+                    !studentDetails.name.trim() ||
+                    studentDetails.grade === null ||
+                    isSubmitting
+                  }
                   className="flex-1 py-2 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
                   {isSubmitting ? 'Generating...' : 'Generate'}

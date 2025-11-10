@@ -27,8 +27,8 @@ export const useParentAddUsers = ({ parentId }: UseUsersParams) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ name }: { name: string }) =>
-      addParentUsers({ parentId, name }, initData),
+    mutationFn: ({ name, grade }: { name: string; grade: number }) =>
+      addParentUsers({ parentId, name, grade }, initData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['users', 'parent', parentId],

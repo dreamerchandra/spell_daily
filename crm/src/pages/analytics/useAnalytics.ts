@@ -7,6 +7,14 @@ export type DailyUsage = {
   partialCompletion: Date[];
   notStarted: Date[];
   followUpDates: Date[];
+  parent?: {
+    id: string;
+    phoneNumber: string;
+    name?: string | null;
+    details: string[];
+    adminId: string;
+    adminName?: string;
+  };
 };
 
 export interface UseAnalyticsParams {
@@ -41,6 +49,7 @@ const fetchAnalytics = async (
 
     const _data = await response.json();
     const data = _data.data;
+    const parent = _data.testCodeDetails?.parent;
 
     return {
       startedAt: new Date(data.startedAt),
@@ -49,6 +58,16 @@ const fetchAnalytics = async (
       ),
       notStarted: data.notStarted.map((date: string) => new Date(date)),
       followUpDates: data.followUpDates.map((date: string) => new Date(date)),
+      parent: parent
+        ? {
+            id: parent.id,
+            phoneNumber: parent.phoneNumber,
+            name: parent.name,
+            details: parent.details,
+            adminId: parent.adminId,
+            adminName: parent.adminName,
+          }
+        : undefined,
     };
   } catch (error) {
     console.warn('Analytics API call failed, using mock data:', error);

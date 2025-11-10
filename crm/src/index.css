@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+textarea.field-sizing-content {
+  height: auto;
+  min-height: 100px;
+  overflow-y: hidden;
+  field-sizing: content;
+}

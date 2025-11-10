@@ -5,6 +5,7 @@ export const testCodeSchema = z.object({
   testCode: z.string(),
   parentId: z.string().optional(),
   name: z.string().optional(),
+  grade: z.number().int().min(1).max(12).optional(),
 });
 
 export type CreateTestCodeRequest = z.infer<typeof testCodeSchema>;
@@ -13,6 +14,14 @@ export type TestCodeResponse = {
   testCode: string;
   parentId?: string;
   createdAt: Date;
+  parent?: {
+    id: string;
+    phoneNumber: string;
+    name?: string | null;
+    details: string[];
+    adminId: string;
+    adminName?: string;
+  };
 };
 
 export const dormantUserSchema = z.object({
@@ -82,14 +91,33 @@ class TestCodeModel {
     const result = await prismaClient.students.create({
       data: {
         testCode: params.testCode,
-        parentId: params.parentId || null,
+        parentId: params.parentId ?? null,
         name: params.name,
+        details: params.grade ? { grade: params.grade } : undefined,
+      },
+      include: {
+        parent: {
+          include: {
+            addByAdmin: true,
+          },
+        },
       },
     });
+    const parent = result.parent ?? null;
     return {
       testCode: result.testCode,
-      parentId: result.parentId || undefined,
+      parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
+      parent: parent
+        ? {
+            details: parent.details ?? [],
+            adminId: parent.addByAdminId,
+            id: parent.id,
+            phoneNumber: parent.phoneNumber,
+            name: parent.name,
+            adminName: parent.addByAdmin?.name ?? undefined,
+          }
+        : undefined,
     };
   }
 
@@ -98,14 +126,32 @@ class TestCodeModel {
       where: {
         testCode,
       },
+      include: {
+        parent: {
+          include: {
+            addByAdmin: true,
+          },
+        },
+      },
     });
     if (!result) {
       return null;
     }
+    const parent = result.parent ?? null;
     return {
       testCode: result.testCode,
       parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
+      parent: parent
+        ? {
+            details: parent.details ?? [],
+            adminId: parent.addByAdminId,
+            id: parent.id,
+            phoneNumber: parent.phoneNumber,
+            name: parent.name,
+            adminName: parent.addByAdmin?.name ?? undefined,
+          }
+        : undefined,
     };
   }
 
