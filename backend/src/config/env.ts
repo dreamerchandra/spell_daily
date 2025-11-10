@@ -37,4 +37,5 @@ export const env = {
     : getEnv('TELEGRAM_FE_URL'),
   VONAGE_API_SECRET: getEnv('VONAGE_API_SECRET'),
   VONAGE_APP_ID: getEnv('VONAGE_APP_ID'),
+  TELEGRAM_GROUP_ID: -4892692975,
 };

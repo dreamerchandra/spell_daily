@@ -1,5 +1,6 @@
 import { testCodeModel } from '../../src/model/test-code-model.js';
 import { bot } from '../../src/services/telegram-bot-service.js';
+import { env } from '../../src/config/env.js';
 
 export const config = {
   schedule: '0 20 * * *', // 8 PM on Mon, Wed, Fri, Sun
@@ -36,7 +37,7 @@ export default async function handler(_req: any, res: any) {
 
   const dictUsers = await testCodeModel.getDormantUsers({
     lastAccess: 0 as unknown as Date,
-    status: 'FREE_TRIAL',
+    status: 'DICTATION',
   });
 
   let report = `Dormant Users Report:\n\n`;
@@ -46,6 +47,6 @@ export default async function handler(_req: any, res: any) {
     ? dictUsers.map(getUserString).join('\n\n')
     : 'None';
   report += `\n\n`;
-  await bot.sendMessage(-4892692975, report, { parse_mode: 'HTML' });
+  await bot.sendMessage(env.TELEGRAM_GROUP_ID, report, { parse_mode: 'HTML' });
   return res.status(200).json({ ok: true });
 }

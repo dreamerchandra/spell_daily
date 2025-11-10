@@ -1,3 +1,4 @@
+import { env } from '../../src/config/env.js';
 import { testCodeModel } from '../../src/model/test-code-model.js';
 import { bot } from '../../src/services/telegram-bot-service.js';
 
@@ -41,11 +42,11 @@ export default async function handler(_req: any, res: any) {
 
   let report = `Dormant Users Report:\n\n`;
 
-  report += `=== DICTATION USERS ===\n`;
+  report += `=== FREE TRIAL USERS ===\n`;
   report += dictUsers.length
     ? dictUsers.map(getUserString).join('\n\n')
     : 'None';
   report += `\n\n`;
-  await bot.sendMessage(-4892692975, report, { parse_mode: 'HTML' });
+  await bot.sendMessage(env.TELEGRAM_GROUP_ID, report, { parse_mode: 'HTML' });
   return res.status(200).json({ ok: true });
 }
