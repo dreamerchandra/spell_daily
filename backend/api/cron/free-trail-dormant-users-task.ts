@@ -46,6 +46,6 @@ export default async function handler(_req: any, res: any) {
     ? dictUsers.map(getUserString).join('\n\n')
     : 'None';
   report += `\n\n`;
-  await bot.sendMessage(4892692975, report, { parse_mode: 'HTML' });
+  await bot.sendMessage(-4892692975, report, { parse_mode: 'HTML' });
   return res.status(200).json({ ok: true });
 }
