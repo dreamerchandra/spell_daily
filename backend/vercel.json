@@ -1,27 +1,20 @@
 {
   "functions": {
-    "api/cron/reminder-task.ts": {
+    "api/cron/reminder-cron.ts": {
       "maxDuration": 300
     },
-    "api/cron/dict-dormant-users-task.ts": {
-      "maxDuration": 300
-    },
-    "api/cron/free-trail-dormant-users-task.ts": {
+    "api/cron/dormant-users-cron.ts": {
       "maxDuration": 300
     }
   },
   "crons": [
     {
-      "path": "/api/cron/reminder-task",
+      "path": "/api/cron/reminder-cron",
       "schedule": "*/5 * * * *"
     },
     {
-      "path": "/api/cron/dict-dormant-users-task",
+      "path": "/api/cron/dormant-users-cron",
       "schedule": "0 20 * * *"
-    },
-    {
-      "path": "/api/cron/free-trail-dormant-users-task",
-      "schedule": "0 20 * * 1,3,5,0"
     }
   ]
 }

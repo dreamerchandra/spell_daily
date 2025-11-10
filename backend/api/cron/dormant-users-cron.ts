@@ -32,9 +32,7 @@ Last Completed Date: ${
   }`;
 };
 
-export default async function handler(_req: any, res: any) {
-  console.log('Cron job running...');
-
+const generateReportForDictationUsers = async () => {
   const dictUsers = await testCodeModel.getDormantUsers({
     lastAccess: 0 as unknown as Date,
     status: 'DICTATION',
@@ -48,5 +46,40 @@ export default async function handler(_req: any, res: any) {
     : 'None';
   report += `\n\n`;
   await bot.sendMessage(env.TELEGRAM_GROUP_ID, report, { parse_mode: 'HTML' });
+};
+
+const generateReportForFreeTrialUsers = async () => {
+  const dictUsers = await testCodeModel.getDormantUsers({
+    lastAccess: 1 as unknown as Date,
+    status: 'FREE_TRIAL',
+  });
+
+  let report = `Dormant Users Report:\n\n`;
+
+  report += `=== FREE TRIAL USERS ===\n`;
+  report += dictUsers.length
+    ? dictUsers.map(getUserString).join('\n\n')
+    : 'None';
+  report += `\n\n`;
+  await bot.sendMessage(env.TELEGRAM_GROUP_ID, report, { parse_mode: 'HTML' });
+};
+
+export default async function handler(_req: any, res: any) {
+  console.log('Cron job running...');
+
+  await generateReportForDictationUsers();
+  // ✅ Check weekday (0 = Sun, 1 = Mon, ..., 6 = Sat)
+  const today = new Date();
+  const weekday = today.getDay();
+
+  // ✅ Run free trial only on Sun(0), Mon(1), Wed(3), Fri(5)
+  const allowedDays = [0, 1, 3, 5];
+
+  if (allowedDays.includes(weekday)) {
+    console.log('Running FREE TRIAL report...');
+    await generateReportForFreeTrialUsers();
+  } else {
+    console.log('Skipping FREE TRIAL report today.');
+  }
   return res.status(200).json({ ok: true });
 }
