@@ -4,6 +4,7 @@ import { env } from '../../config/env.js';
 import { Vonage } from '@vonage/server-sdk';
 import { NCCOBuilder, Talk } from '@vonage/voice';
 import { logger } from '../../lib/logger.js';
+import { bot } from '../../services/telegram-bot-service.js';
 
 const credentials = {
   applicationId: env.VONAGE_APP_ID,
@@ -48,6 +49,13 @@ onCallRouter.post(`${baseVersion}${baseRoute}`, (_req, res) => {
       logger.error(
         'On-Call route hit with request:',
         new Error(JSON.stringify(_req.body))
+      );
+      await bot.sendMessage(
+        env.TELEGRAM_GROUP_ID,
+        'Issue in app, <pre>' + JSON.stringify(_req.body, null, 2) + '</pre>',
+        {
+          parse_mode: 'HTML',
+        }
       );
       const isPhoneCallMade = await makePhoneCall();
       res.status(200).json({
