@@ -40,7 +40,7 @@ const suggestNextTwoStatus = (
       return [
         [
           {
-            text: 'Generate Dictation Link',
+            text: 'View Test Codes',
             web_app: {
               url: getGenerateTestCodeUrl(parentId),
             },

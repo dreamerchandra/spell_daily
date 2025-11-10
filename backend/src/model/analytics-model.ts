@@ -120,9 +120,18 @@ class AnalyticsModel {
     const student = await testCodeModel.getByTestCode(params.testCode);
     ensure(student, 'Student not found for the given test code');
 
-    // Generate all dates in the month
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0); // Last day of the month
+    // Generate dates from start of month until today (if current month) or end of month
+    const startDate = new Date(year, month, 1);
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    // If it's the current month and year, only go up to today, otherwise go to end of month
+    const endDate =
+      month === currentMonth && year === currentYear
+        ? today
+        : new Date(year, month + 1, 0); // Last day of the month
+
     const allDatesInMonth: Date[] = [];
 
     for (

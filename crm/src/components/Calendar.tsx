@@ -106,6 +106,7 @@ export const Calendar: React.FC<CalendarProps> = ({
     if (isToday && !isDisabled) {
       classes += ' ring-2 ring-primary-500';
     }
+    console.log({ statuses, date, isToday, isDisabled });
 
     if (statuses && statuses.length > 0 && !isDisabled) {
       if (statuses.length === 1) {
