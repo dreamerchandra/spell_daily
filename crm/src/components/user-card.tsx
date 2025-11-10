@@ -37,7 +37,7 @@ export const UserCard: FC<{
             <div className="text-sm text-app-secondary">
               {user.lastCompletedDate
                 ? getRelativeTime(new Date(user.lastCompletedDate))
-                : 'No Date'}{' '}
+                : 'Never Completed'}{' '}
               • {user.userAdmin}
             </div>
           </div>

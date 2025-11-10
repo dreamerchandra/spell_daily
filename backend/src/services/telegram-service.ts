@@ -8,10 +8,12 @@ import { telegramAddAdminService } from './telegram-add-admin-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramAddService } from './telegram-add-service.js';
 import { telegramTimePickerService } from './telegram-time-picker-service.js';
+import { telegramReportService } from './telegram-report-service.js';
 
 const handlers: TelegramBaseService[] = [
   telegramAddService,
   telegramParentService,
+  telegramReportService,
   telegramPhoneNumberService,
   telegramUpdateLeadService,
   telegramAttachTestCodeService,

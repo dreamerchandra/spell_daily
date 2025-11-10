@@ -62,7 +62,7 @@ type DormantUserResponse = {
   name?: string;
   parentName?: string;
   testCode: string;
-  lastCompletedDate: Date;
+  lastCompletedDate: Date | null;
   phoneNumber?: string;
   status: 'PAID' | 'FREE_TRIAL' | 'DICTATION';
   userAdmin: string;
@@ -286,7 +286,7 @@ class TestCodeModel {
         name: student.name || '',
         parentName: parent?.name || '',
         testCode: student.testCode,
-        lastCompletedDate: lastActivity?.activityDate || student.createdAt,
+        lastCompletedDate: lastActivity?.activityDate || null,
         phoneNumber: parent?.phoneNumber,
         status: student.status,
         userAdmin: parent?.addByAdmin?.name || 'Unknown',
@@ -314,7 +314,7 @@ class TestCodeModel {
       testCode: result.testCode,
       name: result.name ?? '',
       parentName: result.parent?.name ?? '',
-      lastCompletedDate: result.createdAt,
+      lastCompletedDate: null,
       status: result.status,
       userAdmin: result.parent?.addByAdmin?.name ?? 'Unknown',
     }));
