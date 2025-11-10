@@ -51,7 +51,7 @@ onCallRouter.post(`${baseVersion}${baseRoute}`, (_req, res) => {
         new Error(JSON.stringify(_req.body))
       );
       await bot.sendMessage(
-        env.TELEGRAM_GROUP_ID,
+        env.TELEGRAM_BUG_GROUP_ID,
         'Issue in app, <pre>' + JSON.stringify(_req.body, null, 2) + '</pre>',
         {
           parse_mode: 'HTML',
