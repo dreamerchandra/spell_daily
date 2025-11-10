@@ -50,7 +50,6 @@ const fetchAnalytics = async (
     const _data = await response.json();
     const data = _data.data;
     const parent = _data.testCodeDetails?.parent;
-
     return {
       startedAt: new Date(data.startedAt),
       partialCompletion: data.partialCompletion.map(

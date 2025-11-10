@@ -1,5 +1,6 @@
 import { analyticsModel } from '../model/analytics-model.js';
 import { ensure } from '../types/ensure.js';
+import { testCodeModel } from '../model/test-code-model.js';
 
 class AnalyticsService {
   private isValidBody = (
@@ -19,7 +20,17 @@ class AnalyticsService {
 
   async markAsCompleted(body: unknown) {
     ensure(this.isValidBody(body), 'Invalid CreateTestCodeRequest');
-    return analyticsModel.markAsCompleted(body.testCode);
+    await analyticsModel.markAsCompleted(body.testCode);
+    const testCode = await testCodeModel.getByTestCode(body.testCode);
+    switch (testCode?.status) {
+      case 'DICTATION':
+        return await testCodeModel.updateStatus(
+          testCode.testCode,
+          'FREE_TRIAL'
+        );
+      default:
+        return { message: 'Test code status unknown. No action taken.' };
+    }
   }
 }
 

@@ -14,6 +14,7 @@ export type TestCodeResponse = {
   testCode: string;
   parentId?: string;
   createdAt: Date;
+  status: 'PAID' | 'FREE_TRIAL' | 'DICTATION';
   parent?: {
     id: string;
     phoneNumber: string;
@@ -108,6 +109,7 @@ class TestCodeModel {
       testCode: result.testCode,
       parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
+      status: result.status,
       parent: parent
         ? {
             details: parent.details ?? [],
@@ -142,6 +144,7 @@ class TestCodeModel {
       testCode: result.testCode,
       parentId: result.parentId ?? undefined,
       createdAt: result.createdAt,
+      status: result.status,
       parent: parent
         ? {
             details: parent.details ?? [],
@@ -303,6 +306,20 @@ class TestCodeModel {
       status: result.status,
       userAdmin: result.parent?.addByAdmin?.name ?? 'Unknown',
     }));
+  }
+
+  async updateStatus(
+    testCode: string,
+    status: 'PAID' | 'FREE_TRIAL' | 'DICTATION'
+  ): Promise<void> {
+    await prismaClient.students.update({
+      where: {
+        testCode,
+      },
+      data: {
+        status,
+      },
+    });
   }
 }
 

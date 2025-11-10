@@ -26,7 +26,7 @@ const requestedStatusPrefix = 'requested';
 export const prefixRequestedStatus = (status: LeadStatus): string =>
   `${requestedStatusPrefix}${keyValueSplitter}${status}`;
 
-const getGenerateTestCodeUrl = (parentId: string): string => {
+export const getGenerateTestCodeUrl = (parentId: string): string => {
   const feUrl = env.TELEGRAM_FE_URL;
   return `${feUrl}/generate/${parentId}`;
 };

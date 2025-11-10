@@ -86,7 +86,11 @@ export const Calendar: React.FC<CalendarProps> = ({
     const baseClass =
       'w-10 h-10 flex items-center justify-center text-sm rounded-lg relative';
     const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-    const isDisabled = startedDate && date < startedDate;
+    const thresholdDate = startedDate
+      ? new Date(startedDate.getTime() - 24 * 60 * 60 * 1000)
+      : null;
+    const isDisabled =
+      thresholdDate && date.getTime() < thresholdDate.getTime();
     const isToday = date.toDateString() === new Date().toDateString();
 
     let classes = baseClass;

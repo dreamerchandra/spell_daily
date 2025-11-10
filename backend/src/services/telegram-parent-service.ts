@@ -4,6 +4,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
 import {
+  getGenerateTestCodeUrl,
   prefixParentId,
   prefixRequestedStatus,
   telegramUpdateLeadService,
@@ -125,17 +126,16 @@ class TelegramParentService extends TelegramBaseService {
             ],
             [
               {
-                text: 'Mark: Dictation Requested',
-                callback_data: prefixParentId(
-                  parent.phoneNumber,
-                  prefixRequestedStatus(LeadStatus.DICTATION_REQUESTED)
-                ),
+                text: 'Generate Dictation Link',
+                web_app: {
+                  url: getGenerateTestCodeUrl(parent.id),
+                },
               },
               {
-                text: 'Mark: Free Trial Requested',
+                text: 'Mark: Not Interested',
                 callback_data: prefixParentId(
-                  parent.phoneNumber,
-                  prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
+                  parent.id,
+                  prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
                 ),
               },
             ],
