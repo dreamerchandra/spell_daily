@@ -7,16 +7,19 @@ import Button from '../../components/Button';
 import { AddCircleOutline, Close } from '@mui/icons-material';
 import { Header } from '../../components/Header';
 
+const formData = {
+  name: '',
+  grade: null,
+  testCode: null,
+};
 export default function CodeGenerator() {
   const { parentId } = useParams<{ parentId: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState<{
     name: string;
     grade: number | null;
-  }>({
-    name: '',
-    grade: null,
-  });
+    testCode: string | null;
+  }>(formData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -34,16 +37,22 @@ export default function CodeGenerator() {
   const navigate = useNavigate();
 
   const handleGenerateCode = async () => {
-    if (!studentDetails.name.trim() || studentDetails.grade === null) return;
+    if (
+      !studentDetails.name.trim() ||
+      studentDetails.grade === null ||
+      !studentDetails.testCode
+    )
+      return;
 
     setIsSubmitting(true);
     try {
       const response = await addUser({
         name: studentDetails.name.trim(),
         grade: studentDetails.grade,
+        testCode: studentDetails.testCode,
       });
       setIsModalOpen(false);
-      setStudentDetails({ name: '', grade: null });
+      setStudentDetails(formData);
       navigate(`/analytics/${response.testCode}?isNew=true`);
     } catch (error) {
       console.error('Failed to generate test code:', error);
@@ -54,7 +63,7 @@ export default function CodeGenerator() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setStudentDetails({ name: '', grade: null });
+    setStudentDetails(formData);
   };
 
   return (
@@ -169,23 +178,43 @@ export default function CodeGenerator() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-app-primary mb-2">
-                    Grade Name
-                  </label>
-                  <input
-                    type="number"
-                    value={studentDetails.grade || ''}
-                    onChange={e =>
-                      setStudentDetails({
-                        ...studentDetails,
-                        grade: e.target.value ? Number(e.target.value) : null,
-                      })
-                    }
-                    placeholder="Enter grade name"
-                    className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    autoFocus
-                  />
+                <div className="flex gap-1">
+                  <div>
+                    <label className="block text-sm font-medium text-app-primary mb-2">
+                      Test Code
+                    </label>
+                    <input
+                      type="text"
+                      value={studentDetails.testCode || ''}
+                      onChange={e =>
+                        setStudentDetails({
+                          ...studentDetails,
+                          testCode: e.target.value,
+                        })
+                      }
+                      placeholder="Enter test code"
+                      className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-app-primary mb-2">
+                      Grade
+                    </label>
+                    <input
+                      type="number"
+                      value={studentDetails.grade || ''}
+                      onChange={e =>
+                        setStudentDetails({
+                          ...studentDetails,
+                          grade: e.target.value ? Number(e.target.value) : null,
+                        })
+                      }
+                      placeholder="Enter grade"
+                      className="w-full p-3 bg-app rounded-lg border border-gray-600 text-app-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      autoFocus
+                    />
+                  </div>
                 </div>
               </div>
 

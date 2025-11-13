@@ -17,14 +17,18 @@ crmTestCodeRouter.post(
     const name = (req.body as { name?: string }).name;
     const _grade = Number((req.body as { grade?: string }).grade);
     const grade = isNaN(_grade) ? undefined : _grade;
+    const testCode = (req.body as { testCode?: string }).testCode;
     ensure(
       typeof name === 'string' && name.length > 0,
       'Name is required in request body'
     );
+    ensure(
+      typeof testCode === 'string' && testCode.length > 0,
+      'Test code is required in request body'
+    );
     const kidName = name.trim();
     const parent = await parentModel.getById(parentId);
     ensure(parent !== null && parent !== undefined, 'Parent entity not found');
-    const testCode = testCodeModel.generateTestCode(kidName);
     const testCodeResult = await testCodeModel.createTestCode({
       testCode,
       name: kidName,

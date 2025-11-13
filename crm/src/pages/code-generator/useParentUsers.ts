@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTelegram } from '../../hooks/useTelegram';
-import { fetchParentUsers, addParentUsers } from '../../api/parent-users';
+import {
+  fetchParentUsers,
+  addParentUsers,
+  type AddParentForm,
+} from '../../api/parent-users';
 
 export interface UseUsersParams {
   parentId: string;
@@ -27,8 +31,8 @@ export const useParentAddUsers = ({ parentId }: UseUsersParams) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ name, grade }: { name: string; grade: number }) =>
-      addParentUsers({ parentId, name, grade }, initData),
+    mutationFn: (params: AddParentForm) =>
+      addParentUsers({ parentId, ...params }, initData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['users', 'parent', parentId],

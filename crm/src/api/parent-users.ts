@@ -68,8 +68,14 @@ export const fetchParentUsers = async (
   }
 };
 
+export type AddParentForm = {
+  name: string;
+  grade: number;
+  testCode: string;
+};
+
 export const addParentUsers = async (
-  params: UsersApiParams & { name: string; grade: number },
+  params: UsersApiParams & AddParentForm,
   apiKey: string
 ): Promise<CreateTestCodeResponse> => {
   try {
@@ -81,7 +87,11 @@ export const addParentUsers = async (
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ name: params.name, grade: params.grade }),
+      body: JSON.stringify({
+        name: params.name,
+        grade: params.grade,
+        testCode: params.testCode,
+      }),
     });
 
     if (!response.ok) {

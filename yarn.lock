@@ -2209,6 +2209,7 @@ __metadata:
     "@prisma/client": "npm:^6.18.0"
     "@types/cors": "npm:^2"
     "@types/express": "npm:^4.17.21"
+    "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/newrelic": "npm:^9.14.8"
     "@types/node": "npm:^20.17.6"
     "@types/node-telegram-bot-api": "npm:^0.64.12"
@@ -2223,6 +2224,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.5.4"
     express: "npm:^4.21.2"
     globals: "npm:^16.4.0"
+    jsonwebtoken: "npm:^9.0.2"
     newrelic: "npm:^13.6.2"
     node-telegram-bot-api: "npm:^0.66.0"
     prisma: "npm:^6.18.0"
@@ -2633,6 +2635,16 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: 10/4e5aed58cabb2bbf6f725da13421aa50a49abb6bc17bfab6c31b8774b073fa7b50d557c61f961a09a85f6056151190f8ac95f13f5b48136ba5841f7d4484ec56
+  languageName: node
+  linkType: hard
+
+"@types/jsonwebtoken@npm:^9.0.10":
+  version: 9.0.10
+  resolution: "@types/jsonwebtoken@npm:9.0.10"
+  dependencies:
+    "@types/ms": "npm:*"
+    "@types/node": "npm:*"
+  checksum: 10/d7960d995ad815511c7f4e7f09d91522dfe16e7e800cdd6226c8b1b624c534e0f3b8f8f3beb60e3189865269f028002f1a490189beca5afd02bc96ef1d68f21f
   languageName: node
   linkType: hard
 
@@ -7137,7 +7149,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonwebtoken@npm:9.0.2":
+"jsonwebtoken@npm:9.0.2, jsonwebtoken@npm:^9.0.2":
   version: 9.0.2
   resolution: "jsonwebtoken@npm:9.0.2"
   dependencies:

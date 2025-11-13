@@ -1,4 +1,7 @@
+import { env } from '../config/env.js';
 import { prismaClient } from '../prisma.js';
+import jwt from 'jsonwebtoken';
+import { ensure } from '../types/ensure.js';
 
 export type AdminUserType = {
   id: string;
@@ -26,6 +29,31 @@ class AdminUserModel {
     return await prismaClient.adminUser.create({
       data: { telegramId: telegramIdStr },
     });
+  }
+  public async createJWTToken(telegramId: number): Promise<string> {
+    const user = await this.findByTelegramId(telegramId);
+    ensure(user, 'Admin user not found for JWT token creation');
+    const payload = {
+      id: user.id,
+      telegramId: user.telegramId,
+    };
+
+    const token = jwt.sign(payload, env.JWT_SECRET, {
+      expiresIn: '5m', // Token valid for 5 minutes
+    });
+
+    return token;
+  }
+
+  public async verifyJWTToken(token: string): Promise<AdminUserType> {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as {
+      id: string;
+      telegramId: string;
+    };
+    const telegramId = decoded.telegramId;
+    const user = await this.findByTelegramId(telegramId);
+    ensure(user, 'Admin user not found for given JWT token');
+    return user;
   }
 }
 export const adminUserModel = new AdminUserModel();
