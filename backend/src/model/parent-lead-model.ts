@@ -1,7 +1,5 @@
 import { prismaClient } from '../prisma.js';
 import * as $Enums from '../generated/prisma/enums.js';
-import { ensure } from '../types/ensure.js';
-import { NotFoundError } from '../types/not-found-error.js';
 import { HttpError } from '../types/http-error.js';
 import { ParentUserResponse } from './parent-model.js';
 
@@ -107,10 +105,12 @@ class ParentLeadStatusModel {
       orderBy: { createdAt: 'desc' },
       take: 1,
     });
-    ensure(
-      data,
-      new NotFoundError('Lead status not found for the given parent ID')
-    );
+    if (!data) {
+      return {
+        status: LeadStatus.LEAD,
+        createdAt: new Date(),
+      };
+    }
     return {
       ...data,
       status: leadStatusConverter.fromDb(data.status),
