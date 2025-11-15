@@ -28,7 +28,12 @@ export const prefixRequestedStatus = (status: LeadStatus): string =>
 
 export const getGenerateTestCodeUrl = (parentId: string): string => {
   const feUrl = env.TELEGRAM_FE_URL;
-  return `${feUrl}/generate/${parentId}`;
+  return `${feUrl}/parent/${parentId}`;
+};
+
+export const getAnalyticsForTestCode = (testCode: string): string => {
+  const feUrl = env.TELEGRAM_FE_URL;
+  return `${feUrl}/analytics/${testCode}`;
 };
 
 const suggestNextTwoStatus = (

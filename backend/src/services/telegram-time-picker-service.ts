@@ -57,10 +57,9 @@ class TelegramTimePickerService extends TelegramBaseService {
   }
 
   canHandle(body: Update): boolean {
-    const [payload, parentId] =
-      body.callback_query?.data?.split(
-        telegramCalenderService.groupSeparator
-      ) ?? [];
+    const [payload, parentId] = body.callback_query?.data?.split(
+      telegramCalenderService.groupSeparator
+    ) ?? ['', ''];
     const [action] = payload.split('_');
     return ['t', 'pt'].includes(action) && !!parentId;
   }

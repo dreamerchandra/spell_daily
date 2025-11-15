@@ -90,6 +90,35 @@ class ParentModel {
       adminId: parent.addByAdminId,
     };
   }
+
+  async searchByName(
+    name: string,
+    limit: number = 10
+  ): Promise<ParentUserResponse[]> {
+    const parents = await prismaClient.parentUser.findMany({
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      take: limit,
+    });
+
+    const parentDetails = await Promise.all(
+      parents.map(async parent => {
+        const status = await parentLeadStatusModel.getLeadStatus(parent.id);
+        return {
+          ...parent,
+          details: parent.details || [],
+          status: status.status,
+          statusCreatedAt: status.createdAt,
+          adminId: parent.addByAdminId,
+        };
+      })
+    );
+    return parentDetails;
+  }
 }
 
 export const parentModel = new ParentModel();

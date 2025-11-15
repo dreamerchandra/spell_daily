@@ -333,6 +333,45 @@ class TestCodeModel {
       },
     });
   }
+
+  async getUserByStatus(
+    status: 'PAID' | 'FREE_TRIAL' | 'DICTATION'
+  ): Promise<DormantUserResponse[]> {
+    const results = await prismaClient.students.findMany({
+      where: {
+        status,
+      },
+      include: {
+        parent: {
+          include: {
+            addByAdmin: true,
+          },
+        },
+        DailyActivity: {
+          where: {
+            status: 'COMPLETED',
+          },
+          orderBy: {
+            activityDate: 'desc',
+          },
+          take: 1, // Only get the most recent activity for display
+        },
+      },
+    });
+    return results.map(result => {
+      const parent = result.parent;
+      const lastActivity = result.DailyActivity[0];
+      return {
+        name: result.name || '',
+        parentName: parent?.name || '',
+        testCode: result.testCode,
+        lastCompletedDate: lastActivity?.activityDate || null,
+        phoneNumber: parent?.phoneNumber,
+        status: result.status,
+        userAdmin: parent?.addByAdmin?.name || 'Unknown',
+      };
+    });
+  }
 }
 
 export const testCodeModel = new TestCodeModel();

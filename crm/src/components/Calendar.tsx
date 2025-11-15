@@ -92,6 +92,7 @@ export const Calendar: React.FC<CalendarProps> = ({
     const isDisabled =
       thresholdDate && date.getTime() < thresholdDate.getTime();
     const isToday = date.toDateString() === new Date().toDateString();
+    const isOnOrBeforeToday = date <= new Date();
 
     let classes = baseClass;
 
@@ -106,7 +107,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     if (isToday && !isDisabled) {
       classes += ' ring-2 ring-primary-500';
     }
-    console.log({ statuses, date, isToday, isDisabled });
 
     if (statuses && statuses.length > 0 && !isDisabled) {
       if (statuses.length === 1) {
@@ -122,8 +122,10 @@ export const Calendar: React.FC<CalendarProps> = ({
             break;
         }
       } else {
-        classes += ' bg-gray-600';
+        classes += ' bg-green-500';
       }
+    } else if (!isDisabled && isOnOrBeforeToday) {
+      classes += ' bg-green-600';
     }
 
     return classes;

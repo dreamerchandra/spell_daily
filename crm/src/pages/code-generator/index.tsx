@@ -4,7 +4,7 @@ import { UserCard } from '../../components/user-card';
 import { getTimeOfDay } from '../../utils/get-time-of-day';
 import { useParentUsers, useParentAddUsers } from './useParentUsers';
 import Button from '../../components/Button';
-import { AddCircleOutline, Close } from '@mui/icons-material';
+import { AddCircleOutline, Close, Dialpad } from '@mui/icons-material';
 import { Header } from '../../components/Header';
 
 const formData = {
@@ -99,14 +99,29 @@ export default function CodeGenerator() {
             </p>
           </div>
           <div className="flex items-center  py-3 ">
-            <Button
-              fullWidth
-              variant="text"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <AddCircleOutline className="mr-2" />
-              Generate New Test Code
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                fullWidth
+                variant="text"
+                onClick={() => {
+                  window.open(
+                    `tel:${usersResponse?.parentDetails.phoneNumber}`,
+                    '_blank'
+                  );
+                }}
+              >
+                <Dialpad className="mr-2" />
+                {usersResponse?.parentDetails.phoneNumber}
+              </Button>
+              <Button
+                fullWidth
+                variant="outline"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <AddCircleOutline className="mr-2" />
+                Generate New Test Code
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-2">

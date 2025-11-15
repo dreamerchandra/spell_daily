@@ -19,14 +19,6 @@ function App() {
           }
         />
         <Route
-          path="/generate/:parentId"
-          element={
-            <AdminRoute>
-              <CodeGenerator />
-            </AdminRoute>
-          }
-        />
-        <Route
           path="/analytics/:testCode"
           element={
             <AdminRoute>
@@ -34,6 +26,15 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route
+          path="/parent/:parentId"
+          element={
+            <AdminRoute>
+              <CodeGenerator />
+            </AdminRoute>
+          }
+        />
+
         <Route path="/telegram" element={<TelegramUserInfo />} />
       </Routes>
     </div>

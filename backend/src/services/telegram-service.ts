@@ -10,6 +10,8 @@ import { telegramAddService } from './telegram-add-service.js';
 import { telegramTimePickerService } from './telegram-time-picker-service.js';
 import { telegramReportService } from './telegram-report-service.js';
 import { telegramTokenService } from './telegram-token-service.js';
+import { telegramSearchService } from './telegram-search-service.js';
+import { telegramDictService } from './telegram-dict-service.js';
 
 const handlers: TelegramBaseService[] = [
   telegramAddService,
@@ -22,7 +24,9 @@ const handlers: TelegramBaseService[] = [
   telegramAddAdminService,
   telegramTimePickerService,
   telegramTokenService,
+  telegramDictService,
 ];
+handlers.push(telegramSearchService);
 
 class TelegramService extends TelegramBaseService {
   getUserId(body: TelegramBot.Update): number | null {
