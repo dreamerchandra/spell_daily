@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route
-          path="/analytics/:testCode"
+          path="/analytics/:testCode/*"
           element={
             <AdminRoute>
               <Analytics />
@@ -19,7 +19,7 @@ function App() {
           }
         />
         <Route
-          path="/parent/:parentId"
+          path="/parent/:parentId/*"
           element={
             <AdminRoute>
               <CodeGenerator />

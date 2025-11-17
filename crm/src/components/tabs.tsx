@@ -7,6 +7,7 @@ export interface TabItem {
   id: string;
   label: string;
   link: string; // Navigation path
+  baseUrl: string;
   icon?: ReactNode;
   children?: ReactNode;
 }
@@ -29,7 +30,7 @@ export const Tab: React.FC<TabProps> = ({
   const isActive = location.pathname.endsWith(tab.link);
 
   const handleClick = () => {
-    navigate(tab.link);
+    navigate(`${tab.baseUrl}${tab.link}`);
   };
 
   // Horizontal layout styles

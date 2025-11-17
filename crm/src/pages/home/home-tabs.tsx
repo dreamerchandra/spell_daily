@@ -6,21 +6,23 @@ import { useTelegram } from '../../hooks/useTelegram';
 
 export const HomeTab = () => {
   const { initData } = useTelegram();
-
   const tabs: TabItem[] = [
     {
       id: 'Report',
       label: 'Report',
-      link: '/',
+      link: '',
       children: <ReportTab />,
+      baseUrl: '/',
     },
     {
       id: 'All Users',
       label: 'All Users',
       link: 'all-users',
       children: <AllUsersTab apiKey={initData} />,
+      baseUrl: '/',
     },
   ];
+
   return (
     <>
       <TabList>

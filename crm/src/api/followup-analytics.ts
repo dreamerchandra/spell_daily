@@ -5,7 +5,7 @@ export const markFollowUpApi = async (params: {
   notes: string;
   apiKey: string;
 }) => {
-  const url = new URL(`/crm/v1/followup`, env.BACKEND_URL);
+  const url = new URL(`/crm/v1/follow-ups`, env.BACKEND_URL);
   const response = await fetch(url.toString(), {
     method: 'POST',
     headers: {
