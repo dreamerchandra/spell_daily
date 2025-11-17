@@ -26,6 +26,7 @@ class FollowupModel {
         parentId: data.parentId,
         testCode: data.testCode ?? null,
         notes: data.notes,
+        markOnCalendar: true,
       },
     });
 

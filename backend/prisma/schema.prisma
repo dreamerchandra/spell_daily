@@ -116,13 +116,14 @@ model RemainderLastProcessed {
 }
 
 model Followup {
-  id        String     @id @default(cuid())
-  adminId   String
-  admin     AdminUser  @relation(fields: [adminId], references: [id])
-  parentId  String
-  parent    ParentUser @relation(fields: [parentId], references: [id])
-  testCode  String?
-  student   Students?  @relation(fields: [testCode], references: [testCode])
-  notes     String
-  createdAt DateTime   @default(now())
+  id             String     @id @default(cuid())
+  adminId        String
+  admin          AdminUser  @relation(fields: [adminId], references: [id])
+  parentId       String
+  parent         ParentUser @relation(fields: [parentId], references: [id])
+  testCode       String?
+  student        Students?  @relation(fields: [testCode], references: [testCode])
+  notes          String
+  markOnCalendar Boolean
+  createdAt      DateTime   @default(now())
 }
