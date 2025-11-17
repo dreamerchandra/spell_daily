@@ -31,7 +31,7 @@ import {
 } from './cell-render';
 
 interface Column {
-  id: keyof AllUsersData | 'parentNameDetail' | 'assignedAdmin';
+  id: keyof AllUsersData | 'parentNameDetail' | 'assignedAdmin' | 'grade';
   label: string;
   minWidth?: number;
   sortable?: boolean;
@@ -129,6 +129,13 @@ const originalColumns: Column[] = [
     minWidth: 150,
     pinnable: true,
     render: (row: AllUsersData) => row.admin.name,
+  },
+  {
+    id: 'grade',
+    label: 'Grade',
+    minWidth: 150,
+    pinnable: true,
+    render: (row: AllUsersData) => row.grade,
   },
 ];
 

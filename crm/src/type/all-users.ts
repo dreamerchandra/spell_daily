@@ -13,6 +13,7 @@ export interface AllUsersData {
     name: string;
     id: string;
   };
+  grade: string;
 }
 
 export interface AllUsersResponse {

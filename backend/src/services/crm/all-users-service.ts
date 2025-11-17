@@ -31,6 +31,7 @@ export interface AllUsersData {
     name: string;
     id: string;
   };
+  grade: string;
 }
 
 export interface AllUsersResponse {
@@ -142,6 +143,7 @@ class AllUsersService {
         ls.name AS "studentName",
         ls."testCode" AS "testCode",
         la."activityDate" AS "lastAttendedAt",
+        ls.details->>'grade' AS "grade",
 
         a.id AS "adminId",
         a.name AS "adminName"
@@ -204,6 +206,7 @@ class AllUsersService {
           name: r.adminName ?? '',
           id: r.adminId,
         },
+        grade: r.grade ?? '',
       }));
 
       return {
