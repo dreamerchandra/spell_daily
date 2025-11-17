@@ -1,14 +1,8 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { parentModel, ParentUserResponse } from '../model/parent-model.js';
 import { ensure } from '../types/ensure.js';
-import { LeadStatus } from '../model/parent-lead-model.js';
-import { leadStatusConverter } from '../model/parent-lead-model.js';
 import { parentLeadStatusModel } from '../model/parent-lead-model.js';
-import { getRandomCelebrationGif } from '../config/success-sticker.js';
-import {
-  sendTelegramMessage,
-  sendTelegramSticker,
-} from './telegram-bot-service.js';
+import { sendTelegramMessage } from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
@@ -23,8 +17,8 @@ export const prefixParentId = (parentId: string, suffix: string): string =>
 
 const requestedStatusPrefix = 'requested';
 
-export const prefixRequestedStatus = (status: LeadStatus): string =>
-  `${requestedStatusPrefix}${keyValueSplitter}${status}`;
+export const prefixRequestedStatus = (statusId: string): string =>
+  `${requestedStatusPrefix}${keyValueSplitter}${statusId}`;
 
 export const getGenerateTestCodeUrl = (parentId: string): string => {
   const feUrl = env.TELEGRAM_FE_URL;
@@ -37,142 +31,18 @@ export const getAnalyticsForTestCode = (testCode: string): string => {
 };
 
 const suggestNextTwoStatus = (
-  parentId: string,
-  currentStatus: LeadStatus
+  parentId: string
 ): TelegramBot.InlineKeyboardButton[][] => {
-  switch (currentStatus) {
-    case LeadStatus.LEAD:
-      return [
-        [
-          {
-            text: 'View Test Codes',
-            web_app: {
-              url: getGenerateTestCodeUrl(parentId),
-            },
-          },
-          {
-            text: 'Move to free trial',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
-            ),
-          },
-        ],
-        [
-          {
-            text: 'Mark payment done',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.DICTATION)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    case LeadStatus.DICTATION_REQUESTED:
-      return [
-        [
-          {
-            text: 'Mark: Dictation Done',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.DICTATION)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    case LeadStatus.DICTATION:
-      return [
-        [
-          {
-            text: 'Mark: Free Trial Requested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.FREE_TRIAL_REQUESTED)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    case LeadStatus.FREE_TRIAL_REQUESTED:
-      return [
-        [
-          {
-            text: 'Mark: Free Trial',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.FREE_TRIAL)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    case LeadStatus.FREE_TRIAL:
-      return [
-        [
-          {
-            text: 'Mark: Paid Requested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.PAID_REQUESTED)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    case LeadStatus.PAID_REQUESTED:
-      return [
-        [
-          {
-            text: 'Mark: Paid',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.PAID)
-            ),
-          },
-          {
-            text: 'Mark: Not Interested',
-            callback_data: prefixParentId(
-              parentId,
-              prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-            ),
-          },
-        ],
-      ];
-    default:
-      return [];
-  }
+  return [
+    [
+      {
+        text: 'View Test Codes',
+        web_app: {
+          url: getGenerateTestCodeUrl(parentId),
+        },
+      },
+    ],
+  ];
 };
 
 class TelegramUpdateLeadService extends TelegramBaseService {
@@ -273,7 +143,7 @@ class TelegramUpdateLeadService extends TelegramBaseService {
               callback_data: `pick_date_time:${parent.id}`,
             },
           ],
-          ...suggestNextTwoStatus(parent.id, parent.status),
+          ...suggestNextTwoStatus(parent.id),
         ],
       },
     });
@@ -303,24 +173,17 @@ class TelegramUpdateLeadService extends TelegramBaseService {
     );
 
     const parentId = parentIdSegment.split(keyValueSplitter)[1];
-    const requestedStatus = leadStatusConverter.fromTelegram(
-      requestedStatusSegment.split(keyValueSplitter)[1]
-    );
+    const requestedStatus = requestedStatusSegment.split(keyValueSplitter)[1];
 
     const leadStatus = await parentLeadStatusModel.updateLeadStatus(
       parentId,
       requestedStatus
     );
 
-    if (leadStatus.status === LeadStatus.PAID_REQUESTED) {
-      await sendTelegramSticker(chatId, getRandomCelebrationGif());
-      await sendTelegramMessage(chatId, '🎉 Payment requested! Great job! 💪');
-    } else {
-      await sendTelegramMessage(
-        chatId,
-        `✅ Update Done \n Status Changed: ${leadStatusConverter.toString(leadStatus.status)} \n Parent: ${leadStatus.name}`
-      );
-    }
+    await sendTelegramMessage(
+      chatId,
+      `✅ Update Done \n Status Changed: ${leadStatus.status.label} \n Parent: ${leadStatus.name}`
+    );
   };
 }
 

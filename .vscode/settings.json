@@ -19,5 +19,49 @@
   "liveServer.settings.port": 5501,
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.next": true,
+    "**/.nuxt": true,
+    "**/out": true,
+    "**/.cache": true,
+    "**/.vercel": true,
+    "**/.netlify": true,
+    "**/coverage": true,
+    "**/.nyc_output": true,
+    "**/*.log": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.next": true,
+    "**/.nuxt": true,
+    "**/out": true,
+    "**/.cache": true,
+    "**/.vercel": true,
+    "**/.netlify": true,
+    "**/coverage": true,
+    "**/.nyc_output": true,
+    "**/*.log": true,
+    "**/package-lock.json": true,
+    "**/yarn.lock": true,
+    "**/pnpm-lock.yaml": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.next/**": true,
+    "**/.nuxt/**": true,
+    "**/out/**": true,
+    "**/.cache/**": true,
+    "**/.vercel/**": true,
+    "**/.netlify/**": true,
+    "**/coverage/**": true,
+    "**/.nyc_output/**": true
   }
 }

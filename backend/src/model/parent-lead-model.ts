@@ -1,91 +1,33 @@
 import { prismaClient } from '../prisma.js';
-import * as $Enums from '../generated/prisma/enums.js';
-import { HttpError } from '../types/http-error.js';
+import { ensure } from '../types/ensure.js';
 import { ParentUserResponse } from './parent-model.js';
-
-export enum LeadStatus {
-  LEAD,
-  DICTATION_REQUESTED,
-  DICTATION,
-  FREE_TRIAL_REQUESTED,
-  FREE_TRIAL,
-  PAID_REQUESTED,
-  PAID,
-  NOT_INTERESTED,
-}
-
-export const leadStatusConverter = {
-  fromDb: (status: $Enums.LeadStatus): LeadStatus => {
-    switch (status) {
-      case $Enums.LeadStatus.LEAD:
-        return LeadStatus.LEAD;
-      case $Enums.LeadStatus.DICTATION:
-        return LeadStatus.DICTATION;
-      case $Enums.LeadStatus.FREE_TRIAL:
-        return LeadStatus.FREE_TRIAL;
-      case $Enums.LeadStatus.PAID:
-        return LeadStatus.PAID;
-      case $Enums.LeadStatus.NOT_INTERESTED:
-        return LeadStatus.NOT_INTERESTED;
-      case $Enums.LeadStatus.DICTATION_REQUESTED:
-        return LeadStatus.DICTATION_REQUESTED;
-      case $Enums.LeadStatus.FREE_TRIAL_REQUESTED:
-        return LeadStatus.FREE_TRIAL_REQUESTED;
-      case $Enums.LeadStatus.PAID_REQUESTED:
-        return LeadStatus.PAID_REQUESTED;
-    }
-  },
-  toDb: (status: LeadStatus): $Enums.LeadStatus => {
-    switch (status) {
-      case LeadStatus.LEAD:
-        return $Enums.LeadStatus.LEAD;
-      case LeadStatus.DICTATION:
-        return $Enums.LeadStatus.DICTATION;
-      case LeadStatus.FREE_TRIAL:
-        return $Enums.LeadStatus.FREE_TRIAL;
-      case LeadStatus.PAID:
-        return $Enums.LeadStatus.PAID;
-      case LeadStatus.NOT_INTERESTED:
-        return $Enums.LeadStatus.NOT_INTERESTED;
-      case LeadStatus.DICTATION_REQUESTED:
-        return $Enums.LeadStatus.DICTATION_REQUESTED;
-      case LeadStatus.FREE_TRIAL_REQUESTED:
-        return $Enums.LeadStatus.FREE_TRIAL_REQUESTED;
-      case LeadStatus.PAID_REQUESTED:
-        return $Enums.LeadStatus.PAID_REQUESTED;
-    }
-  },
-  fromTelegram: (status: string): LeadStatus => {
-    const numericStatus = parseInt(status, 10);
-    if (isNaN(numericStatus)) {
-      throw new HttpError(`Invalid status: ${status}`);
-    }
-    return LeadStatus[LeadStatus[numericStatus] as keyof typeof LeadStatus];
-  },
-  toString: (status: LeadStatus): string => {
-    return LeadStatus[status];
-  },
-};
 
 export type ParentLead = {
   phoneNumber: string;
   name?: string;
   details?: string;
-  status: LeadStatus;
+  statusId: string;
+  status: {
+    label: string;
+    value: string;
+    color: string;
+  };
 };
 
 class ParentLeadStatusModel {
+  private defaultStatus: ParentLead['status'] | null = null;
   public async updateLeadStatus(
     parentId: string,
-    status: LeadStatus
+    statusId: string
   ): Promise<ParentUserResponse> {
     const data = await prismaClient.leads.create({
       data: {
         parentId,
-        status: leadStatusConverter.toDb(status),
+        statusId: statusId,
       },
       include: {
         parent: true,
+        status: true,
       },
     });
     return {
@@ -95,25 +37,69 @@ class ParentLeadStatusModel {
       phoneNumber: data.parent.phoneNumber,
       name: data.parent.name,
       details: data.parent.details || [],
-      status: leadStatusConverter.fromDb(data.status),
+      status: {
+        label: data.status.label,
+        value: data.status.value,
+        color: data.status.color,
+      },
+      statusId: data.statusId,
       adminId: data.parent.addByAdminId,
     };
   }
-  public async getLeadStatus(parentId: string) {
+  public async getDefaultLeadStatus() {
+    if (this.defaultStatus) {
+      return this.defaultStatus;
+    }
+    const defaultStatus = await prismaClient.leadOptions.findFirst({
+      where: {
+        isDefault: true,
+      },
+    });
+    ensure(defaultStatus, 'Default lead status not found');
+    this.defaultStatus = {
+      label: defaultStatus.label,
+      value: defaultStatus.value,
+      color: defaultStatus.color,
+    };
+    return this.defaultStatus;
+  }
+  public async getLeadStatus(parentId: string): Promise<{
+    statusId: string;
+    status: {
+      label: string;
+      value: string;
+      color: string;
+    };
+    createdAt: Date;
+  }> {
     const data = await prismaClient.leads.findFirst({
       where: { parentId },
       orderBy: { createdAt: 'desc' },
       take: 1,
+      include: {
+        status: true,
+      },
     });
     if (!data) {
+      const defaultStatus = await this.getDefaultLeadStatus();
       return {
-        status: LeadStatus.LEAD,
+        statusId: defaultStatus.value,
+        status: {
+          label: defaultStatus.label,
+          value: defaultStatus.value,
+          color: defaultStatus.color,
+        },
         createdAt: new Date(),
       };
     }
     return {
-      ...data,
-      status: leadStatusConverter.fromDb(data.status),
+      statusId: data.statusId,
+      status: {
+        label: data.status.label,
+        value: data.status.value,
+        color: data.status.color,
+      },
+      createdAt: data.createdAt,
     };
   }
 }

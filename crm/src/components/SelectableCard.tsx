@@ -62,7 +62,8 @@ export const SelectableItem: FC<SelectableItemProps> = ({
   className = '',
   longPressThreshold = 500,
 }) => {
-  const { toggleSelection, hasSelections, isSelected } = useSelectionContext();
+  const { toggleSelection, hasSelections, isSelected, disableSelection } =
+    useSelectionContext();
   const [isPressed, setIsPressed] = useState(false);
   const [isLongPressed, setIsLongPressed] = useState(false);
   const pressTimer = useRef<number | null>(null);
@@ -77,6 +78,7 @@ export const SelectableItem: FC<SelectableItemProps> = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    if (disableSelection) return;
     e.preventDefault();
     setIsPressed(true);
     pressTimer.current = window.setTimeout(() => {
@@ -86,16 +88,19 @@ export const SelectableItem: FC<SelectableItemProps> = ({
   };
 
   const handleMouseUp = () => {
+    if (disableSelection) return;
     setIsPressed(false);
     clearTimer();
   };
 
   const handleMouseLeave = () => {
+    if (disableSelection) return;
     setIsPressed(false);
     clearTimer();
   };
 
   const handleLongPress = () => {
+    if (disableSelection) return;
     toggleSelection(id);
   };
 

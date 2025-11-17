@@ -39,23 +39,22 @@ model ParentUser {
   followups    Followup[]
 }
 
-enum LeadStatus {
-  LEAD
-  DICTATION_REQUESTED
-  DICTATION
-  FREE_TRIAL_REQUESTED
-  FREE_TRIAL
-  PAID_REQUESTED
-  PAID
-  NOT_INTERESTED
+model LeadOptions {
+  value     String  @id
+  label     String
+  color     String
+  rank      Int
+  isDefault Boolean @default(false)
+  leads     Leads[]
 }
 
 model Leads {
-  id        String     @id @default(cuid())
+  id        String      @id @default(cuid())
   parentId  String
-  parent    ParentUser @relation(fields: [parentId], references: [id])
-  status    LeadStatus
-  createdAt DateTime   @default(now())
+  parent    ParentUser  @relation(fields: [parentId], references: [id])
+  statusId  String
+  status    LeadOptions @relation(fields: [statusId], references: [value])
+  createdAt DateTime    @default(now())
 }
 
 enum StudentStatus {

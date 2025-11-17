@@ -6,9 +6,15 @@ import type { SelectableCardContextType } from '../contexts/SelectableCardContex
 export const useSelectionContext = (): SelectableCardContextType => {
   const context = useContext(SelectableCardContext);
   if (!context) {
-    throw new Error(
-      'useSelectionContext must be used within a SelectableCardProvider'
-    );
+    return {
+      disableSelection: true,
+      clearSelections: () => {},
+      hasSelections: false,
+      isSelected: () => false,
+      selectedIds: [],
+      setSelectedIds: () => {},
+      toggleSelection: () => {},
+    };
   }
   return context;
 };

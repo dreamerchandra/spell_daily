@@ -3,7 +3,6 @@ import { ensure } from '../types/ensure.js';
 import { NotFoundError } from '../types/not-found-error.js';
 import { UniqueConstraintError } from '../types/unique-constrain-error.js';
 import { parentLeadStatusModel } from './parent-lead-model.js';
-import { LeadStatus } from './parent-lead-model.js';
 
 export type ParentUser = {
   phoneNumber: string;
@@ -16,7 +15,12 @@ export interface ParentUserResponse extends Omit<ParentUser, 'details'> {
   id: string;
   createdAt: Date;
   statusCreatedAt: Date;
-  status: LeadStatus;
+  statusId: string;
+  status: {
+    label: string;
+    value: string;
+    color: string;
+  };
   details: string[];
 }
 
@@ -32,13 +36,16 @@ class ParentModel {
           addByAdminId: data.adminId,
         },
       });
+      const defaultLeadStatus =
+        await parentLeadStatusModel.getDefaultLeadStatus();
       const status = await parentLeadStatusModel.updateLeadStatus(
         parent.id,
-        LeadStatus.LEAD
+        defaultLeadStatus.value
       );
       return {
         ...parent,
         createdAt: new Date(),
+        statusId: status.statusId,
         status: status.status,
         statusCreatedAt: status.createdAt,
         adminId: data.adminId,
@@ -70,6 +77,7 @@ class ParentModel {
     return {
       ...parent,
       details: parent.details || [],
+      statusId: status.statusId,
       status: status.status,
       statusCreatedAt: status.createdAt,
       adminId: parent.addByAdminId,
@@ -85,6 +93,7 @@ class ParentModel {
     return {
       ...parent,
       details: parent.details || [],
+      statusId: status.statusId,
       status: status.status,
       statusCreatedAt: status.createdAt,
       adminId: parent.addByAdminId,
@@ -111,6 +120,7 @@ class ParentModel {
         return {
           ...parent,
           details: parent.details || [],
+          statusId: status.statusId,
           status: status.status,
           statusCreatedAt: status.createdAt,
           adminId: parent.addByAdminId,

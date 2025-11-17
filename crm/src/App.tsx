@@ -11,14 +11,6 @@ function App() {
     <div className="App">
       <Routes>
         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/analytics/:testCode"
           element={
             <AdminRoute>
@@ -36,6 +28,14 @@ function App() {
         />
 
         <Route path="/telegram" element={<TelegramUserInfo />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

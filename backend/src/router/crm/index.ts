@@ -3,6 +3,7 @@ import crmAuthRouter from './auth-user-router/index.js';
 import crmDormantAuthRouter from './dormant-router/index.js';
 import crmAnalyticsRouter from './analytics-user-router/index.js';
 import crmFollowUpRouter from './followup-router/index.js';
+import allUsersRouter from './all-user-router/index.js';
 
 export default [
   ...crmTestCodeRouter,
@@ -10,4 +11,5 @@ export default [
   ...crmDormantAuthRouter,
   ...crmAnalyticsRouter,
   ...crmFollowUpRouter,
+  ...allUsersRouter,
 ];

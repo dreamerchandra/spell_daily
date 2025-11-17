@@ -25,8 +25,12 @@ export default defineConfig({
             '@tanstack/react-query',
             '@tanstack/react-query-devtools',
           ],
+          // Material-UI Core Components
+          'mui-core': ['@mui/material', '@emotion/react', '@emotion/styled'],
           // Material-UI Icons
           'mui-icons': ['@mui/icons-material'],
+          // Material-UI Date Pickers (if used)
+          'mui-date-pickers': ['@mui/x-date-pickers'],
           // Other vendor libraries can be added here
         },
       },

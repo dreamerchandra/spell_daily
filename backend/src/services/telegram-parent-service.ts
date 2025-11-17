@@ -5,13 +5,10 @@ import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
 import {
   getGenerateTestCodeUrl,
-  prefixParentId,
-  prefixRequestedStatus,
   telegramUpdateLeadService,
 } from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
-import { LeadStatus } from '../model/parent-lead-model.js';
 import { ParentUserResponse } from '../model/parent-model.js';
 import { asyncContext } from '../lib/asyncContext.js';
 class TelegramParentService extends TelegramBaseService {
@@ -130,13 +127,6 @@ class TelegramParentService extends TelegramBaseService {
                 web_app: {
                   url: getGenerateTestCodeUrl(parent.id),
                 },
-              },
-              {
-                text: 'Mark: Not Interested',
-                callback_data: prefixParentId(
-                  parent.id,
-                  prefixRequestedStatus(LeadStatus.NOT_INTERESTED)
-                ),
               },
             ],
           ],
