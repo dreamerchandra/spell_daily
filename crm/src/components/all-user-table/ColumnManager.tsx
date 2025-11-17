@@ -310,7 +310,7 @@ export function ColumnManager({
                   items={columnConfigs.map(c => c.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <ul className="space-y-0">
+                  <ul className="space-y-0 max-h-[400px] overflow-y-auto">
                     {columnConfigs.map(config => (
                       <SortableItem
                         key={config.id}
