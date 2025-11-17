@@ -5,6 +5,8 @@ import {
   addParentUsers,
   editTestCode,
   type AddParentForm,
+  deleteTestCode,
+  deleteBulkTestCodes,
 } from '../../api/parent-users';
 
 export interface UseUsersParams {
@@ -52,6 +54,41 @@ export const useEditTestCode = ({ oldTestCode }: { oldTestCode: string }) => {
     onSuccess: response => {
       queryClient.invalidateQueries({
         queryKey: ['users', 'parent', response.parentId],
+      });
+    },
+  });
+};
+
+export const useDeleteTestCode = ({
+  oldTestCode,
+  parentId,
+}: {
+  oldTestCode: string;
+  parentId: string;
+}) => {
+  const { initData } = useTelegram();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => deleteTestCode({ oldTestCode }, initData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'parent', parentId],
+      });
+    },
+  });
+};
+
+export const useBulkDeleteTestCodes = ({ parentId }: { parentId: string }) => {
+  const { initData } = useTelegram();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (testCodes: string[]) =>
+      deleteBulkTestCodes({ testCodes }, initData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'parent', parentId],
       });
     },
   });

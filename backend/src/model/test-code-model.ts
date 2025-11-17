@@ -178,6 +178,14 @@ class TestCodeModel {
     };
   }
 
+  async deleteTestCode(oldTestCode: string): Promise<void> {
+    await prismaClient.students.delete({
+      where: {
+        testCode: oldTestCode,
+      },
+    });
+  }
+
   async getByTestCode(testCode: string): Promise<TestCodeResponse | null> {
     const result = await prismaClient.students.findUnique({
       where: {
@@ -418,6 +426,16 @@ class TestCodeModel {
         status: result.status,
         userAdmin: parent?.addByAdmin?.name || 'Unknown',
       };
+    });
+  }
+
+  async bulkDeleteTestCodes(testCodes: string[]): Promise<void> {
+    await prismaClient.students.deleteMany({
+      where: {
+        testCode: {
+          in: testCodes,
+        },
+      },
     });
   }
 }

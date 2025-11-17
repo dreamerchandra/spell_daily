@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { NavigationContext } from './navigation-context';
 import type { NavigationContextType } from './navigation-context';
+import { useTelegram } from '../hooks/useTelegram';
 
 interface NavigationProviderProps {
   children: ReactNode;
@@ -12,11 +13,31 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   children,
 }) => {
   const location = useLocation();
+  const telegram = useTelegram();
   const [navigationStack, setNavigationStack] = useState<string[]>(() => {
     // Initialize from sessionStorage or empty array
     const saved = sessionStorage.getItem('navigationStack');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Update Telegram WebApp back button when navigation stack changes
+  useEffect(() => {
+    if (telegram.isReady) {
+      if (navigationStack.length > 1) {
+        telegram.showBackButton(() => {
+          // Handle Telegram back button click
+          if (navigationStack.length > 1) {
+            const newStack = navigationStack.slice(0, -1);
+            setNavigationStack(newStack);
+            sessionStorage.setItem('navigationStack', JSON.stringify(newStack));
+            window.history.back();
+          }
+        });
+      } else {
+        telegram.hideBackButton();
+      }
+    }
+  }, [navigationStack, telegram]);
 
   useEffect(() => {
     const currentPath = location.pathname;

@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 import type { User } from '../type/user';
+import { SelectableItem, SelectionIndicator } from './SelectableCard';
+import { useSelection } from '../hooks/useSelectionContext';
 
 const getRelativeTime = (date: Date) => {
   const now = new Date();
@@ -17,17 +19,23 @@ export const UserCard: FC<{
   user: User;
   handleItemClick: () => void;
 }> = ({ user, handleItemClick }) => {
+  const isSelected = useSelection(user.testCode);
+
   return (
-    <div
-      className="flex items-center justify-between py-3 hover:bg-app-hover rounded-lg px-2 cursor-pointer transition-colors"
+    <SelectableItem
+      id={user.testCode}
       onClick={handleItemClick}
+      className="flex items-center justify-between py-3 rounded-lg px-2"
     >
       <div className="flex items-center">
+        <SelectionIndicator id={user.testCode} className="mr-3" />
+
         <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center mr-4">
           <span className="font-bold text-app-primary">
             {user.name?.charAt(0)}
           </span>
         </div>
+
         <div className="flex flex-col gap-1">
           <div className="font-medium text-app-primary">
             {user.name ?? 'Name'} ({user.parentName ?? 'Parent Name'})
@@ -43,19 +51,22 @@ export const UserCard: FC<{
           </div>
         </div>
       </div>
-      <svg
-        className="w-5 h-5 text-app-secondary"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
-    </div>
+
+      {!isSelected && (
+        <svg
+          className="w-5 h-5 text-app-secondary"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      )}
+    </SelectableItem>
   );
 };

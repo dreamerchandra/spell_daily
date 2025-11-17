@@ -7,7 +7,10 @@ import { useAnalytics } from './useAnalytics.ts';
 import Button from '../../components/Button.tsx';
 import { EditSharp } from '@mui/icons-material';
 import { TestCodeModel } from '../../components/test-code-model';
-import { useEditTestCode } from '../code-generator/useParentUsers';
+import {
+  useDeleteTestCode,
+  useEditTestCode,
+} from '../code-generator/useParentUsers';
 
 export default function Analytics() {
   const { testCode } = useParams<{ testCode: string }>();
@@ -44,6 +47,11 @@ export default function Analytics() {
     testCode: testCode!,
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
+  });
+
+  const { mutateAsync: deleteTestCode } = useDeleteTestCode({
+    oldTestCode: testCode!,
+    parentId: analyticsData?.parent?.id!,
   });
 
   const startedDate = analyticsData?.startedAt
@@ -157,16 +165,21 @@ export default function Analytics() {
       </div>
       {isModalOpen && (
         <TestCodeModel
+          mode="edit"
           handleCloseModal={handleCloseModal}
           studentDetails={studentDetails}
           setStudentDetails={setStudentDetails}
-          handleGenerateCode={async () => {
+          onSubmit={async () => {
             await editTestCode({
               name: studentDetails.name,
               grade: studentDetails.grade,
               testCode: studentDetails.testCode!,
             });
             navigate(`/analytics/${studentDetails.testCode}`);
+          }}
+          onDelete={async () => {
+            await deleteTestCode();
+            navigate(`/parent/${analyticsData?.parent?.id}`);
           }}
           isSubmitting={isSubmitting}
         />

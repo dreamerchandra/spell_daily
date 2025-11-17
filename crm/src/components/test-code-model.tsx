@@ -1,11 +1,14 @@
 import { Close } from '@mui/icons-material';
+import Button from './Button';
 
 export const TestCodeModel = ({
   handleCloseModal,
   studentDetails,
   setStudentDetails,
-  handleGenerateCode,
+  onSubmit,
   isSubmitting,
+  mode,
+  onDelete,
 }: {
   handleCloseModal: () => void;
   studentDetails: {
@@ -20,8 +23,10 @@ export const TestCodeModel = ({
       testCode: string | null;
     }>
   >;
-  handleGenerateCode: () => void;
+  onSubmit: () => Promise<any>;
+  onDelete?: () => Promise<any>;
   isSubmitting: boolean;
+  mode: 'create' | 'edit';
 }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -98,24 +103,33 @@ export const TestCodeModel = ({
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <button
-            onClick={handleCloseModal}
-            className="flex-1 py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleGenerateCode}
-            disabled={
-              !studentDetails.name.trim() ||
-              studentDetails.grade === null ||
-              isSubmitting
-            }
-            className="flex-1 py-2 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {isSubmitting ? 'Generating...' : 'Generate'}
-          </button>
+        <div className="flex gap-3 justify-between flex-row-reverse">
+          <div className="flex gap-3 justify-start flex-row-reverse">
+            <Button
+              onClick={onSubmit}
+              disabled={
+                !studentDetails.name.trim() ||
+                studentDetails.grade === null ||
+                isSubmitting
+              }
+            >
+              {mode === 'create' ? 'Add Code' : 'Update Code'}
+            </Button>
+            <Button onClick={handleCloseModal} variant="outline">
+              Cancel
+            </Button>
+          </div>
+          <div>
+            {onDelete ? (
+              <Button
+                onClick={onDelete}
+                variant="danger-text"
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

@@ -10,6 +10,8 @@ const crmTestCodeRouter = Router();
 const baseVersion = '/v1';
 const baseRoute = '/test-code';
 const editBaseRoute = '/edit-test-code';
+const deleteBaseRoute = '/delete-test-code';
+const bulkDeleteBaseRoute = '/bulk-delete-test-code';
 
 const testCodeModelSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -52,6 +54,38 @@ crmTestCodeRouter.put(
     });
     res.status(200).json({
       data: testCodeResult,
+    });
+  })
+);
+
+crmTestCodeRouter.delete(
+  `${baseVersion}${deleteBaseRoute}/:oldTestCode`,
+  telegramWebAppAdminMiddleware,
+  asyncErrorHandler(async (req, res) => {
+    const { oldTestCode } = req.params;
+    await testCodeModel.deleteTestCode(oldTestCode);
+    res.status(200).json({
+      data: {
+        ok: true,
+      },
+    });
+  })
+);
+
+crmTestCodeRouter.post(
+  `${baseVersion}${bulkDeleteBaseRoute}`,
+  telegramWebAppAdminMiddleware,
+  asyncErrorHandler(async (req, res) => {
+    const { testCodes } = z
+      .object({
+        testCodes: z.array(z.string().min(1, 'Test code is required')),
+      })
+      .parse(req.body);
+    await testCodeModel.bulkDeleteTestCodes(testCodes);
+    res.status(200).json({
+      data: {
+        ok: true,
+      },
     });
   })
 );

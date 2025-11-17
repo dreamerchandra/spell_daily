@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import type { ReactNode, MouseEvent } from 'react';
 
-type ButtonVariant = 'text' | 'outline' | 'primary' | 'secondary';
+type ButtonVariant =
+  | 'text'
+  | 'outline'
+  | 'primary'
+  | 'secondary'
+  | 'danger-text'
+  | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 export type ButtonClickEvent = MouseEvent<HTMLButtonElement>;
@@ -111,6 +117,19 @@ export default function Button({
       'hover:bg-app-hover active:bg-app-secondary',
       'focus:ring-app-accent',
       'disabled:text-app-secondary',
+    ].join(' '),
+
+    danger: [
+      'bg-red-500 text-white shadow-lg',
+      'hover:bg-red-600 active:bg-red-700',
+      'focus:ring-red-500',
+      'disabled:bg-red-300 disabled:text-red-100',
+    ].join(' '),
+    'danger-text': [
+      'bg-transparent text-red-500',
+      'hover:bg-red-100 active:bg-red-200',
+      'focus:ring-red-500',
+      'disabled:text-red-300',
     ].join(' '),
   };
 

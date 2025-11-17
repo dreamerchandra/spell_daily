@@ -136,3 +136,60 @@ export const editTestCode = async (
     throw error;
   }
 };
+
+const DELETE_URL = '/crm/v1/delete-test-code';
+
+export const deleteTestCode = async (
+  params: { oldTestCode: string },
+  apiKey: string
+): Promise<void> => {
+  try {
+    const url = new URL(`${DELETE_URL}/${params.oldTestCode}`, env.BACKEND_URL);
+
+    const response = await fetch(url.toString(), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return;
+  } catch (error) {
+    console.warn('API call failed:', error);
+    throw error;
+  }
+};
+
+const BULK_DELETE_URL = '/crm/v1/bulk-delete-test-code';
+
+export const deleteBulkTestCodes = async (
+  params: { testCodes: string[] },
+  apiKey: string
+): Promise<void> => {
+  try {
+    const url = new URL(BULK_DELETE_URL, env.BACKEND_URL);
+
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        testCodes: params.testCodes,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return;
+  } catch (error) {
+    console.warn('API call failed:', error);
+    throw error;
+  }
+};
