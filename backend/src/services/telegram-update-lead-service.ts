@@ -7,7 +7,7 @@ import { telegramService } from './telegram-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { telegramCalenderService } from './telegram-calender-service.js';
 import { remainderModel } from '../model/remainder-model.js';
-import { env } from '../config/env.js';
+import { FE_URL } from '../utils/fe-urls.js';
 
 const groupSplitter = '&&';
 const keyValueSplitter = ':';
@@ -20,16 +20,6 @@ const requestedStatusPrefix = 'requested';
 export const prefixRequestedStatus = (statusId: string): string =>
   `${requestedStatusPrefix}${keyValueSplitter}${statusId}`;
 
-export const getGenerateTestCodeUrl = (parentId: string): string => {
-  const feUrl = env.TELEGRAM_FE_URL;
-  return `${feUrl}/parent/${parentId}`;
-};
-
-export const getAnalyticsForTestCode = (testCode: string): string => {
-  const feUrl = env.TELEGRAM_FE_URL;
-  return `${feUrl}/analytics/${testCode}`;
-};
-
 const suggestNextTwoStatus = (
   parentId: string
 ): TelegramBot.InlineKeyboardButton[][] => {
@@ -38,7 +28,7 @@ const suggestNextTwoStatus = (
       {
         text: 'View Test Codes',
         web_app: {
-          url: getGenerateTestCodeUrl(parentId),
+          url: FE_URL.getGenerateTestCodeUrl(parentId),
         },
       },
     ],

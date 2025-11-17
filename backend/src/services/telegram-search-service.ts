@@ -4,9 +4,8 @@ import { sendTelegramMessage } from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
 import { ensure } from '../types/ensure.js';
 import { parentModel } from '../model/parent-model.js';
-import { getGenerateTestCodeUrl } from './telegram-update-lead-service.js';
 import { testCodeModel } from '../model/test-code-model.js';
-import { getAnalyticsForTestCode } from './telegram-update-lead-service.js';
+import { FE_URL } from '../utils/fe-urls.js';
 
 class TelegramSearchService extends TelegramBaseService {
   isAuthRequired(): boolean {
@@ -43,7 +42,7 @@ class TelegramSearchService extends TelegramBaseService {
               {
                 text: 'View Analytics',
                 web_app: {
-                  url: getAnalyticsForTestCode(testCode.testCode),
+                  url: FE_URL.getAnalyticsForTestCode(testCode.testCode),
                 },
               },
             ],
@@ -77,7 +76,7 @@ class TelegramSearchService extends TelegramBaseService {
               {
                 text: 'View Students',
                 web_app: {
-                  url: getGenerateTestCodeUrl(parent.id),
+                  url: FE_URL.getGenerateTestCodeUrl(parent.id),
                 },
               },
             ],

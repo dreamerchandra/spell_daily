@@ -3,14 +3,12 @@ import { UniqueConstraintError } from '../types/unique-constrain-error.js';
 import TelegramBot from 'node-telegram-bot-api';
 import { getPhoneNumber } from '../utils/phone-number.js';
 import { ensure } from '../types/ensure.js';
-import {
-  getGenerateTestCodeUrl,
-  telegramUpdateLeadService,
-} from './telegram-update-lead-service.js';
+import { telegramUpdateLeadService } from './telegram-update-lead-service.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { TelegramBaseService } from './telegram-base-service.js';
 import { ParentUserResponse } from '../model/parent-model.js';
 import { asyncContext } from '../lib/asyncContext.js';
+import { FE_URL } from '../utils/fe-urls.js';
 class TelegramParentService extends TelegramBaseService {
   public hintMessage = '/show_parent_hint';
   private parentMessageInfo =
@@ -125,7 +123,7 @@ class TelegramParentService extends TelegramBaseService {
               {
                 text: 'Generate Dictation Link',
                 web_app: {
-                  url: getGenerateTestCodeUrl(parent.id),
+                  url: FE_URL.getGenerateTestCodeUrl(parent.id),
                 },
               },
             ],

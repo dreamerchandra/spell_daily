@@ -12,8 +12,10 @@ import { telegramReportService } from './telegram-report-service.js';
 import { telegramTokenService } from './telegram-token-service.js';
 import { telegramSearchService } from './telegram-search-service.js';
 import { telegramDictService } from './telegram-dict-service.js';
+import { telegramLnkService } from './telegram-link-service.js';
 
 const handlers: TelegramBaseService[] = [
+  telegramLnkService,
   telegramAddService,
   telegramParentService,
   telegramReportService,

@@ -5,7 +5,7 @@ import { asyncContext } from '../lib/asyncContext.js';
 import { sendTelegramMessage } from './telegram-bot-service.js';
 import { telegramService } from './telegram-service.js';
 import { ensure } from '../types/ensure.js';
-import { env } from '../config/env.js';
+import { FE_URL } from '../utils/fe-urls.js';
 
 function formatDateDDMMYYYY(date: Date): string {
   const d = new Date(date);
@@ -14,11 +14,6 @@ function formatDateDDMMYYYY(date: Date): string {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
-
-const getReportUrl = (): string => {
-  const feUrl = env.TELEGRAM_FE_URL;
-  return `${feUrl}/`;
-};
 
 const getUserString = (user: {
   name?: string;
@@ -100,7 +95,7 @@ class TelegramReportService extends TelegramBaseService {
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
-          [{ text: 'Refresh Report', web_app: { url: getReportUrl() } }],
+          [{ text: 'Refresh Report', web_app: { url: FE_URL.getReportUrl() } }],
         ],
       },
     });
