@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Calendar } from '../../components/Calendar';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Header } from '../../components/Header';
-import { ShareWelcomeMessage } from './share-message';
 import { useAnalytics } from './useAnalytics.ts';
 import Button from '../../components/Button.tsx';
 import { EditSharp } from '@mui/icons-material';
@@ -11,12 +9,11 @@ import {
   useDeleteTestCode,
   useEditTestCode,
 } from '../code-generator/useParentUsers';
+import { AnalyticsTab } from './tab/index.tsx';
 
 export default function Analytics() {
   const { testCode } = useParams<{ testCode: string }>();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [searchParams] = useSearchParams();
-  const isNew = searchParams.get('isNew') === 'true';
+  const currentDate = new Date();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const [studentDetails, setStudentDetails] = useState<{
@@ -38,12 +35,7 @@ export default function Analytics() {
     setIsModalOpen(false);
   };
 
-  const {
-    data: analyticsData,
-    isLoading,
-    isError,
-    error,
-  } = useAnalytics({
+  const { data: analyticsData, isLoading } = useAnalytics({
     testCode: testCode!,
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
@@ -54,38 +46,6 @@ export default function Analytics() {
     parentId: analyticsData?.parent?.id!,
   });
 
-  const startedDate = analyticsData?.startedAt
-    ? new Date(analyticsData.startedAt)
-    : null;
-
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentDate);
-    if (direction === 'prev') {
-      newDate.setMonth(currentDate.getMonth() - 1);
-    } else {
-      newDate.setMonth(currentDate.getMonth() + 1);
-    }
-
-    // Don't allow navigation before started month
-    if (startedDate) {
-      const startedMonth = new Date(
-        startedDate.getFullYear(),
-        startedDate.getMonth(),
-        1
-      );
-      const targetMonth = new Date(
-        newDate.getFullYear(),
-        newDate.getMonth(),
-        1
-      );
-      if (direction === 'prev' && targetMonth < startedMonth) {
-        return;
-      }
-    }
-
-    setCurrentDate(newDate);
-  };
-
   const handleModalOpen = () => {
     setIsModalOpen(true);
     setStudentDetails({
@@ -95,31 +55,8 @@ export default function Analytics() {
     });
   };
 
-  const canNavigatePrev = () => {
-    if (!startedDate) return true;
-    const currentMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      1
-    );
-    const startedMonth = new Date(
-      startedDate.getFullYear(),
-      startedDate.getMonth(),
-      1
-    );
-    return currentMonth > startedMonth;
-  };
-
-  const calendarEvents = analyticsData
-    ? {
-        partial: analyticsData.partialCompletion,
-        notStarted: analyticsData.notStarted,
-        followUp: analyticsData.followUpDates,
-      }
-    : undefined;
-
   return (
-    <div className="min-h-screen bg-app text-app-primary">
+    <div className="h-screen bg-app text-app-primary flex flex-col ">
       <Header>
         <div className="flex flex-row justify-between">
           <div>
@@ -143,25 +80,8 @@ export default function Analytics() {
         </div>
       </Header>
 
-      <div className="mx-auto max-w-4xl p-6 flex gap-6 flex-col">
-        {analyticsData ? (
-          <ShareWelcomeMessage
-            currentMonth={currentDate.getMonth()}
-            dailyUsage={analyticsData}
-            isNew={isNew}
-            testCode={testCode!}
-          />
-        ) : null}
-        <Calendar
-          currentDate={currentDate}
-          onNavigateMonth={navigateMonth}
-          canNavigatePrev={canNavigatePrev()}
-          events={calendarEvents}
-          startedDate={startedDate}
-          isLoading={isLoading}
-          isError={isError}
-          error={error}
-        />
+      <div className="flex-1 overflow-hidden">
+        <AnalyticsTab parentId={analyticsData?.parent?.id!} />
       </div>
       {isModalOpen && (
         <TestCodeModel

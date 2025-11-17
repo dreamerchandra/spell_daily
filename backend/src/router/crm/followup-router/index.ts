@@ -16,6 +16,7 @@ crmFollowUpRouter.get(
     const { parentId } = req.params;
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 20;
+    const testCode = req.query.testCode as string | undefined;
 
     // Validate query parameters
     if (page < 1) {
@@ -36,6 +37,7 @@ crmFollowUpRouter.get(
         parentId,
         page,
         limit,
+        testCode,
       });
 
       logger.info('Successfully fetched follow-ups', {
@@ -62,7 +64,7 @@ crmFollowUpRouter.post(
   telegramWebAppAdminMiddleware,
   asyncErrorHandler(async (req, res) => {
     const { parentId } = req.params;
-    const { text } = req.body;
+    const { text, testCode } = req.body;
     const userId = req.telegramAdminUser!.id;
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -87,7 +89,8 @@ crmFollowUpRouter.post(
       const result = await followupModel.createFollowupForParent(
         parentId,
         userId,
-        text.trim()
+        text.trim(),
+        testCode
       );
 
       logger.info('Successfully created follow-up', {

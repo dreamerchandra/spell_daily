@@ -4,6 +4,7 @@ export interface FollowUp {
   text: string;
   date: Date;
   adminName: string;
+  id: string;
 }
 
 export interface FollowUpResponse {
@@ -16,14 +17,25 @@ export interface FollowUpResponse {
 }
 
 export const getFollowUps = async (
-  parentId: string,
-  page: number,
-  limit: number,
+  {
+    parentId,
+    page,
+    limit,
+    testCode,
+  }: {
+    parentId: string;
+    page: number;
+    limit: number;
+    testCode?: string;
+  },
   apiKey: string
 ): Promise<FollowUpResponse> => {
   const url = new URL(`/crm/v1/follow-ups/${parentId}`, env.BACKEND_URL);
   url.searchParams.set('page', page.toString());
   url.searchParams.set('limit', limit.toString());
+  if (testCode) {
+    url.searchParams.set('testCode', testCode);
+  }
 
   const response = await fetch(url.toString(), {
     method: 'GET',
@@ -50,10 +62,17 @@ export const getFollowUps = async (
 };
 
 export const createFollowUp = async (
-  parentId: string,
-  text: string,
+  {
+    parentId,
+    text,
+    testCode,
+  }: {
+    parentId: string;
+    text: string;
+    testCode?: string;
+  },
   apiKey: string
-): Promise<void> => {
+): Promise<FollowUp> => {
   const url = new URL(`/crm/v1/follow-ups/${parentId}`, env.BACKEND_URL);
 
   const response = await fetch(url.toString(), {
@@ -62,10 +81,12 @@ export const createFollowUp = async (
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, testCode }),
   });
 
   if (!response.ok) {
     throw new Error('Failed to create follow-up');
   }
+  const data = await response.json();
+  return data;
 };

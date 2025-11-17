@@ -12,6 +12,7 @@ export const getFollowupsSchema = z.object({
   parentId: z.string(),
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(20),
+  testCode: z.string().optional(),
 });
 
 export type CreateFollowupParams = z.infer<typeof createFollowupSchema>;
@@ -64,7 +65,7 @@ class FollowupModel {
 
   async getFollowups(params: GetFollowupsParams): Promise<FollowupsResponse> {
     const validatedParams = await getFollowupsSchema.parseAsync(params);
-    const { parentId, page, limit } = validatedParams;
+    const { parentId, page, limit, testCode } = validatedParams;
     const skip = (page - 1) * limit;
 
     // Verify parent exists
@@ -81,6 +82,14 @@ class FollowupModel {
     const total = await prismaClient.followup.count({
       where: {
         parentId: parentId,
+        OR: [
+          {
+            testCode: testCode,
+          },
+          {
+            testCode: undefined,
+          },
+        ],
       },
     });
 
@@ -126,7 +135,8 @@ class FollowupModel {
   async createFollowupForParent(
     parentId: string,
     adminId: string,
-    text: string
+    text: string,
+    testCode?: string
   ): Promise<FollowupWithAdmin> {
     // Verify parent exists
     const parentExists = await prismaClient.parentUser.findUnique({
@@ -144,6 +154,7 @@ class FollowupModel {
         parentId,
         notes: text,
         markOnCalendar: true,
+        testCode: testCode ?? null,
       },
       include: {
         admin: {
