@@ -4,6 +4,10 @@ import { ShareMessageTab } from './share-message-tab';
 import { AnalyticsView } from './analytics-view';
 import { FollowUpTab } from '../../code-generator/tab/follow-up-tab';
 
+const Loading = () => {
+  return <div>Loading...</div>;
+};
+
 export const AnalyticsTab = ({ parentId }: { parentId: string }) => {
   const { testCode } = useParams<{ testCode: string }>();
   const [searchParams] = useSearchParams();
@@ -34,11 +38,11 @@ export const AnalyticsTab = ({ parentId }: { parentId: string }) => {
   ];
 
   if (!testCode) {
-    return null;
+    return <Loading />;
   }
 
   if (!parentId) {
-    return null;
+    return <Loading />;
   }
 
   return (
