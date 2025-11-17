@@ -26,6 +26,7 @@ export type TestCodeResponse = {
   student: {
     id: string;
     name?: string | null;
+    grade?: number | null;
   };
 };
 
@@ -117,6 +118,52 @@ class TestCodeModel {
       student: {
         id: result.testCode,
         name: result.name,
+        grade: (result.details as any)?.grade ?? null,
+      },
+      parent: parent
+        ? {
+            details: parent.details ?? [],
+            adminId: parent.addByAdminId,
+            id: parent.id,
+            phoneNumber: parent.phoneNumber,
+            name: parent.name,
+            adminName: parent.addByAdmin?.name ?? undefined,
+          }
+        : undefined,
+    };
+  }
+
+  async updateTestCode(
+    oldTestCode: string,
+    params: CreateTestCodeRequest
+  ): Promise<TestCodeResponse> {
+    const result = await prismaClient.students.update({
+      where: {
+        testCode: oldTestCode,
+      },
+      data: {
+        testCode: params.testCode,
+        name: params.name,
+        details: params.grade ? { grade: params.grade } : undefined,
+      },
+      include: {
+        parent: {
+          include: {
+            addByAdmin: true,
+          },
+        },
+      },
+    });
+    const parent = result.parent ?? null;
+    return {
+      testCode: result.testCode,
+      parentId: result.parentId ?? undefined,
+      createdAt: result.createdAt,
+      status: result.status,
+      student: {
+        id: result.testCode,
+        name: result.name,
+        grade: (result.details as any)?.grade ?? null,
       },
       parent: parent
         ? {
@@ -156,6 +203,7 @@ class TestCodeModel {
       student: {
         id: result.testCode,
         name: result.name,
+        grade: (result.details as any)?.grade ?? null,
       },
       parent: parent
         ? {

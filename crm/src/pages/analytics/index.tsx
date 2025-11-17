@@ -1,15 +1,39 @@
 import { useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Calendar } from '../../components/Calendar';
 import { Header } from '../../components/Header';
 import { ShareWelcomeMessage } from './share-message';
 import { useAnalytics } from './useAnalytics.ts';
+import Button from '../../components/Button.tsx';
+import { EditSharp } from '@mui/icons-material';
+import { TestCodeModel } from '../../components/test-code-model';
+import { useEditTestCode } from '../code-generator/useParentUsers';
 
 export default function Analytics() {
   const { testCode } = useParams<{ testCode: string }>();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [searchParams] = useSearchParams();
   const isNew = searchParams.get('isNew') === 'true';
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [studentDetails, setStudentDetails] = useState<{
+    name: string;
+    grade: number | null;
+    testCode: string | null;
+  }>({
+    name: '',
+    grade: null,
+    testCode: null,
+  });
+
+  const { mutateAsync: editTestCode, isPending: isSubmitting } =
+    useEditTestCode({
+      oldTestCode: testCode!,
+    });
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const {
     data: analyticsData,
@@ -54,6 +78,15 @@ export default function Analytics() {
     setCurrentDate(newDate);
   };
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+    setStudentDetails({
+      grade: analyticsData?.student?.grade || null,
+      name: analyticsData?.student?.name || '',
+      testCode: testCode || null,
+    });
+  };
+
   const canNavigatePrev = () => {
     if (!startedDate) return true;
     const currentMonth = new Date(
@@ -80,14 +113,25 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-app text-app-primary">
       <Header>
-        <div>
-          <h1 className="text-xl font-bold text-app-primary">
-            Analytics Dashboard
-          </h1>
-          <p className="text-sm text-gray-400">
-            Test Code:{' '}
-            <span className="text-app-primary font-semibold">{testCode}</span>
-          </p>
+        <div className="flex flex-row justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-app-primary">
+              Analytics Dashboard
+            </h1>
+            <p className="text-sm text-gray-400">
+              Test Code:{' '}
+              <span className="text-app-primary font-semibold">{testCode}</span>
+            </p>
+          </div>
+          <div>
+            <Button
+              variant="text"
+              disabled={isLoading || isSubmitting}
+              onClick={handleModalOpen}
+            >
+              <EditSharp />
+            </Button>
+          </div>
         </div>
       </Header>
 
@@ -111,6 +155,22 @@ export default function Analytics() {
           error={error}
         />
       </div>
+      {isModalOpen && (
+        <TestCodeModel
+          handleCloseModal={handleCloseModal}
+          studentDetails={studentDetails}
+          setStudentDetails={setStudentDetails}
+          handleGenerateCode={async () => {
+            await editTestCode({
+              name: studentDetails.name,
+              grade: studentDetails.grade,
+              testCode: studentDetails.testCode!,
+            });
+            navigate(`/analytics/${studentDetails.testCode}`);
+          }}
+          isSubmitting={isSubmitting}
+        />
+      )}
     </div>
   );
 }

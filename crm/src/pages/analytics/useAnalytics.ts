@@ -18,6 +18,7 @@ export type DailyUsage = {
   student?: {
     id: string;
     name?: string | null;
+    grade?: number | null;
   };
 };
 
@@ -65,6 +66,7 @@ const fetchAnalytics = async (
       student: {
         id: student.id,
         name: student?.name,
+        grade: student?.grade ?? null,
       },
       parent: parent
         ? {

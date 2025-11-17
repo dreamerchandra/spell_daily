@@ -70,7 +70,7 @@ export const fetchParentUsers = async (
 
 export type AddParentForm = {
   name: string;
-  grade: number;
+  grade: number | null;
   testCode: string;
 };
 
@@ -83,6 +83,38 @@ export const addParentUsers = async (
 
     const response = await fetch(url.toString(), {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        name: params.name,
+        grade: params.grade,
+        testCode: params.testCode,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.data as CreateTestCodeResponse;
+  } catch (error) {
+    console.warn('API call failed:', error);
+    throw error;
+  }
+};
+
+const EDIT_URL = '/crm/v1/edit-test-code';
+export const editTestCode = async (
+  params: { oldTestCode: string } & AddParentForm,
+  apiKey: string
+): Promise<CreateTestCodeResponse> => {
+  try {
+    const url = new URL(`${EDIT_URL}/${params.oldTestCode}`, env.BACKEND_URL);
+
+    const response = await fetch(url.toString(), {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
