@@ -79,7 +79,11 @@ export const useDeleteTestCode = ({
   });
 };
 
-export const useBulkDeleteTestCodes = ({ parentId }: { parentId: string }) => {
+export const useBulkDeleteTestCodes = ({
+  parentId,
+}: {
+  parentId?: string;
+} = {}) => {
   const { initData } = useTelegram();
   const queryClient = useQueryClient();
 
@@ -88,7 +92,12 @@ export const useBulkDeleteTestCodes = ({ parentId }: { parentId: string }) => {
       deleteBulkTestCodes({ testCodes }, initData),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['users', 'parent', parentId],
+        queryKey: parentId
+          ? ['users', 'parent', parentId]
+          : ['users', 'parent'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'dormant'],
       });
     },
   });
