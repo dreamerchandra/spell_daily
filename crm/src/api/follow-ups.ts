@@ -87,6 +87,8 @@ export const createFollowUp = async (
   if (!response.ok) {
     throw new Error('Failed to create follow-up');
   }
-  const data = await response.json();
-  return data;
+  const json = await response.json();
+  const data = json.data;
+  const date = new Date(data.date);
+  return { ...data, date };
 };
