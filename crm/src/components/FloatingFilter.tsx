@@ -4,20 +4,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 export type FilterOptions = {
-  status: 'ALL' | 'FREE_TRIAL' | 'DICTATION' | 'PAID';
   userAdmin: 'ALL' | 'MY';
   lastAccess: number | 'ALL';
+  notCompletedDate: Date;
 };
 
 type InternalFilterOptions = {
-  status: 'ALL' | 'FREE_TRIAL' | 'DICTATION' | 'PAID';
   userAdmin: 'ALL' | 'MY';
   lastAccess: 'ALL' | 'YESTERDAY' | '2_DAYS_AGO' | 'CUSTOM';
   customDate?: Date;
 };
 
 interface FloatingFilterProps {
-  onFilterChange: (filters: FilterOptions) => void;
+  onFilterChange: (filters: Omit<FilterOptions, 'notCompletedDate'>) => void;
 }
 
 export const FloatingFilter: React.FC<FloatingFilterProps> = ({
@@ -26,7 +25,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [internalFilters, setInternalFilters] = useState<InternalFilterOptions>(
     {
-      status: 'ALL',
       userAdmin: 'ALL',
       lastAccess: 'ALL',
     }
@@ -37,7 +35,7 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
 
   const convertToExternalFormat = (
     internal: InternalFilterOptions
-  ): FilterOptions => {
+  ): Omit<FilterOptions, 'notCompletedDate'> => {
     let lastAccess: number | 'ALL' = 'ALL';
 
     switch (internal.lastAccess) {
@@ -66,7 +64,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
     }
 
     return {
-      status: internal.status,
       userAdmin: internal.userAdmin,
       lastAccess,
     };
@@ -110,7 +107,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
 
   const resetFilters = () => {
     const resetInternalFilters: InternalFilterOptions = {
-      status: 'ALL',
       userAdmin: 'ALL',
       lastAccess: 'ALL',
     };
@@ -119,9 +115,7 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
   };
 
   const hasActiveFilters =
-    internalFilters.status !== 'ALL' ||
-    internalFilters.userAdmin !== 'ALL' ||
-    internalFilters.lastAccess !== 'ALL';
+    internalFilters.userAdmin !== 'ALL' || internalFilters.lastAccess !== 'ALL';
 
   return (
     <>
@@ -156,22 +150,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
                 Reset All
               </button>
             )}
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-app-primary mb-2">
-              Status
-            </label>
-            <select
-              value={internalFilters.status}
-              onChange={e => handleFilterChange('status', e.target.value)}
-              className="w-full p-2 bg-app rounded border border-gray-600 text-app-primary focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="ALL">All</option>
-              <option value="FREE_TRIAL">Free Trial</option>
-              <option value="DICTATION">Dictation</option>
-              <option value="PAID">Paid</option>
-            </select>
           </div>
 
           <div className="mb-4">
@@ -225,8 +203,6 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
             <div className="text-xs text-gray-400 mt-2">
               {
                 [
-                  internalFilters.status !== 'ALL' &&
-                    `Status: ${internalFilters.status}`,
                   internalFilters.userAdmin !== 'ALL' &&
                     `Admin: ${internalFilters.userAdmin}`,
                   internalFilters.lastAccess !== 'ALL' &&

@@ -34,6 +34,31 @@ export const dormantUserSchema = z.object({
   q: z.string().optional(),
   status: z.enum(['ALL', 'FREE_TRIAL', 'DICTATION', 'PAID']).optional(),
   userAdmin: z.enum(['ALL', 'MY']).optional(),
+  notCompletedDate: z.preprocess(val => {
+    if (val == undefined) return undefined;
+    if (val instanceof Date) return val;
+    const toMidnight = (date: Date) => {
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+    if (typeof val === 'string') {
+      const parsed = Date.parse(val);
+      if (isNaN(parsed)) return undefined;
+      return toMidnight(new Date(parsed));
+    }
+    if (typeof val === 'number') {
+      if (val <= 0) {
+        return undefined;
+      }
+      const targetDate = new Date(val);
+      return toMidnight(targetDate);
+    }
+
+    // Convert days to midnight of that many days ago
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate());
+    return toMidnight(targetDate);
+  }, z.date().optional()),
   lastAccess: z
     .union([z.number(), z.string(), z.literal('ALL')])
     .optional()
@@ -59,7 +84,7 @@ export const dormantUserSchema = z.object({
 });
 export type DormantUserApiParams = z.infer<typeof dormantUserSchema>;
 
-type DormantUserResponse = {
+export type DormantUserResponse = {
   name?: string;
   parentName?: string;
   testCode: string;
@@ -312,6 +337,22 @@ class TestCodeModel {
           },
         },
       ];
+    }
+
+    if (query.notCompletedDate) {
+      const nextDay = new Date(query.notCompletedDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      whereConditions.NOT = {
+        DailyActivity: {
+          some: {
+            status: 'COMPLETED',
+            activityDate: {
+              gte: query.notCompletedDate,
+              lt: nextDay,
+            },
+          },
+        },
+      };
     }
 
     const students = await prismaClient.students.findMany({

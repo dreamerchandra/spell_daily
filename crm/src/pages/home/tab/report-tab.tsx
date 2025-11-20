@@ -1,11 +1,8 @@
-import { UserCard } from '../../../components/user-card';
-import { Search } from '../search';
 import {
   FloatingFilter,
   type FilterOptions,
 } from '../../../components/FloatingFilter';
 import { useState } from 'react';
-import { useDebounce } from '../../../hooks/useDebounce';
 import { useNavigate } from 'react-router-dom';
 import { useDormantUser } from '../useDormantUsers';
 import { SelectableCardProvider } from '../../../components/SelectableCard';
@@ -13,6 +10,37 @@ import Button from '../../../components/Button';
 import { DeleteOutline } from '@mui/icons-material';
 import { useBulkDeleteTestCodes } from '../../code-generator/useParentUsers';
 import { useSelectionContext } from '../../../hooks/useSelectionContext';
+import type { User } from '../../../type/user';
+import { QuickDateFilter } from '../../../components/QuickDateFilter';
+
+const UserList = ({
+  users,
+  handleItemClick,
+}: {
+  users: Array<User>;
+  handleItemClick: (testCode: string) => void;
+}) => {
+  return (
+    <div className="overflow-y-auto flex flex-col h-100%">
+      {users.length ? (
+        users.map(userItem => (
+          <Button
+            size="sm"
+            key={`user-${userItem.testCode}`}
+            variant="text"
+            onClick={() => handleItemClick(userItem.testCode)}
+          >
+            {userItem.testCode}
+          </Button>
+        ))
+      ) : (
+        <div className="text-center py-4 text-gray-400 text-sm">
+          No free trial users
+        </div>
+      )}
+    </div>
+  );
+};
 
 const BulkSelectActions = () => {
   const { selectedIds, hasSelections, clearSelections } = useSelectionContext();
@@ -51,16 +79,33 @@ const BulkSelectActions = () => {
   );
 };
 
+const getNotCompletedDate = () => {
+  const now = new Date();
+  if (now.getHours() >= 11) {
+    return now;
+  } else {
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    return yesterday;
+  }
+};
+
 export const ReportTab = () => {
-  const [searchValue, setSearchValue] = useState<string>('');
-  const [filters, setFilters] = useState<FilterOptions>({
-    status: 'ALL',
+  const [filters, setFilters] = useState<
+    FilterOptions & {
+      notCompletedDate: Date;
+    }
+  >({
     userAdmin: 'ALL',
     lastAccess: 'ALL',
+    notCompletedDate: getNotCompletedDate(),
   });
 
+  const handleDateChange = (date: Date) => {
+    setFilters(prev => ({ ...prev, notCompletedDate: date }));
+  };
+
   const navigate = useNavigate();
-  const debouncedSearchValue = useDebounce(searchValue, 300);
   const {
     data: usersResponse,
     isLoading,
@@ -68,59 +113,83 @@ export const ReportTab = () => {
     error,
   } = useDormantUser({
     filters,
-    searchQuery: debouncedSearchValue,
   });
   return (
     <SelectableCardProvider>
       <div className="mx-auto">
-        <div className="sticky top-0 z-10 bg-app">
-          <Search onChange={value => setSearchValue(value || '')} />
-        </div>
+        <QuickDateFilter
+          onDateChange={handleDateChange}
+          date={filters.notCompletedDate}
+        />
 
         <div className="px-6">
-          <h2 className="text-lg font-semibold mb-4 text-app-primary">
-            Pending Tests
-            {usersResponse && (
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                ({usersResponse.users.length} of {usersResponse.total})
-              </span>
-            )}
-          </h2>
-
-          <div className="space-y-2">
-            {isLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
-                <p className="text-gray-400 mt-2">Loading users...</p>
-              </div>
-            ) : isError ? (
-              <div className="text-center py-8 text-red-400">
-                <p>Failed to load users</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {error instanceof Error
-                    ? error.message
-                    : 'Unknown error occurred'}
-                </p>
-              </div>
-            ) : usersResponse?.users.length ? (
-              usersResponse.users.map((userItem, index) => (
-                <UserCard
-                  user={userItem}
-                  key={`${userItem.testCode}-${index}`}
-                  handleItemClick={() => {
-                    navigate(`/analytics/${userItem.testCode}`);
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
+              <p className="text-gray-400 mt-2">Loading users...</p>
+            </div>
+          ) : isError ? (
+            <div className="text-center py-8 text-red-400">
+              <p>Failed to load users</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {error instanceof Error
+                  ? error.message
+                  : 'Unknown error occurred'}
+              </p>
+            </div>
+          ) : usersResponse ? (
+            <div className="grid grid-cols-3 gap-1">
+              {/* Dict Users Column */}
+              <div className=" rounded-lg p-4">
+                <h3 className="text-md font-medium mb-3 text-purple-600 border-b border-purple-200 pb-2 text-nowrap">
+                  Dict ({usersResponse.dict?.length || 0})
+                </h3>
+                <UserList
+                  users={usersResponse.dict || []}
+                  handleItemClick={testCode => {
+                    navigate(`/analytics/${testCode}`);
                   }}
                 />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                No users found matching the current filters
               </div>
-            )}
-          </div>
+
+              {/* Free Trial Users Column */}
+              <div className="rounded-lg p-4">
+                <h3 className="text-md font-medium mb-3 text-blue-600 border-b border-blue-200 pb-2 text-nowrap">
+                  Free Trial ({usersResponse.freeTrial?.length || 0})
+                </h3>
+                <UserList
+                  users={usersResponse.freeTrial || []}
+                  handleItemClick={testCode => {
+                    navigate(`/analytics/${testCode}`);
+                  }}
+                />
+              </div>
+
+              {/* Paid Users Column */}
+              <div className="rounded-lg p-4">
+                <h3 className="text-md font-medium mb-3 text-green-600 border-b border-green-200 pb-2 text-nowrap">
+                  Paid ({usersResponse.paid?.length || 0})
+                </h3>
+                <UserList
+                  users={usersResponse.paid || []}
+                  handleItemClick={testCode => {
+                    navigate(`/analytics/${testCode}`);
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              No users found matching the current filters
+            </div>
+          )}
         </div>
 
-        <FloatingFilter onFilterChange={setFilters} />
+        <FloatingFilter
+          onFilterChange={filters =>
+            setFilters(prev => ({ ...prev, ...filters }))
+          }
+        />
       </div>
       <BulkSelectActions />
     </SelectableCardProvider>

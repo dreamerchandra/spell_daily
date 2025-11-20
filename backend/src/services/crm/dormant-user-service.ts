@@ -1,6 +1,7 @@
 import { ensure } from '../../types/ensure.js';
 import {
   DormantUserApiParams,
+  DormantUserResponse,
   dormantUserSchema,
   testCodeModel,
 } from '../../model/test-code-model.js';
@@ -14,9 +15,34 @@ class DormantUserService {
   async getDormantUsers(
     query: unknown,
     currentAdminId?: string
-  ): Promise<unknown[]> {
+  ): Promise<{
+    freeTrial: DormantUserResponse[];
+    paid: DormantUserResponse[];
+    dict: DormantUserResponse[];
+  }> {
     ensure(this.isValidDormantUserQuery(query), 'Invalid query parameters');
-    return testCodeModel.getDormantUsers(query, currentAdminId);
+    const dictPromise = testCodeModel.getDormantUsers(
+      { ...query, status: 'DICTATION' },
+      currentAdminId
+    );
+    const paidPromise = testCodeModel.getDormantUsers(
+      { ...query, status: 'PAID' },
+      currentAdminId
+    );
+    const freeTrialPromise = testCodeModel.getDormantUsers(
+      { ...query, status: 'FREE_TRIAL' },
+      currentAdminId
+    );
+    const [dict, paid, freeTrial] = await Promise.all([
+      dictPromise,
+      paidPromise,
+      freeTrialPromise,
+    ]);
+    return {
+      dict,
+      paid,
+      freeTrial,
+    };
   }
 }
 

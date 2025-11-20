@@ -7,13 +7,13 @@ export interface UsersApiParams {
   status?: string;
   userAdmin?: string;
   lastAccess?: number | 'ALL';
+  notCompletedDate?: string;
 }
 
 export interface UsersApiResponse {
-  users: User[];
-  total: number;
-  page: number;
-  limit: number;
+  freeTrial: User[];
+  paid: User[];
+  dict: User[];
 }
 
 export const convertFiltersToParams = (
@@ -26,16 +26,16 @@ export const convertFiltersToParams = (
     params.q = searchQuery.trim();
   }
 
-  if (filters.status !== 'ALL') {
-    params.status = filters.status;
-  }
-
   if (filters.userAdmin !== 'ALL') {
     params.userAdmin = filters.userAdmin;
   }
 
   if (filters.lastAccess !== 'ALL') {
     params.lastAccess = filters.lastAccess;
+  }
+
+  if (filters.notCompletedDate) {
+    params.notCompletedDate = filters.notCompletedDate.toISOString();
   }
 
   return params;
@@ -68,13 +68,14 @@ export const fetchDormantUsers = async (
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return {
-      users: data.data,
-      total: data.data.length,
-      page: 1,
-      limit: data.data.length,
+    const data = (await response.json()) as {
+      data: {
+        freeTrial: User[];
+        paid: User[];
+        dict: User[];
+      };
     };
+    return data.data;
   } catch (error) {
     console.warn('API call failed, using mock data:', error);
 
