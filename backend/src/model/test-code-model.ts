@@ -34,51 +34,48 @@ export const dormantUserSchema = z.object({
   q: z.string().optional(),
   status: z.enum(['ALL', 'FREE_TRIAL', 'DICTATION', 'PAID']).optional(),
   userAdmin: z.enum(['ALL', 'MY']).optional(),
+
   notCompletedDate: z.preprocess(val => {
-    if (val == undefined) return undefined;
-    if (val instanceof Date) return val;
+    if (val === undefined || val === null) return undefined;
+
     const toMidnight = (date: Date) => {
       date.setHours(0, 0, 0, 0);
       return date;
     };
+
+    // Already a date
+    if (val instanceof Date && !isNaN(val.getTime())) {
+      return toMidnight(val);
+    }
+
+    // String input
     if (typeof val === 'string') {
       const parsed = Date.parse(val);
       if (isNaN(parsed)) return undefined;
       return toMidnight(new Date(parsed));
     }
+
+    // Number input (timestamp)
     if (typeof val === 'number') {
-      if (val <= 0) {
-        return undefined;
-      }
-      const targetDate = new Date(val);
-      return toMidnight(targetDate);
+      if (val <= 0) return undefined;
+      return toMidnight(new Date(val));
     }
 
-    // Convert days to midnight of that many days ago
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate());
-    return toMidnight(targetDate);
+    return undefined;
   }, z.date().optional()),
+
   lastAccess: z
     .union([z.number(), z.string(), z.literal('ALL')])
     .optional()
     .transform(val => {
       if (val === 'ALL' || val == undefined) return undefined;
 
-      // Convert string to number if it's a numeric string
-      let days: number;
-      if (typeof val === 'string') {
-        const parsed = parseInt(val, 10);
-        if (isNaN(parsed)) return undefined;
-        days = parsed;
-      } else {
-        days = val;
-      }
+      const days = typeof val === 'string' ? parseInt(val, 10) : val;
+      if (isNaN(days)) return undefined;
 
-      // Convert days to midnight of that many days ago
       const targetDate = new Date();
       targetDate.setDate(targetDate.getDate() - days);
-      targetDate.setHours(0, 0, 0, 0); // Set to midnight
+      targetDate.setHours(0, 0, 0, 0);
       return targetDate;
     }),
 });

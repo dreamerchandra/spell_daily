@@ -167,7 +167,7 @@ export const ReportTab = () => {
   };
 
   const {
-    data: usersResponse,
+    data: incompletedUsers,
     isLoading: isDormantUsersLoading,
     isError,
     error,
@@ -184,15 +184,19 @@ export const ReportTab = () => {
       freeTrial:
         allTestCodes?.freeTrial.filter(
           ft =>
-            !usersResponse?.freeTrial.find(urt => urt.testCode === ft.testCode)
+            !incompletedUsers?.freeTrial.find(
+              urt => urt.testCode === ft.testCode
+            )
         ) || [],
       paid:
         allTestCodes?.paid.filter(
-          pt => !usersResponse?.paid.find(urt => urt.testCode === pt.testCode)
+          pt =>
+            !incompletedUsers?.paid.find(urt => urt.testCode === pt.testCode)
         ) || [],
       dict:
         allTestCodes?.dict.filter(
-          dt => !usersResponse?.dict.find(urt => urt.testCode === dt.testCode)
+          dt =>
+            !incompletedUsers?.dict.find(urt => urt.testCode === dt.testCode)
         ) || [],
     };
     const users = {
@@ -202,14 +206,14 @@ export const ReportTab = () => {
         dict: [],
       },
       completed_test: completedTestCodes,
-      not_completed_test: usersResponse || {
+      not_completed_test: incompletedUsers || {
         freeTrial: [],
         paid: [],
         dict: [],
       },
     };
     return users;
-  }, [allTestCodes, usersResponse]);
+  }, [allTestCodes, incompletedUsers]);
 
   const allUserLength =
     kanbanData?.all.freeTrial.length +

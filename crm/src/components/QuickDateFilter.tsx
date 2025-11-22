@@ -27,8 +27,8 @@ export const QuickDateFilter: React.FC<QuickDateFilterProps> = ({
   };
 
   return (
-    <div className="px-6 py-4 border-b border-gray-700">
-      <div className="flex items-center justify-center gap-4">
+    <div className="py-4 border-b border-gray-700">
+      <div className="flex items-center justify-center gap-4 w-full">
         <Button
           variant="text"
           size="sm"

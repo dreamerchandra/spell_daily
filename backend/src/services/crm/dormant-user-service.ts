@@ -7,10 +7,10 @@ import {
 } from '../../model/test-code-model.js';
 
 class DormantUserService {
-  isValidDormantUserQuery(query: unknown): query is DormantUserApiParams {
+  isValidDormantUserQuery(query: unknown): DormantUserApiParams {
     const params = query as DormantUserApiParams;
     const result = dormantUserSchema.parse(params);
-    return Boolean(result);
+    return result;
   }
   async getDormantUsers(
     query: unknown,
@@ -20,17 +20,18 @@ class DormantUserService {
     paid: DormantUserResponse[];
     dict: DormantUserResponse[];
   }> {
-    ensure(this.isValidDormantUserQuery(query), 'Invalid query parameters');
+    const processedQuery = this.isValidDormantUserQuery(query);
+    ensure(processedQuery, 'Invalid query parameters');
     const dictPromise = testCodeModel.getDormantUsers(
-      { ...query, status: 'DICTATION' },
+      { ...processedQuery, status: 'DICTATION' },
       currentAdminId
     );
     const paidPromise = testCodeModel.getDormantUsers(
-      { ...query, status: 'PAID' },
+      { ...processedQuery, status: 'PAID' },
       currentAdminId
     );
     const freeTrialPromise = testCodeModel.getDormantUsers(
-      { ...query, status: 'FREE_TRIAL' },
+      { ...processedQuery, status: 'FREE_TRIAL' },
       currentAdminId
     );
     const [dict, paid, freeTrial] = await Promise.all([
