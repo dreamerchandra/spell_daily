@@ -102,3 +102,37 @@ export const updateLeadStatus = async (
     throw error;
   }
 };
+
+const BASE_ALL_TEST_CODE_URL = '/crm/v1/all-test-users';
+
+export interface MiniTestCodesResponse {
+  testCode: string;
+  phoneNumber?: string;
+  status: 'PAID' | 'FREE_TRIAL' | 'DICTATION';
+}
+
+export const getAllTestCodes = async (
+  apiKey: string
+): Promise<MiniTestCodesResponse[]> => {
+  try {
+    const url = new URL(BASE_ALL_TEST_CODE_URL, env.BACKEND_URL);
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.warn('API call failed:', error);
+    throw error;
+  }
+};

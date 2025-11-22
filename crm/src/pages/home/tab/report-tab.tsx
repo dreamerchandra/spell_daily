@@ -2,7 +2,7 @@ import {
   FloatingFilter,
   type FilterOptions,
 } from '../../../components/FloatingFilter';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDormantUser } from '../useDormantUsers';
 import { SelectableCardProvider } from '../../../components/SelectableCard';
@@ -10,14 +10,18 @@ import Button from '../../../components/Button';
 import { DeleteOutline } from '@mui/icons-material';
 import { useBulkDeleteTestCodes } from '../../code-generator/useParentUsers';
 import { useSelectionContext } from '../../../hooks/useSelectionContext';
-import type { User } from '../../../type/user';
 import { QuickDateFilter } from '../../../components/QuickDateFilter';
+import { useAllTestCodes } from '../../../hooks/useAllTestCode';
+import { FilterClip, type Filter } from '../../../components/filter-clip';
 
+type RenderUsers = {
+  testCode: string;
+};
 const UserList = ({
   users,
   handleItemClick,
 }: {
-  users: Array<User>;
+  users: Array<RenderUsers>;
   handleItemClick: (testCode: string) => void;
 }) => {
   return (
@@ -90,6 +94,60 @@ const getNotCompletedDate = () => {
   }
 };
 
+const KanbanList = ({
+  usersResponse,
+}: {
+  usersResponse: {
+    freeTrial: RenderUsers[];
+    paid: RenderUsers[];
+    dict: RenderUsers[];
+  };
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div className="grid grid-cols-3 gap-1">
+      {/* Dict Users Column */}
+      <div className=" rounded-lg p-4">
+        <h3 className="text-md font-medium mb-3 text-purple-600 border-b border-purple-200 pb-2 text-nowrap">
+          Dict ({usersResponse.dict?.length || 0})
+        </h3>
+        <UserList
+          users={usersResponse.dict || []}
+          handleItemClick={testCode => {
+            navigate(`/analytics/${testCode}`);
+          }}
+        />
+      </div>
+
+      {/* Free Trial Users Column */}
+      <div className="rounded-lg p-4">
+        <h3 className="text-md font-medium mb-3 text-blue-600 border-b border-blue-200 pb-2 text-nowrap">
+          Free Trial ({usersResponse.freeTrial?.length || 0})
+        </h3>
+        <UserList
+          users={usersResponse.freeTrial || []}
+          handleItemClick={testCode => {
+            navigate(`/analytics/${testCode}`);
+          }}
+        />
+      </div>
+
+      {/* Paid Users Column */}
+      <div className="rounded-lg p-4">
+        <h3 className="text-md font-medium mb-3 text-green-600 border-b border-green-200 pb-2 text-nowrap">
+          Paid ({usersResponse.paid?.length || 0})
+        </h3>
+        <UserList
+          users={usersResponse.paid || []}
+          handleItemClick={testCode => {
+            navigate(`/analytics/${testCode}`);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const ReportTab = () => {
   const [filters, setFilters] = useState<
     FilterOptions & {
@@ -100,20 +158,72 @@ export const ReportTab = () => {
     lastAccess: 'ALL',
     notCompletedDate: getNotCompletedDate(),
   });
+  const [chip, setChip] = useState<
+    Filter<'all' | 'completed_test' | 'not_completed_test'>
+  >({ label: 'All', value: 'all' });
 
   const handleDateChange = (date: Date) => {
     setFilters(prev => ({ ...prev, notCompletedDate: date }));
   };
 
-  const navigate = useNavigate();
   const {
     data: usersResponse,
-    isLoading,
+    isLoading: isDormantUsersLoading,
     isError,
     error,
   } = useDormantUser({
     filters,
   });
+  const { data: allTestCodes, isLoading: isLoadingTestCodes } =
+    useAllTestCodes();
+
+  const isLoading = isDormantUsersLoading || isLoadingTestCodes;
+
+  const kanbanData = useMemo(() => {
+    const completedTestCodes = {
+      freeTrial:
+        allTestCodes?.freeTrial.filter(
+          ft =>
+            !usersResponse?.freeTrial.find(urt => urt.testCode === ft.testCode)
+        ) || [],
+      paid:
+        allTestCodes?.paid.filter(
+          pt => !usersResponse?.paid.find(urt => urt.testCode === pt.testCode)
+        ) || [],
+      dict:
+        allTestCodes?.dict.filter(
+          dt => !usersResponse?.dict.find(urt => urt.testCode === dt.testCode)
+        ) || [],
+    };
+    const users = {
+      all: allTestCodes || {
+        freeTrial: [],
+        paid: [],
+        dict: [],
+      },
+      completed_test: completedTestCodes,
+      not_completed_test: usersResponse || {
+        freeTrial: [],
+        paid: [],
+        dict: [],
+      },
+    };
+    return users;
+  }, [allTestCodes, usersResponse]);
+
+  const allUserLength =
+    kanbanData?.all.freeTrial.length +
+    kanbanData?.all.paid.length +
+    kanbanData?.all.dict.length;
+  const notCompletedUserLength =
+    kanbanData?.not_completed_test.freeTrial.length +
+    kanbanData?.not_completed_test.paid.length +
+    kanbanData?.not_completed_test.dict.length;
+  const completedUserLength =
+    kanbanData?.completed_test.freeTrial.length +
+    kanbanData?.completed_test.paid.length +
+    kanbanData?.completed_test.dict.length;
+
   return (
     <SelectableCardProvider>
       <div className="mx-auto">
@@ -121,6 +231,27 @@ export const ReportTab = () => {
           onDateChange={handleDateChange}
           date={filters.notCompletedDate}
         />
+        <div className=" p-2 border-b ">
+          <FilterClip
+            selected={chip}
+            onChange={setChip}
+            allFilters={[
+              {
+                label: `All ${allUserLength}`,
+                value: 'all' as const,
+              },
+              {
+                label: `Completed Test ${completedUserLength}`,
+                value: 'completed_test' as const,
+              },
+              {
+                label: `Not Completed Test ${notCompletedUserLength}`,
+                value: 'not_completed_test' as const,
+              },
+            ]}
+            defaultFilter="all"
+          />
+        </div>
 
         <div className="px-6">
           {isLoading ? (
@@ -137,47 +268,8 @@ export const ReportTab = () => {
                   : 'Unknown error occurred'}
               </p>
             </div>
-          ) : usersResponse ? (
-            <div className="grid grid-cols-3 gap-1">
-              {/* Dict Users Column */}
-              <div className=" rounded-lg p-4">
-                <h3 className="text-md font-medium mb-3 text-purple-600 border-b border-purple-200 pb-2 text-nowrap">
-                  Dict ({usersResponse.dict?.length || 0})
-                </h3>
-                <UserList
-                  users={usersResponse.dict || []}
-                  handleItemClick={testCode => {
-                    navigate(`/analytics/${testCode}`);
-                  }}
-                />
-              </div>
-
-              {/* Free Trial Users Column */}
-              <div className="rounded-lg p-4">
-                <h3 className="text-md font-medium mb-3 text-blue-600 border-b border-blue-200 pb-2 text-nowrap">
-                  Free Trial ({usersResponse.freeTrial?.length || 0})
-                </h3>
-                <UserList
-                  users={usersResponse.freeTrial || []}
-                  handleItemClick={testCode => {
-                    navigate(`/analytics/${testCode}`);
-                  }}
-                />
-              </div>
-
-              {/* Paid Users Column */}
-              <div className="rounded-lg p-4">
-                <h3 className="text-md font-medium mb-3 text-green-600 border-b border-green-200 pb-2 text-nowrap">
-                  Paid ({usersResponse.paid?.length || 0})
-                </h3>
-                <UserList
-                  users={usersResponse.paid || []}
-                  handleItemClick={testCode => {
-                    navigate(`/analytics/${testCode}`);
-                  }}
-                />
-              </div>
-            </div>
+          ) : kanbanData ? (
+            <KanbanList usersResponse={kanbanData[chip.value]} />
           ) : (
             <div className="text-center py-8 text-gray-400">
               No users found matching the current filters

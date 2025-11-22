@@ -1,3 +1,4 @@
+import { StudentStatus } from '../../generated/prisma/enums.js';
 import { parentLeadStatusModel } from '../../model/parent-lead-model.js';
 import { testCodeModel } from '../../model/test-code-model.js';
 import { prismaClient } from '../../prisma.js';
@@ -41,6 +42,14 @@ export interface AllUsersResponse {
     limit: number;
   };
   data: AllUsersData[];
+}
+
+export interface MiniVersionTestCode {
+  testCode: string;
+  name?: string | null;
+  parentId?: string | null;
+  status: StudentStatus;
+  parentPhoneNumber?: string | null;
 }
 
 class AllUsersService {
@@ -230,6 +239,30 @@ class AllUsersService {
     ensure(student.parent, new Error('Test code not found'));
 
     await parentLeadStatusModel.updateLeadStatus(student.parent.id, leadStatus);
+  }
+
+  async getAllTestCodeMiniVersion(): Promise<MiniVersionTestCode[]> {
+    const testCodes = await prismaClient.students.findMany({
+      select: {
+        testCode: true,
+        name: true,
+        parentId: true,
+        status: true,
+        parent: {
+          select: {
+            phoneNumber: true,
+          },
+        },
+      },
+    });
+
+    return testCodes.map(tc => ({
+      testCode: tc.testCode,
+      name: tc.name,
+      parentId: tc.parentId,
+      status: tc.status,
+      parentPhoneNumber: tc.parent?.phoneNumber,
+    }));
   }
 }
 

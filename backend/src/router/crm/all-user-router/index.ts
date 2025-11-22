@@ -45,6 +45,16 @@ allUsersRouter.get(
   })
 );
 
+allUsersRouter.get(
+  `${baseVersion}/all-test-users`,
+  telegramWebAppAdminMiddleware,
+  asyncErrorHandler(async (_req, res) => {
+    const result = await allUsersService.getAllTestCodeMiniVersion();
+
+    return res.status(200).json(result);
+  })
+);
+
 // PUT /crm/v1/all-users/:testCode/status - Update lead status
 allUsersRouter.put(
   `${baseVersion}${baseRoute}/:testCode/status`,
