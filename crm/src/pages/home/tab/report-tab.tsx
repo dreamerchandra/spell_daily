@@ -38,9 +38,7 @@ const UserList = ({
           </Button>
         ))
       ) : (
-        <div className="text-center py-4 text-gray-400 text-sm">
-          No free trial users
-        </div>
+        <div className="text-center py-4 text-gray-400 text-sm">No users</div>
       )}
     </div>
   );
