@@ -33,6 +33,7 @@ export interface AllUsersData {
     id: string;
   };
   grade: string;
+  status: StudentStatus;
 }
 
 export interface AllUsersResponse {
@@ -151,6 +152,7 @@ class AllUsersService {
 
         ls.name AS "studentName",
         ls."testCode" AS "testCode",
+        ls."status" AS "status",
         la."activityDate" AS "lastAttendedAt",
         ls.details->>'grade' AS "grade",
 
@@ -211,6 +213,7 @@ class AllUsersService {
         studentName: r.studentName ?? '',
         createdAt: r.createdAt,
         lastAttendedAt: r.lastAttendedAt ?? null,
+        status: r.status ?? '',
         admin: {
           name: r.adminName ?? '',
           id: r.adminId,
@@ -239,6 +242,17 @@ class AllUsersService {
     ensure(student.parent, new Error('Test code not found'));
 
     await parentLeadStatusModel.updateLeadStatus(student.parent.id, leadStatus);
+  }
+
+  async updateStudentStatus(
+    testCode: string,
+    status: StudentStatus
+  ): Promise<void> {
+    const student = await testCodeModel.getByTestCode(testCode);
+
+    ensure(student, new Error('Test code not found'));
+
+    await testCodeModel.updateStudentStatus(testCode, status);
   }
 
   async getAllTestCodeMiniVersion(): Promise<MiniVersionTestCode[]> {

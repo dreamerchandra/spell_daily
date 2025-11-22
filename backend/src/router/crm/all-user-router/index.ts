@@ -3,6 +3,8 @@ import { telegramWebAppAdminMiddleware } from '../../../middleware/admin_middlew
 import { asyncErrorHandler } from '../../../middleware/error-middleware.js';
 import { allUsersService } from '../../../services/crm/all-users-service.js';
 import { leadOptionModel } from '../../../model/lead-option.js';
+import { ensure } from '../../../types/ensure.js';
+import { StudentStatus } from '../../../generated/prisma/enums.js';
 
 const allUsersRouter = Router();
 const baseVersion = '/v1';
@@ -67,6 +69,27 @@ allUsersRouter.put(
 
     return res.status(200).json({
       message: 'Lead status updated successfully',
+    });
+  })
+);
+
+allUsersRouter.put(
+  `${baseVersion}${baseRoute}/:testCode/student-status`,
+  telegramWebAppAdminMiddleware,
+  asyncErrorHandler(async (req, res) => {
+    const { testCode } = req.params;
+    const { status } = req.body as { status: string };
+    ensure(
+      Object.keys(StudentStatus).includes(status),
+      'Invalid student status'
+    );
+    await allUsersService.updateStudentStatus(
+      testCode,
+      status as StudentStatus
+    );
+
+    return res.status(200).json({
+      message: 'Student status updated successfully',
     });
   })
 );

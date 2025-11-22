@@ -103,6 +103,35 @@ export const updateLeadStatus = async (
   }
 };
 
+export const updateStudentStatus = async (
+  testCode: string,
+  status: string,
+  apiKey: string
+): Promise<void> => {
+  try {
+    const url = new URL(
+      `${BASE_URL}/${testCode}/student-status`,
+      env.BACKEND_URL
+    );
+
+    const response = await fetch(url.toString(), {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.warn('API call failed:', error);
+    throw error;
+  }
+};
+
 const BASE_ALL_TEST_CODE_URL = '/crm/v1/all-test-users';
 
 export interface MiniTestCodesResponse {

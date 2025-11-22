@@ -476,6 +476,20 @@ class TestCodeModel {
       },
     });
   }
+
+  async updateStudentStatus(
+    testCode: string,
+    status: 'PAID' | 'FREE_TRIAL' | 'DICTATION'
+  ): Promise<void> {
+    await prismaClient.students.update({
+      where: {
+        testCode,
+      },
+      data: {
+        status,
+      },
+    });
+  }
 }
 
 export const testCodeModel = new TestCodeModel();

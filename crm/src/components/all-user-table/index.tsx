@@ -7,27 +7,24 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Paper,
   TablePagination,
 } from '@mui/material';
 import { PushPin } from '@mui/icons-material';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { FloatingFilter } from './FloatingFilter';
 import { ColumnManager } from './ColumnManager';
 import { useColumnManagement } from './useColumnManagement';
 import { useDebounce } from './useDebounce';
 import type { AllUsersData, AllUsersFilters } from '../../type/all-users';
+import { fetchAllUsers, fetchLeadStatuses } from '../../api/all-users';
 import {
-  fetchAllUsers,
-  fetchLeadStatuses,
-  updateLeadStatus,
-} from '../../api/all-users';
-import { LeadStatusEditor } from './lead-status';
-import {
+  darkTheme,
   ParentUserRender,
   PhoneNumberRender,
   TestCodeRender,
+  LeadStatusRender,
+  StudentStatusRender,
 } from './cell-render';
 
 interface Column {
@@ -50,6 +47,13 @@ const originalColumns: Column[] = [
     render: row => <ParentUserRender row={row} />,
   },
   {
+    id: 'status',
+    label: 'Status',
+    minWidth: 150,
+    pinnable: true,
+    render: (row: AllUsersData) => <StudentStatusRender row={row} />,
+  },
+  {
     id: 'phoneNumber',
     label: 'Phone Number',
     minWidth: 130,
@@ -61,24 +65,7 @@ const originalColumns: Column[] = [
     label: 'Lead Status',
     minWidth: 120,
     pinnable: true,
-    render: (row: AllUsersData) => (
-      <span
-        className={`
-        inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border
-        ${
-          row.leadStatus === 'paid'
-            ? 'bg-green-900/20 text-green-400 border-green-400/30'
-            : row.leadStatus === 'free_trial'
-              ? 'bg-yellow-900/20 text-yellow-400 border-yellow-400/30'
-              : row.leadStatus === 'lead'
-                ? 'bg-blue-900/20 text-blue-400 border-blue-400/30'
-                : 'bg-gray-900/20 text-gray-400 border-gray-400/30'
-        }
-      `}
-      >
-        {row.leadStatus}
-      </span>
-    ),
+    render: row => <LeadStatusRender row={row} />,
   },
   {
     id: 'testCode',
@@ -145,7 +132,6 @@ interface AllUsersTableProps {
 
 export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryClient = useQueryClient();
 
   // Column management
   const {
@@ -153,32 +139,6 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
     pinnedColumnsSet,
     handleColumnsChange,
   } = useColumnManagement(originalColumns);
-
-  // Dark theme colors from tailwind config
-  const darkTheme = useMemo(
-    () => ({
-      background: {
-        app: '#111827',
-        secondary: '#1f2937',
-        hover: '#374151',
-        paper: '#1f2937',
-      },
-      text: {
-        primary: '#ffffff',
-        secondary: '#9ca3af',
-        accent: '#60a5fa',
-      },
-      colors: {
-        primary: '#3b82f6',
-        accent: {
-          blue: '#60a5fa',
-          orange: '#f97316',
-          red: '#ef4444',
-        },
-      },
-    }),
-    []
-  );
 
   // Get filters from URL
   const getFiltersFromUrl = useCallback((): AllUsersFilters => {
@@ -328,19 +288,6 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
     [updateFilters]
   );
 
-  // Handle lead status update
-  const handleLeadStatusUpdate = useCallback(
-    async (testCode: string, newStatus: string) => {
-      try {
-        await updateLeadStatus(testCode, newStatus, apiKey);
-        queryClient.invalidateQueries({ queryKey: ['allUsers'] });
-      } catch (error) {
-        console.error('Failed to update lead status:', error);
-      }
-    },
-    [apiKey, queryClient]
-  );
-
   return (
     <div className="bg-app text-app-primary min-h-screen p-2">
       {/* Floating Filter Component */}
@@ -370,7 +317,6 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
         )}
 
         <TableContainer
-          component={Paper}
           sx={{
             backgroundColor: darkTheme.background.secondary,
             border: `1px solid ${darkTheme.background.hover}`,
@@ -483,15 +429,7 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
                         padding: '12px 16px',
                       }}
                     >
-                      {column.id === 'leadStatus' ? (
-                        <LeadStatusEditor
-                          darkTheme={darkTheme}
-                          row={row}
-                          handleLeadStatusUpdate={handleLeadStatusUpdate}
-                          leadStatuses={leadStatuses}
-                          key={String(column.id)}
-                        />
-                      ) : column.render ? (
+                      {column.render ? (
                         column.render(row)
                       ) : (
                         <span className="text-white-100 text-sm">

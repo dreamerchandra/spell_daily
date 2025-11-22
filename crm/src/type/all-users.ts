@@ -1,3 +1,5 @@
+export type StudentStatus = 'PAID' | 'FREE_TRIAL' | 'DICTATION';
+
 export interface AllUsersData {
   testCode: string; // rowId
   parentId: string;
@@ -14,6 +16,7 @@ export interface AllUsersData {
     id: string;
   };
   grade: string;
+  status: StudentStatus;
 }
 
 export interface AllUsersResponse {
