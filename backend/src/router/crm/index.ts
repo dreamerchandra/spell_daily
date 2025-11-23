@@ -5,6 +5,7 @@ import crmAnalyticsRouter from './analytics-user-router/index.js';
 import crmFollowUpRouter from './followup-router/index.js';
 import allUsersRouter from './all-user-router/index.js';
 import dataCollectionRouter from './data-collection-router/index.js';
+import crmBulkUpdateRouter from './bulk-update-router/index.js';
 
 export default [
   ...crmTestCodeRouter,
@@ -14,4 +15,5 @@ export default [
   ...crmFollowUpRouter,
   ...allUsersRouter,
   ...dataCollectionRouter,
+  ...crmBulkUpdateRouter,
 ];
