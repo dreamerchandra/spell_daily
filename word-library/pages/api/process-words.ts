@@ -40,6 +40,14 @@ Here's an example
       "Pop ___ has influenced many aspects of modern society.",
     ],
 }
+
+Here the syllable is used for audio hints, and the actualSyllable is the correct breakdown of the word.
+syllable should never be the same as actualSyllable.
+syllable is fed to const utterance = new SpeechSynthesisUtterance(syllable[number].toLocaleLowerCase()); and used for syllable audio hints.
+So for example, for the word "CULTURE", syllable could be ['cul', 'tur'] while actualSyllable is ['cul', 'ture'].
+This way, when the syllables are spoken individually, they feel natural and correct, instead of awkward or incorrect pronunciations. (e.g., 'ture' pronounced as 'tur' instead of 'ture').
+
+Make sure the JSON is properly formatted.
 Do not include any other text or any other format.
 Do not respond in markdown format.
 Just give the JSON object.
