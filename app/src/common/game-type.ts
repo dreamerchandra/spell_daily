@@ -3,13 +3,13 @@ import type { GameRef } from './game-ref';
 import type { WordDef } from '../words';
 
 export type SpellingGameMode =
-  | 'fullWord'
+  | 'typingWithBox'
   | 'syllable'
   | 'voiceTyping'
   | 'jumbled'
   | 'twoOption'
   | 'fourOption'
-  | 'typing';
+  | 'typingWithoutBox';
 
 export type UsageGameMode = 'context' | 'correctSentence';
 

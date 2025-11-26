@@ -3,36 +3,35 @@ import { Keyboard } from '../../components/atoms/Keyboard';
 import { Definition } from '../../components/atoms/hints/definition';
 import { Syllable } from '../../components/atoms/hints/syllable';
 import { Speaker } from '../../components/atoms/speaker';
+import { SpellingInput } from '../../components/organisms/SpellingInput/KeyboardInput';
 import { useHintState } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
-import { useTypingState } from './typing-state';
+import { makeArray, useFullWordState } from './typing-with-box';
 import type { GameComponent } from '../../common/game-type';
-import { TypingInput } from '../../components/organisms/SpellingInput/TypingInput';
 import { getGameState } from '../../common/game-ref';
-import {
-  SuccessAnimationType,
-  successSoundManager,
-} from '../../util/soundManager';
 
-export const TypingGame: GameComponent = forwardRef(
+export const TypingWithBox: GameComponent = forwardRef(
   ({ wordDef, setDisableChecking }, ref) => {
-    const { state, setIsCorrect, setUserInput, setNewWord } = useTypingState();
+    const { state, setIsCorrect, setUserInput, setNewWord } =
+      useFullWordState();
 
     const hintState = useHintState();
 
     const { speak, isPlaying, isSupported } = useSpellingSpeech();
 
+    const wordLength = wordDef.word.length;
+    const lastAttempt = state.attempts[state.attempts.length - 1];
+
     useImperativeHandle(ref, () => {
       return {
         getCorrectState: () => {
           const gameState = getGameState(
-            state.userInput.split(''),
+            lastAttempt.userInput,
             wordDef.actualSyllable
           );
           if (gameState === 'CORRECT') {
-            successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
             setIsCorrect(true);
-          } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+          } else if (gameState === 'INCORRECT') {
             setIsCorrect(false);
           }
           return gameState;
@@ -45,24 +44,29 @@ export const TypingGame: GameComponent = forwardRef(
     }, [setNewWord, wordDef]);
 
     useEffect(() => {
-      setDisableChecking(state.userInput.length === 0);
-    }, [setDisableChecking, state.userInput]);
+      const lastAttempt = state.attempts[state.attempts.length - 1];
+      setDisableChecking(lastAttempt.userInput.includes(''));
+    }, [setDisableChecking, state.attempts]);
 
     const handleKeyPress = (key: string) => {
+      let newWord = lastAttempt.userInput.join('');
       if (key === '⌫') {
-        const newInput = state.userInput.slice(0, -1);
-        setUserInput(newInput);
+        newWord = newWord.slice(0, newWord.length - 1);
+        const newArr = makeArray(newWord, wordLength);
+        setUserInput(newArr);
         return;
       }
-
-      const newInput = state.userInput + key;
-      setUserInput(newInput);
+      if (newWord.length === lastAttempt.userInput.length) return;
+      newWord += key;
+      const newArr = makeArray(newWord, wordLength);
+      setUserInput(newArr);
     };
 
     const playAudio = () => {
       speak(wordDef.word);
     };
 
+    const lastTwoAttempts = state.attempts.slice(-2);
     return (
       <div className="relative w-full max-w-md px-4 text-center">
         <div className="mb-4">
@@ -83,14 +87,18 @@ export const TypingGame: GameComponent = forwardRef(
             <Definition definition={wordDef.definition} />
           )}
 
-          <TypingInput
-            userInput={state.userInput.split('')}
-            disableTalkBack={false}
-            wordDef={wordDef}
-            isCorrect={state.isCorrect}
-            className="mb-8"
-          />
-
+          <div className="mb-4 flex flex-col items-center gap-2">
+            {lastTwoAttempts.map((attempt, index) => (
+              <div key={index}>
+                <SpellingInput
+                  userInput={attempt.userInput}
+                  isCorrect={attempt.isCorrect}
+                  wordDef={wordDef}
+                  disableTalkBack={true}
+                />
+              </div>
+            ))}
+          </div>
           <Keyboard onKeyPress={handleKeyPress} />
         </div>
       </div>

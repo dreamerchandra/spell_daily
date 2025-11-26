@@ -669,18 +669,18 @@ export const sampleSpellingWords: WordDef[] = [
 ];
 
 export const wordSequence: { mode: GameMode; word: string }[] = [
-  { mode: 'typing', word: 'CULTURE' },
-  { mode: 'fullWord', word: 'DEFINITELY' },
+  { mode: 'typingWithoutBox', word: 'CULTURE' },
+  { mode: 'typingWithBox', word: 'DEFINITELY' },
   { mode: 'fourOption', word: 'OPINION' },
   { mode: 'jumbled', word: 'COUSIN' },
-  { mode: 'typing', word: 'IMPRESS' },
-  { mode: 'fullWord', word: 'ARRANGEMENT' },
+  { mode: 'typingWithoutBox', word: 'IMPRESS' },
+  { mode: 'typingWithBox', word: 'ARRANGEMENT' },
   { mode: 'syllable', word: 'EXHAUST' },
   { mode: 'twoOption', word: 'MEMORABLE' },
   { mode: 'fourOption', word: 'SPECIAL' },
   { mode: 'jumbled', word: 'SYSTEM' },
-  { mode: 'typing', word: 'RAINBOW' },
-  { mode: 'fullWord', word: 'BUTTERFLY' },
+  { mode: 'typingWithoutBox', word: 'RAINBOW' },
+  { mode: 'typingWithBox', word: 'BUTTERFLY' },
   { mode: 'context', word: 'ELEPHANT' },
   { mode: 'correctSentence', word: 'TREASURE' },
 ];

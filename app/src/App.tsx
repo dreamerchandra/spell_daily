@@ -7,10 +7,10 @@ import { ProgressWithTimer, type TimerRef } from './components/atoms/Progress';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
-import { FullWordGame } from './game/full-word';
+import { TypingWithBox } from './game/typing-with-box';
 import { JumbledWordGame } from './game/jumbled-word/index';
 import { SyllableGame } from './game/syllabi';
-import { TypingGame } from './game/typing';
+import { TypingWithoutBox } from './game/typing-withou-box';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import { gameSequence, type GameSequenceType } from './words';
@@ -23,13 +23,13 @@ import { useOnTestModeChange } from './context/hint-context/index';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ComponentMap: Record<GameMode, GameComponent<any>> = {
-  fullWord: FullWordGame,
+  typingWithBox: TypingWithBox,
   syllable: SyllableGame,
   voiceTyping: VoiceTypingGame,
   jumbled: JumbledWordGame,
   fourOption: FourOptionGame,
   twoOption: TwoOptionGame,
-  typing: TypingGame,
+  typingWithoutBox: TypingWithoutBox,
   context: ContextGame,
   correctSentence: CorrectSentenceGame,
 } as const;
@@ -132,7 +132,7 @@ export const App = () => {
         setStart(true);
       },
     });
-  }, []);
+  }, [setStart]);
 
   useEffect(() => {
     if (currentWordIndex === 0) return;
