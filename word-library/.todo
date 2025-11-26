@@ -1,0 +1,27 @@
+- Adding re-generate button next to each key value pair
+  - Your should send the entire context to llm to re-generate that particular value
+- Figure if we can use llm for tts, but its be super natural
+- Instead of using llm, can we use something similar to https://www.oxfordlearnersdictionaries.com/external/pdf/wordlists/oxford-3000-5000/The_Oxford_3000_by_CEFR_level.pdf where can get standard word examples and usages
+
+You are a vocabulary generator. For each input word, produce the following fields in JSON:
+
+word
+part_of_speech
+simple_definition (within 3 to 5 words)
+example_sentences (3 short sentences)
+synonyms (3)
+antonyms (3)
+topic_tag (choose exactly one)
+Topic tags
+people, places, food, school, work, actions, objects, feelings, time, nature, technology, travel, health, culture, communication, society, numbers, environment, clothing, entertainment.
+
+word_family (related forms)
+Rules
+
+1.⁠ ⁠Keep definitions and sentences simple and clear.
+
+2.⁠ ⁠Word family must be valid morphological relatives.
+
+3.⁠ ⁠Do not invent impossible relatives.
+
+4.⁠ ⁠Topic tag must be picked from the list above.
