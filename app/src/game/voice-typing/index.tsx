@@ -58,12 +58,12 @@ const VoiceMicrophoneButton = ({
   return (
     <div className="mb-6 text-center">
       {!isSupported && (
-        <p className="mb-2 text-sm text-game-secondary-400">
+        <p className="mb-2 text-sm text-orange-600">
           ⚠️ Speech recognition not supported in this browser
         </p>
       )}
 
-      {error && <p className="mb-2 text-sm text-game-error-400">❌ {error}</p>}
+      {error && <p className="mb-2 text-sm text-game-error-600">❌ {error}</p>}
 
       <button
         onClick={isListening ? onStop : onStart}
@@ -73,7 +73,7 @@ const VoiceMicrophoneButton = ({
         {isListening ? <>🔴</> : <>🎤</>}
       </button>
 
-      <p className="text-sm text-dark-500">
+      <p className="text-sm text-ui-textMuted">
         {isListening ? 'Listening... Click to stop' : 'Click to say letters'}
       </p>
     </div>

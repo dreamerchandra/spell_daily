@@ -73,17 +73,17 @@ export const SettingsMenu = ({
       <div className="flex w-60 flex-col gap-2 p-2">
         {/* Game Mode Section */}
         <div className="mb-6 flex items-center justify-between">
-          <span className="text-lg font-light text-white">Game Mode</span>
+          <span className="text-lg font-light text-ui-text">Game Mode</span>
           <select
             value={currentMode}
             onChange={e => handleModeChange(e.target.value as GameMode)}
-            className="rounded-lg border-2 border-white/30 bg-dark-800/80 px-3 py-1 text-white backdrop-blur-sm transition-colors hover:border-white/50 focus:border-white/70 focus:outline-none"
+            className="rounded-lg border-2 border-gray-300 bg-white px-3 py-1 text-ui-text backdrop-blur-sm transition-colors hover:border-gray-400 focus:border-ui-primary focus:outline-none"
           >
             {gameModes.map(mode => (
               <option
                 key={mode.value}
                 value={mode.value}
-                className="bg-dark-800 text-white"
+                className="bg-white text-ui-text"
               >
                 {mode.label}
               </option>

@@ -63,7 +63,9 @@ export const SpellingInputBasic = ({
   };
 
   return (
-    <div className={`flex justify-center gap-2 ${className}`}>
+    <div
+      className={`flex justify-center gap-2  px-2 max-w-[100vw]${className}`}
+    >
       {userInput.map((letter, index) => (
         <div
           key={index}

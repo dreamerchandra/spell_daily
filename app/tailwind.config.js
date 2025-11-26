@@ -6,13 +6,14 @@ export default {
       colors: {
         // Dark theme colors
         dark: {
-          950: '#0f0a1a', // Deep purple-black
-          900: '#1a1625', // Dark purple
-          800: '#2a2438', // Medium purple-gray
-          700: '#3d344a', // Lighter purple-gray
-          600: '#4f4560', // Even lighter purple
-          500: '#64748b', // neutral gray
+          950: '#0f0a1a',
+          900: '#1a1625',
+          800: '#2a2438',
+          700: '#3d344a',
+          600: '#4f4560',
+          500: '#64748b',
         },
+
         // Game specific colors
         game: {
           primary: {
@@ -21,7 +22,7 @@ export default {
             200: '#e9d5ff',
             300: '#d8b4fe',
             400: '#c084fc',
-            500: '#a855f7', // Purple from logo - main primary
+            500: '#a855f7',
             600: '#9333ea',
             700: '#7c3aed',
             800: '#6b21a8',
@@ -33,7 +34,7 @@ export default {
             200: '#fde68a',
             300: '#fcd34d',
             400: '#fbbf24',
-            500: '#f59e0b', // Yellow/Orange accent from logo
+            500: '#f59e0b',
             600: '#d97706',
             700: '#b45309',
             800: '#92400e',
@@ -64,14 +65,29 @@ export default {
             900: '#7f1d1d',
           },
         },
+
+        // New UI theme from screenshot
+        ui: {
+          background: '#F6F1FF',
+          card: '#FFFFFF',
+          primary: '#6C4DFF',
+          accentBlue: '#7A8CFF',
+          accentCoral: '#FF6F61',
+          text: '#1A1A1A',
+          textMuted: '#6E6E6E',
+          keyBg: '#E5E5E5',
+          keyBorder: '#C7C7C7',
+        },
       },
+
       backgroundImage: {
-        'dark-gradient':
-          'linear-gradient(to bottom right, #1a1625, #2a2438, #1a1625)',
+        'light-gradient':
+          'linear-gradient(to bottom right, #F6F1FF, #E8E0FF, #F6F1FF)',
         'game-gradient': 'linear-gradient(to right, var(--tw-gradient-stops))',
-        'primary-gradient': 'linear-gradient(135deg, #a855f7, #9333ea)',
-        'secondary-gradient': 'linear-gradient(135deg, #f59e0b, #d97706)',
+        'primary-gradient': 'linear-gradient(135deg, #6C4DFF, #7A8CFF)',
+        'secondary-gradient': 'linear-gradient(135deg, #FF6F61, #FF8A80)',
       },
+
       backdropBlur: {
         xs: '2px',
       },

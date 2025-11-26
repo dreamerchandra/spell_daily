@@ -51,9 +51,7 @@ export const CorrectSentenceGame: GameComponent<WordUsage> = forwardRef(
     if (!state.currentQuestion) {
       return (
         <div className="relative w-full max-w-md px-4 text-center">
-          <p className="text-game-secondary-600 dark:text-game-secondary-400">
-            Loading question...
-          </p>
+          <p className="text-orange-600">Loading question...</p>
         </div>
       );
     }
@@ -90,16 +88,16 @@ export const CorrectSentenceGame: GameComponent<WordUsage> = forwardRef(
                 className={`rounded-lg border-2 p-4 text-left transition-all duration-200 ${
                   state.selectedAnswer === option
                     ? state.isCorrect === true
-                      ? 'border-green-500/50 bg-green-500/20 text-green-300'
+                      ? 'border-green-500 bg-green-50 text-green-700'
                       : state.isCorrect === false
                         ? option === state.currentQuestion?.correctAnswer
-                          ? 'border-green-500/50 bg-green-500/20 text-green-300'
-                          : 'border-red-500/50 bg-red-500/20 text-red-300'
-                        : 'border-purple-500/50 bg-purple-500/20 text-purple-300'
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-ui-primary bg-indigo-50 text-ui-primary'
                     : state.isCorrect !== null &&
                         option === state.currentQuestion?.correctAnswer
-                      ? 'border-gray-500/30 bg-gray-500/10 text-gray-300 hover:border-gray-500/50 hover:bg-gray-500/20'
-                      : 'border-gray-500/30 bg-gray-500/10 text-gray-300 hover:border-gray-500/50 hover:bg-gray-500/20'
+                      ? 'border-gray-300 bg-white text-ui-text hover:border-gray-400 hover:bg-gray-50'
+                      : 'border-gray-300 bg-white text-ui-text hover:border-gray-400 hover:bg-gray-50'
                 } ${state.isCorrect !== null ? 'cursor-default' : 'cursor-pointer'} `}
                 disabled={state.isCorrect !== null}
               >

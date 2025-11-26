@@ -97,7 +97,7 @@ export const SuccessDroppableSlot: React.FC<DroppableSlotProps> = ({
   return (
     <div className="relative inline-block">
       <div
-        className={`rounded-lg border-2 border-dashed border-game-success-500 bg-game-success-100 px-3 py-2 text-center font-medium text-game-success-700 transition-all ${animation.duration} ${animation.easing} dark:bg-game-success-900 dark:text-game-success-300 ${animation.classes}`}
+        className={`rounded-lg border-2 border-dashed border-game-success-500 bg-game-success-100 px-3 py-2 text-center font-medium text-game-success-700 transition-all ${animation.duration} ${animation.easing} ${animation.classes}`}
         data-droppable-slot={index}
         onTransitionEnd={handleTransitionEnd}
       >

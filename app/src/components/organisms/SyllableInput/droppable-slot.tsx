@@ -123,19 +123,19 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
 
     if (isDragOver || isTouchOver) {
       classes +=
-        'border-game-success-500 bg-game-success-50 text-game-success-700 dark:bg-game-success-900 dark:text-game-success-300 scale-105';
+        'border-game-success-500 bg-game-success-50 text-game-success-700 scale-105';
     } else if (syllable) {
       // Show success colors when answer is correct, primary otherwise
       if (isCorrect === true) {
         classes +=
-          'border-game-success-500 bg-game-success-100 text-game-success-700 dark:bg-game-success-900 dark:text-game-success-300';
+          'border-game-success-500 bg-game-success-100 text-game-success-700';
       } else {
         classes +=
-          'border-game-primary-500 bg-game-primary-100 text-game-primary-700 dark:bg-game-primary-900 dark:text-game-primary-300 cursor-pointer hover:bg-game-primary-200 dark:hover:bg-game-primary-800';
+          'border-ui-primary bg-indigo-50 text-ui-primary cursor-pointer hover:bg-indigo-100';
       }
     } else {
       classes +=
-        ' border-gray-400 bg-white text-gray-400 dark:bg-gray-700 dark:text-gray-500 hover:border-game-primary-400 hover:bg-game-primary-50 dark:hover:bg-game-primary-900';
+        ' border-gray-400 bg-white text-gray-400 hover:border-ui-primary hover:bg-indigo-50';
       if (showHintSpeaker) {
         classes += ' cursor-pointer';
       }
@@ -172,8 +172,8 @@ const InputDroppableSlot: React.FC<DroppableSlotProps> = ({
         <button
           className={`absolute -right-2 -top-1 rounded-full p-1 text-xs transition-colors ${
             isSpeaking
-              ? 'bg-game-primary-500 text-white'
-              : 'bg-gray-200 text-gray-600 hover:bg-game-primary-100 hover:text-game-primary-600 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-game-primary-800 dark:hover:text-game-primary-300'
+              ? 'bg-ui-primary text-white'
+              : 'bg-gray-200 text-gray-600 hover:bg-indigo-100 hover:text-ui-primary'
           }`}
           onClick={e => {
             e.stopPropagation();

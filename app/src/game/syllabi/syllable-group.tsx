@@ -43,7 +43,7 @@ const RandomOption: FC<{
       key={syllableIndex}
       className="border-1 flex flex-col rounded-xl shadow-sm"
     >
-      <h4 className="mb-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <h4 className="mb-3 text-center text-sm font-semibold text-ui-textMuted">
         Part {syllableIndex + 1}
       </h4>
       <div className="flex flex-col gap-2">
@@ -55,10 +55,10 @@ const RandomOption: FC<{
 
           if (isSelected) {
             buttonClasses +=
-              'bg-game-primary-100 border-game-primary-500 text-game-primary-700 dark:bg-game-primary-900 dark:text-game-primary-300 shadow-md';
+              'bg-indigo-50 border-ui-primary text-ui-primary shadow-md';
           } else {
             buttonClasses +=
-              'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600 cursor-grab active:cursor-grabbing';
+              'bg-white border-gray-200 text-ui-text hover:bg-gray-50 hover:border-gray-300 cursor-grab active:cursor-grabbing';
           }
 
           return (

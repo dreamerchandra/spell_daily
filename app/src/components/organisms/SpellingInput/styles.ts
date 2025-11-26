@@ -4,29 +4,27 @@ export const BASE_BOX_CLASSES =
 
 // Success state styles
 export const SUCCESS_STYLES =
-  'border-game-success-500/60 bg-game-success-500/20 text-game-success-300';
+  'border-game-success-500 bg-green-50 text-green-700';
 
 // Error state styles
-export const ERROR_STYLES =
-  'border-game-error-500/60 bg-game-error-500/20 text-game-error-300';
+export const ERROR_STYLES = 'border-game-error-500 bg-red-50 text-red-700';
 
 // Primary state styles (for filled letters)
-export const PRIMARY_STYLES =
-  'border-game-primary-500/60 bg-game-primary-500/20 text-game-primary-300';
+export const PRIMARY_STYLES = 'border-ui-primary bg-indigo-50 text-ui-primary';
 
 // Empty state styles (for unfilled letters)
-export const EMPTY_STYLES = 'border-dark-700/50 bg-dark-800/30 text-dark-500';
+export const EMPTY_STYLES = 'border-gray-300 bg-white text-gray-400';
 
 // Active state (focus ring)
 export const ACTIVE_RING =
-  'ring-2 ring-game-primary-400/50 animate-pulse transition-all duration-300';
+  'ring-2 ring-ui-primary/50 animate-pulse transition-all duration-300';
 
 // Placeholder text color (for auto-filled hints)
-export const PLACEHOLDER_TEXT = 'text-dark-500/70';
+export const PLACEHOLDER_TEXT = 'text-gray-400';
 
 // Default text colors
-export const WHITE_TEXT = 'text-white';
-export const GRAY_TEXT = 'text-gray-300';
+export const WHITE_TEXT = 'text-ui-text';
+export const GRAY_TEXT = 'text-ui-textMuted';
 
 // Custom animation classes
 export const CELEBRATION_ANIMATIONS = {
@@ -35,5 +33,5 @@ export const CELEBRATION_ANIMATIONS = {
   jump: 'animate-bounce -translate-y-2 rotate-12',
   glow: 'shadow-xl shadow-emerald-400/50 ring-2 ring-emerald-400/30 scale-110',
   typewriter: 'animate-pulse',
-  cursor: 'animate-ping ring-2 ring-blue-400',
+  cursor: 'animate-ping ring-2 ring-ui-primary',
 } as const;

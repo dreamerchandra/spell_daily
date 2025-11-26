@@ -18,10 +18,10 @@ const KeyboardKey = ({
 
   const variantClasses = {
     normal:
-      'bg-[#2c2545] border-[#3d3660]/30 text-white/85 hover:bg-[#342d4f] h-[54px] flex-1 min-w-[32px] shadow-sm',
+      'bg-ui-keyBg border-ui-keyBorder text-ui-text hover:bg-gray-200 h-[54px] flex-1 min-w-[32px] shadow-sm',
     special:
-      'bg-[#c1352b] border-[#d13028]/30 text-white hover:bg-[#d13028] h-[54px] flex-1 min-w-[48px] shadow-sm',
-    wide: 'bg-[#2c2545] border-[#3d3660]/30 text-white/85 hover:bg-[#342d4f] h-[54px] shadow-sm',
+      'bg-ui-accentCoral border-red-300 text-white hover:bg-red-400 h-[54px] flex-1 min-w-[48px] shadow-sm',
+    wide: 'bg-ui-keyBg border-ui-keyBorder text-ui-text hover:bg-gray-200 h-[54px] shadow-sm',
   };
 
   return (
@@ -87,7 +87,7 @@ export const Keyboard = ({ onKeyPress, className = '' }: KeyboardProps) => {
         </div>
 
         {/* Row 2: ASDFGHJKL */}
-        <div className="flex justify-center gap-2 px-4">
+        <div className="flex justify-center gap-2  px-2 max-w-[100vw]px-4 max-w-[100vw]">
           {keyboard[1].map(key => (
             <KeyboardKey key={key} char={key} onClick={() => onKeyPress(key)} />
           ))}

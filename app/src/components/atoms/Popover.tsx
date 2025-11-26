@@ -48,7 +48,7 @@ export const Popover = ({
       {isOpen && (
         <div
           ref={popoverRef}
-          className="absolute left-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-dark-600/30 bg-gradient-to-b from-dark-700/95 to-dark-800/95 p-2 shadow-xl backdrop-blur-lg"
+          className="absolute left-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-gray-300 bg-gradient-to-b from-white to-gray-50 p-2 shadow-xl backdrop-blur-lg"
         >
           {children}
         </div>

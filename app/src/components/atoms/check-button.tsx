@@ -28,7 +28,7 @@ export const CheckButton: FC<{
   return (
     <div className="m-auto flex w-[80%] flex-col justify-center">
       {gameState === 'SO_CLOSE' && (
-        <p className="mb-2 text-center text-lg text-yellow-400">
+        <p className="mb-2 text-center text-lg text-yellow-600">
           So close! Try again.
         </p>
       )}

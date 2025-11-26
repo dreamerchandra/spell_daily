@@ -225,7 +225,9 @@ export const FireAnimation = ({
         }
       `}</style>
 
-      <div className={`flex justify-center gap-2 ${className} relative`}>
+      <div
+        className={`flex justify-center gap-2  px-2 max-w-[100vw]${className} relative`}
+      >
         {userInput.map((letter, index) => (
           <div
             key={index}

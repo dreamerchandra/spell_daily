@@ -40,8 +40,8 @@ export const SyllableInput: FC<{
   });
 
   return (
-    <div className="mb-6 rounded-xl border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800">
-      <h3 className="mb-3 text-lg font-semibold text-gray-700 dark:text-gray-200">
+    <div className="mb-6 rounded-xl border border-gray-300 bg-white p-4 shadow-sm">
+      <h3 className="mb-3 text-lg font-semibold text-ui-text">
         Build the word:
       </h3>
       <div className="flex flex-col items-center justify-center gap-2">
@@ -62,7 +62,7 @@ export const SyllableInput: FC<{
               />
               {index < wordDef.actualSyllable.length - 1 &&
                 state.isCorrect === true && (
-                  <span className="mx-2 flex items-center text-gray-400 dark:text-gray-500">
+                  <span className="mx-2 flex items-center text-gray-400">
                     +
                   </span>
                 )}
@@ -78,10 +78,8 @@ export const SyllableInput: FC<{
             pubSub.publish('Animation:End');
           }}
         >
-          <span className="mx-2 flex items-center text-gray-400 dark:text-gray-500">
-            =
-          </span>
-          <span className="text-lg font-semibold text-game-success-600 dark:text-game-success-400">
+          <span className="mx-2 flex items-center text-gray-400 ">=</span>
+          <span className="text-lg font-semibold text-game-success-600">
             {wordDef.word}
           </span>
         </div>

@@ -220,7 +220,7 @@ const DraggableLetter = ({
     if (showSyllableColors && phoneticColorClass) {
       return `${phoneticColorClass} ${WHITE_TEXT}`;
     }
-    return 'bg-gradient-to-r from-dark-700/70 to-dark-800/70 text-gray-200 hover:from-dark-800 hover:to-dark-900';
+    return 'bg-gradient-to-r from-ui-keyBg to-gray-200 text-ui-text hover:from-gray-200 hover:to-gray-300';
   };
 
   return (
@@ -233,7 +233,7 @@ const DraggableLetter = ({
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className={`flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-dark-600/30 text-sm font-semibold shadow-sm transition-all duration-200 hover:scale-105 ${getBackgroundClasses()} ${
+      className={`flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-ui-keyBorder text-sm font-semibold shadow-sm transition-all duration-200 hover:scale-105 ${getBackgroundClasses()} ${
         isDragging ? 'opacity-50' : ''
       }`}
       title="Drag to position or click to add"
@@ -456,7 +456,7 @@ export const SpellingInputDragDrop = ({
 
       <DragOverlay>
         {activeId ? (
-          <div className="flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-dark-600/30 bg-gradient-to-r from-dark-700/70 to-dark-800/70 text-sm font-semibold text-gray-200 opacity-75 shadow-sm">
+          <div className="flex h-10 min-w-[2.5rem] transform cursor-move select-none items-center justify-center rounded-lg border border-ui-keyBorder bg-gradient-to-r from-ui-keyBg to-gray-200 text-sm font-semibold text-ui-text opacity-75 shadow-sm">
             {String(activeId).startsWith('input-')
               ? userInput[parseInt(String(activeId).split('-')[1])].letter
               : availableLetters[parseInt(String(activeId).split('-')[1])]

@@ -18,11 +18,11 @@ const ScrambledKey = ({
 
   const variantClasses = {
     normal:
-      'bg-gradient-to-r from-dark-700/70 to-dark-800/70 border-dark-600/30 text-gray-200 hover:from-dark-800 hover:to-dark-900 hover:scale-105',
+      'bg-gradient-to-r from-ui-keyBg to-gray-200 border-ui-keyBorder text-ui-text hover:from-gray-200 hover:to-gray-300 hover:scale-105',
     special:
-      'bg-gradient-to-r from-game-error-600/80 to-game-error-700/80 border-game-error-500/30 text-white hover:from-game-error-700 hover:to-game-error-800 hover:scale-105',
+      'bg-gradient-to-r from-ui-accentCoral to-red-400 border-red-300 text-white hover:from-red-400 hover:to-red-500 hover:scale-105',
     disabled:
-      'bg-gradient-to-r from-gray-600/50 to-gray-700/50 border-gray-500/30 text-gray-400 cursor-not-allowed',
+      'bg-gradient-to-r from-gray-300 to-gray-400 border-gray-400 text-gray-500 cursor-not-allowed',
   };
 
   const currentVariant = disabled ? 'disabled' : variant;

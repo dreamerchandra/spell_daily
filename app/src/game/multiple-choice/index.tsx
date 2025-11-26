@@ -51,22 +51,22 @@ const DroppableSlot = ({ children, isOver, isCorrect }: DroppableSlotProps) => {
       }}
       className={`inline-flex min-w-16 items-center justify-center px-2 py-1 transition-all duration-300 ease-out ${
         isEmpty
-          ? `border-b-2 border-dashed border-gray-300 dark:border-gray-600 ${
+          ? `border-b-2 border-dashed border-gray-300 ${
               isOver
-                ? 'scale-105 border-dashed border-game-primary-400 bg-game-primary-500/10'
-                : 'border-dashed hover:border-gray-400 dark:hover:border-gray-500'
+                ? 'scale-105 border-dashed border-ui-primary bg-indigo-50'
+                : 'border-dashed hover:border-gray-400'
             }`
           : `rounded-md border bg-transparent px-3 py-1 ${
               isCorrect === true
-                ? 'success-border border-dashed text-game-success-600 dark:text-game-success-400'
+                ? 'success-border border-dashed text-game-success-600'
                 : isCorrect === false
-                  ? 'border-dashed border-game-error-500 text-game-error-600 dark:text-game-error-400'
-                  : 'border-dashed border-game-primary-500 text-game-primary-600 dark:text-game-primary-400'
+                  ? 'border-dashed border-game-error-500 text-game-error-600'
+                  : 'border-dashed border-ui-primary text-ui-primary'
             }`
       }`}
     >
       {isEmpty ? (
-        <span className="select-none text-xs font-medium text-gray-400 dark:text-gray-500">
+        <span className="select-none text-xs font-medium text-gray-400">
           {isOver ? '✨' : '___'}
         </span>
       ) : (
@@ -95,7 +95,7 @@ const DraggableOption = ({
       className={`relative cursor-pointer select-none overflow-hidden rounded-lg border p-3 text-center font-medium shadow-sm transition-all duration-200 ease-out hover:scale-105 active:scale-95 ${
         isDragging
           ? 'rotate-2 scale-110 opacity-50'
-          : 'cursor-grab border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300 hover:bg-gray-100 active:cursor-grabbing dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+          : 'cursor-grab border-gray-200 bg-white text-ui-text hover:border-gray-300 hover:bg-gray-50 active:cursor-grabbing'
       } ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       onClick={onSelect}
       draggable
@@ -117,7 +117,7 @@ const UsageSentence = ({
   const words = usage.split(' ');
 
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-4 text-lg shadow-sm dark:border-gray-600 dark:bg-gray-800">
+    <div className="mb-6 flex flex-wrap items-center justify-center gap-1 rounded-xl border border-gray-200 bg-white p-4 text-lg shadow-sm">
       {words.map((word, index) => {
         if (word.includes('___')) {
           const beforeBlank = word.split('___')[0];
@@ -126,9 +126,7 @@ const UsageSentence = ({
           return (
             <span key={index} className="flex items-center">
               {beforeBlank && (
-                <span className="text-gray-700 dark:text-gray-300">
-                  {beforeBlank}
-                </span>
+                <span className="text-ui-text">{beforeBlank}</span>
               )}
               <DroppableSlot
                 id={`slot-${index}`}
@@ -136,22 +134,18 @@ const UsageSentence = ({
                 isCorrect={isCorrect}
               >
                 {droppedOption && (
-                  <span className="relative font-bold tracking-wide text-white drop-shadow-sm">
+                  <span className="relative font-bold tracking-wide text-black drop-shadow-sm">
                     {droppedOption}
                   </span>
                 )}
               </DroppableSlot>
-              {afterBlank && (
-                <span className="text-gray-700 dark:text-gray-300">
-                  {afterBlank}
-                </span>
-              )}
+              {afterBlank && <span className="text-ui-text">{afterBlank}</span>}
             </span>
           );
         } else {
           // Regular word
           return (
-            <span key={index} className="text-gray-700 dark:text-gray-300">
+            <span key={index} className="text-ui-text">
               {word}
             </span>
           );
@@ -234,9 +228,7 @@ const MultiOptionGame: FC<MultiOptionGameProps> = forwardRef(
     if (!wordDef || !state.selectedUsage) {
       return (
         <div className="relative w-full max-w-md px-4 text-center">
-          <p className="text-game-secondary-600 dark:text-game-secondary-400">
-            Loading word options...
-          </p>
+          <p className="text-orange-600">Loading word options...</p>
         </div>
       );
     }
@@ -272,7 +264,7 @@ const MultiOptionGame: FC<MultiOptionGameProps> = forwardRef(
             </div>
 
             <div className="mb-8">
-              <h4 className="text-md mb-4 font-medium text-gray-700 dark:text-gray-300">
+              <h4 className="text-md mb-4 font-medium text-ui-text">
                 Choose the correct spelling:
               </h4>
               <div className="flex flex-wrap justify-start gap-4">

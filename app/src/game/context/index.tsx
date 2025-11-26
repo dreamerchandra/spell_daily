@@ -50,9 +50,7 @@ export const ContextGame: GameComponent<WordUsage> = forwardRef(
     if (!state.currentQuestion) {
       return (
         <div className="relative w-full max-w-md px-4 text-center">
-          <p className="text-game-secondary-600 dark:text-game-secondary-400">
-            Loading context question...
-          </p>
+          <p className="text-orange-600">Loading context question...</p>
         </div>
       );
     }
@@ -61,20 +59,20 @@ export const ContextGame: GameComponent<WordUsage> = forwardRef(
       <div className="relative w-full max-w-2xl px-4 text-center">
         <div className="mb-4">
           <div className="mb-6 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-            <p className="mb-2 text-lg font-medium text-blue-300">
+            <p className="mb-2 text-lg font-medium text-purple-500">
               Read this sentence:
             </p>
-            <p className="text-xl font-semibold italic text-white">
+            <p className="text-xl font-semibold italic text-ui-text">
               "{state.currentQuestion.sentence}"
             </p>
           </div>
 
           {/* Question prompt */}
           <div className="mb-6">
-            <p className="mb-4 text-lg text-gray-300">
+            <p className="mb-4 text-lg text-gray-900">
               What does{' '}
               <span
-                className="font-bold uppercase text-yellow-400"
+                className="font-bold uppercase text-purple-900 underline"
                 onClick={playAudio}
               >
                 {wordDef.word}
@@ -92,16 +90,16 @@ export const ContextGame: GameComponent<WordUsage> = forwardRef(
                 className={`rounded-lg border-2 p-4 text-left transition-all duration-200 ${
                   state.selectedAnswer === option
                     ? state.isCorrect === true
-                      ? 'border-green-500/50 bg-green-500/20 text-green-300'
+                      ? 'border-green-500 bg-green-50 text-green-700'
                       : state.isCorrect === false
                         ? option === state.currentQuestion?.correctAnswer
-                          ? 'border-green-500/50 bg-green-500/20 text-green-300'
-                          : 'border-red-500/50 bg-red-500/20 text-red-300'
-                        : 'border-blue-500/50 bg-blue-500/20 text-blue-300'
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-ui-primary bg-indigo-50 text-ui-primary'
                     : state.isCorrect !== null &&
                         option === state.currentQuestion?.correctAnswer
-                      ? 'border-gray-500/30 bg-gray-500/10 text-gray-300 hover:border-gray-500/50 hover:bg-gray-500/20'
-                      : 'border-gray-500/30 bg-gray-500/10 text-gray-300 hover:border-gray-500/50 hover:bg-gray-500/20'
+                      ? 'border-gray-300 bg-white text-ui-text hover:border-gray-400 hover:bg-gray-50'
+                      : 'border-gray-300 bg-white text-ui-text hover:border-gray-400 hover:bg-gray-50'
                 } ${state.isCorrect !== null ? 'cursor-default' : 'cursor-pointer'} `}
                 disabled={state.isCorrect !== null}
               >

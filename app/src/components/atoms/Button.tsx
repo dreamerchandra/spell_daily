@@ -22,15 +22,15 @@ export const Button = ({
 
   const variantClasses = {
     primary:
-      'bg-gradient-to-r from-game-primary-600 to-game-primary-700 border-game-primary-500/30 text-white hover:from-game-primary-700 hover:to-game-primary-800',
+      'bg-gradient-to-r from-ui-primary to-ui-accentBlue border-ui-primary/30 text-white hover:from-indigo-600 hover:to-blue-600',
     secondary:
-      'bg-gradient-to-r from-game-secondary-600 to-game-secondary-700 border-game-secondary-500/30 text-white hover:from-game-secondary-700 hover:to-game-secondary-800',
+      'bg-gradient-to-r from-ui-accentCoral to-red-400 border-ui-accentCoral/30 text-white hover:from-red-500 hover:to-red-500',
     success:
       'bg-gradient-to-r from-game-success-600 to-game-success-700 border-game-success-500/30 text-white hover:from-game-success-700 hover:to-game-success-800',
     error:
       'bg-gradient-to-r from-game-error-600 to-game-error-700 border-game-error-500/30 text-white hover:from-game-error-700 hover:to-game-error-800',
     ghost:
-      'bg-gradient-to-r from-dark-700/70 to-dark-800/70 border-dark-600/30 text-gray-200 hover:from-dark-800 hover:to-dark-900',
+      'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-ui-text hover:from-gray-200 hover:to-gray-300',
   };
 
   const sizeClasses = {
@@ -40,7 +40,7 @@ export const Button = ({
   };
 
   const disabledClasses =
-    'cursor-not-allowed bg-dark-800/50 border-dark-700/30 text-dark-500 hover:scale-100';
+    'cursor-not-allowed bg-gray-200 border-gray-300 text-gray-400 hover:scale-100';
 
   const combinedClasses = `
     ${baseClasses}

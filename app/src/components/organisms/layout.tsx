@@ -10,7 +10,7 @@ export const Layout = ({
   children: ReactNode;
 }) => {
   return (
-    <div className="h-screen w-screen overflow-hidden bg-dark-gradient">
+    <div className="h-screen w-screen overflow-hidden bg-light-gradient">
       <div className="sticky top-0 z-[1000]">{header}</div>
       <main className="flex h-[calc(100vh-175px)] items-center justify-center">
         {children}
