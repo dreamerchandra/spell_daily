@@ -1,0 +1,21 @@
+- automate the cron
+- Sending link to users (widget/notification) (2 days) (bhuvana)
+
+- Word bank (chandra)
+- Firebase migration (rewrite everything) (chandra)
+  - app
+  - naveen's backend
+  - admin panel
+
+- Handling absent cases in Word scheduling & handling twice within a day (naveen)
+- Report (naveen)
+
+- Test case automation
+
+widget & cron
+
+word bank & firebase migration
+
+srs
+
+Report
