@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameRef, GameState } from './common/game-ref';
 import { type GameComponent, type GameMode } from './common/game-type';
 import { Continue } from './components/atoms/continue';
@@ -13,7 +13,7 @@ import { SyllableGame } from './game/syllabi';
 import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import { sampleSpellingWords, sampleWordUsage } from './words';
+import { gameSequence } from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { useIsTestMode, useSetTestMode } from './context/hint-context';
 import { ContextGame } from './game/context';
@@ -34,27 +34,13 @@ const ComponentMap: Record<GameMode, GameComponent<any>> = {
   correctSentence: CorrectSentenceGame,
 } as const;
 
-const useWords = (mode: GameMode) => {
-  return useMemo(() => {
-    if (mode === 'context' || mode === 'correctSentence') {
-      return sampleWordUsage;
-    } else {
-      return sampleSpellingWords;
-    }
-  }, [mode]);
-};
-
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
   const [disableChecking, setDisableChecking] = useState(true);
   const [canContinue, setCanContinue] = useState(false);
-  const [gameMode, setGameMode] = useLocalStorageState<GameMode>(
-    'GAME_TYPE',
-    'syllable'
-  );
-  const words = useWords(gameMode);
+  const [gameMode, setGameMode] = useState<GameMode>('syllable');
 
   const timerRef = useRef<TimerRef>(null);
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
@@ -63,9 +49,9 @@ export const App = () => {
   );
   const isTestMode = useIsTestMode();
   const setTestMode = useSetTestMode();
+  const [start, setStart] = useState(false);
 
   const Component = ComponentMap[gameMode];
-  const [start, setStart] = useState(false);
   const onCheckAnswer = useCallback((): GameState => {
     const answer = gameRef.current?.getCorrectState();
     if (answer === 'CORRECT') {
@@ -77,7 +63,9 @@ export const App = () => {
 
   useOnTestModeChange(enabled => {
     if (enabled) {
-      timerRef.current?.startTimer(words[currentWordIndex].word.length * 2);
+      timerRef.current?.startTimer(
+        gameSequence[currentWordIndex].testTimerSeconds
+      );
     } else {
       timerRef.current?.stopTimer();
     }
@@ -85,14 +73,16 @@ export const App = () => {
 
   const moveToNextWord = useCallback(() => {
     setCurrentWordIndex(prev => {
-      const nextIndex = prev < words.length - 1 ? prev + 1 : prev;
-      if (isTestMode) {
-        timerRef.current?.startTimer(words[nextIndex].word.length * 2);
+      const nextIndex = prev < gameSequence.length - 1 ? prev + 1 : prev;
+      const nextGame = gameSequence[nextIndex];
+      setGameMode(nextGame.mode);
+      if (nextGame.isTestMode) {
+        setTestMode(true);
       }
       return nextIndex;
     });
     setCanContinue(false);
-  }, [isTestMode, words]);
+  }, [setTestMode]);
 
   const onTimeUp = useCallback(() => {
     Avatar.show({
@@ -108,17 +98,11 @@ export const App = () => {
     Avatar.show({
       text: 'Hiii! I can guide you through learning spelling!',
       yesText: "🎉 Let's go!",
-      noText: '🧪 Test Mode',
-      onNo: () => {
-        setTestMode(true);
-        timerRef.current?.startTimer(words[0].word.length * 2);
-        setStart(true);
-      },
       onYes: () => {
         setStart(true);
       },
     });
-  }, [setTestMode, words]);
+  }, []);
 
   useEffect(() => {
     if (currentWordIndex === 0) return;
@@ -136,14 +120,12 @@ export const App = () => {
           ProgressComponent={
             <ProgressWithTimer
               score={currentWordIndex + 1}
-              total={words.length}
+              total={gameSequence.length}
               ref={timerRef}
               disableTimer={!isTestMode}
               onTimeUp={onTimeUp}
             />
           }
-          gameMode={gameMode}
-          onGameModeChange={setGameMode}
           soundEnabled={soundEnabled}
           onSoundToggle={setSoundEnabled}
         />
@@ -164,7 +146,7 @@ export const App = () => {
       {start ? (
         <Component
           ref={gameRef}
-          wordDef={words[currentWordIndex]}
+          wordDef={gameSequence[currentWordIndex].def}
           setDisableChecking={setDisableChecking}
         />
       ) : null}

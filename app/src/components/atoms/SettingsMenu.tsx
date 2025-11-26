@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Popover } from './Popover';
-import type { GameMode } from '../../common/game-type';
 
 interface SettingsMenuProps {
-  currentMode: GameMode;
-  onModeChange: (mode: GameMode) => void;
   soundEnabled?: boolean;
   onSoundToggle?: (enabled: boolean) => void;
   testMode: boolean;
@@ -12,29 +9,10 @@ interface SettingsMenuProps {
 }
 
 export const SettingsMenu = ({
-  currentMode,
-  onModeChange,
   testMode,
   onTestModeToggle,
 }: SettingsMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const gameModes = [
-    { value: 'fullWord' as GameMode, label: 'Full Word' },
-    { value: 'syllable' as GameMode, label: 'Syllable' },
-    { value: 'voiceTyping' as GameMode, label: 'Voice' },
-    { value: 'jumbled' as GameMode, label: 'Jumbled' },
-    { value: 'fourOption' as GameMode, label: '4-Option' },
-    { value: 'twoOption' as GameMode, label: '2-Option' },
-    { value: 'typing' as GameMode, label: 'Typing' },
-    { value: 'context' as GameMode, label: 'Context' },
-    { value: 'correctSentence' as GameMode, label: 'Usage' },
-  ];
-
-  const handleModeChange = (mode: GameMode) => {
-    onModeChange(mode);
-    setIsOpen(false);
-  };
 
   const handleTestModeToggle = () => {
     onTestModeToggle(!testMode);
@@ -71,26 +49,6 @@ export const SettingsMenu = ({
       }
     >
       <div className="flex w-60 flex-col gap-2 p-2">
-        {/* Game Mode Section */}
-        <div className="mb-6 flex items-center justify-between">
-          <span className="text-lg font-light text-ui-text">Game Mode</span>
-          <select
-            value={currentMode}
-            onChange={e => handleModeChange(e.target.value as GameMode)}
-            className="rounded-lg border-2 border-gray-300 bg-white px-3 py-1 text-ui-text backdrop-blur-sm transition-colors hover:border-gray-400 focus:border-ui-primary focus:outline-none"
-          >
-            {gameModes.map(mode => (
-              <option
-                key={mode.value}
-                value={mode.value}
-                className="bg-white text-ui-text"
-              >
-                {mode.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Sound Section */}
         {/* <div className="flex items-center justify-between">
           <span className="text-lg font-light text-white">Sound</span>

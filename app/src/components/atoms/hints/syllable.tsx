@@ -9,8 +9,8 @@ export const Syllable = ({
   return (
     <div className="relative mb-4 flex items-center justify-center gap-2 text-center">
       <p className="text-3xl">👉 </p>
-      <div className="gradient-border relative inline-block overflow-hidden rounded-2xl p-4">
-        <div className="relative z-10 flex gap-1 text-lg font-medium text-gray-200">
+      <div className="gradient-border relative inline-block overflow-hidden rounded-2xl">
+        <div className="relative z-10 flex gap-1 text-lg font-medium text-gray-200 bg-primary-gradient px-4 py-2 rounded-xl">
           {wordDef.ipa.map((part, index) => (
             <span className="relative" key={part}>
               <span

@@ -1,3 +1,4 @@
+import { type GameMode } from './common/game-type';
 export interface WordDef {
   word: string;
   definition: string;
@@ -666,3 +667,51 @@ export const sampleSpellingWords: WordDef[] = [
     ],
   },
 ];
+
+export const wordSequence: { mode: GameMode; word: string }[] = [
+  { mode: 'typing', word: 'CULTURE' },
+  { mode: 'fullWord', word: 'DEFINITELY' },
+  { mode: 'fourOption', word: 'OPINION' },
+  { mode: 'jumbled', word: 'COUSIN' },
+  { mode: 'typing', word: 'IMPRESS' },
+  { mode: 'fullWord', word: 'ARRANGEMENT' },
+  { mode: 'syllable', word: 'EXHAUST' },
+  { mode: 'twoOption', word: 'MEMORABLE' },
+  { mode: 'fourOption', word: 'SPECIAL' },
+  { mode: 'jumbled', word: 'SYSTEM' },
+  { mode: 'typing', word: 'RAINBOW' },
+  { mode: 'fullWord', word: 'BUTTERFLY' },
+  { mode: 'context', word: 'ELEPHANT' },
+  { mode: 'correctSentence', word: 'TREASURE' },
+];
+
+export type GameSequenceType = {
+  mode: GameMode;
+  def: WordDef | WordUsage;
+  testTimerSeconds: number;
+  isTestMode: boolean;
+}[];
+
+export const gameSequence: GameSequenceType = (() => {
+  const sequence: GameSequenceType = [];
+  for (const item of wordSequence) {
+    const wordDef = sampleSpellingWords.find(w => w.word === item.word);
+    const wordUsage = sampleWordUsage.find(w => w.word === item.word);
+    if (wordDef && !['context', 'correctSentence'].includes(item.mode)) {
+      sequence.push({
+        mode: item.mode,
+        def: wordDef,
+        testTimerSeconds: wordDef.word.length * 2,
+        isTestMode: Math.random() < 0.5,
+      });
+    } else if (wordUsage) {
+      sequence.push({
+        mode: item.mode,
+        def: wordUsage,
+        testTimerSeconds: 30,
+        isTestMode: false,
+      });
+    }
+  }
+  return sequence as GameSequenceType;
+})();
