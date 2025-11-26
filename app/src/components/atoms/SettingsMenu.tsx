@@ -4,20 +4,10 @@ import { Popover } from './Popover';
 interface SettingsMenuProps {
   soundEnabled?: boolean;
   onSoundToggle?: (enabled: boolean) => void;
-  testMode: boolean;
-  onTestModeToggle: (enabled: boolean) => void;
 }
 
-export const SettingsMenu = ({
-  testMode,
-  onTestModeToggle,
-}: SettingsMenuProps) => {
+export const SettingsMenu = (_props: SettingsMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleTestModeToggle = () => {
-    onTestModeToggle(!testMode);
-    setIsOpen(false);
-  };
 
   //   const handleSoundToggle = () => {
   //     if (onSoundToggle) {
@@ -67,23 +57,6 @@ export const SettingsMenu = ({
             />
           </button>
         </div> */}
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-light text-white">Test Mode</span>
-          <button
-            onClick={handleTestModeToggle}
-            className={`relative h-8 w-16 rounded-full border-2 border-white/30 p-1 transition-colors ${
-              testMode ? 'bg-red-400' : 'bg-transparent'
-            }`}
-          >
-            <div
-              className={`h-5 w-5 rounded-full border border-white/50 bg-white shadow-sm transition-transform ${
-                testMode
-                  ? 'translate-x-7 bg-white'
-                  : 'translate-x-0 bg-white/20'
-              }`}
-            />
-          </button>
-        </div>
       </div>
     </Popover>
   );

@@ -80,6 +80,7 @@ interface DraggableOptionProps {
   id: string;
   option: string;
   isDragging: boolean;
+  isSelected: boolean;
   onSelect: () => void;
   disabled: boolean;
 }
@@ -88,6 +89,7 @@ const DraggableOption = ({
   option,
   onSelect,
   isDragging,
+  isSelected,
   disabled,
 }: DraggableOptionProps) => {
   return (
@@ -96,7 +98,9 @@ const DraggableOption = ({
         isDragging
           ? 'rotate-2 scale-110 opacity-50'
           : 'cursor-grab border-gray-200 bg-white text-ui-text hover:border-gray-300 hover:bg-gray-50 active:cursor-grabbing'
-      } ${disabled ? 'pointer-events-none opacity-50' : ''}`}
+      } ${disabled ? 'pointer-events-none opacity-50' : ''} ${
+        isSelected ? 'ring-2 ring-ui-primary' : ''
+      }`}
       onClick={onSelect}
       draggable
     >
@@ -275,6 +279,7 @@ const MultiOptionGame: FC<MultiOptionGameProps> = forwardRef(
                     id={option}
                     option={option}
                     isDragging={false}
+                    isSelected={state.droppedOption === option}
                     onSelect={() => handleOptionSelect(option)}
                   />
                 ))}

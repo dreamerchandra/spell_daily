@@ -13,9 +13,9 @@ import { SyllableGame } from './game/syllabi';
 import { TypingGame } from './game/typing';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import { gameSequence } from './words';
+import { gameSequence, type GameSequenceType } from './words';
 import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
-import { useIsTestMode, useSetTestMode } from './context/hint-context';
+import { useSetTestMode } from './context/hint-context';
 import { ContextGame } from './game/context';
 import { CorrectSentenceGame } from './game/correct-sentence';
 import { CheckButton } from './components/atoms/check-button';
@@ -34,22 +34,65 @@ const ComponentMap: Record<GameMode, GameComponent<any>> = {
   correctSentence: CorrectSentenceGame,
 } as const;
 
+const useGameState = (gameSequence: GameSequenceType) => {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [canContinue, setCanContinue] = useState(false);
+  const gameMode = gameSequence[currentWordIndex].mode;
+  const timerRef = useRef<TimerRef>(null);
+  const setTestMode = useSetTestMode();
+  const isTestMode = gameSequence[currentWordIndex].isTestMode;
+  const testTimerSeconds = gameSequence[currentWordIndex].testTimerSeconds;
+  useEffect(() => {
+    if (isTestMode) {
+      setTestMode(true);
+      timerRef.current?.startTimer(testTimerSeconds);
+    } else {
+      setTestMode(false);
+      timerRef.current?.stopTimer();
+    }
+  }, [isTestMode, setTestMode, testTimerSeconds]);
+  const [start, setStart] = useState(false);
+  const moveToNextWord = useCallback(() => {
+    setCurrentWordIndex(prev => {
+      const nextIndex = prev < gameSequence.length - 1 ? prev + 1 : prev;
+      return nextIndex;
+    });
+    setCanContinue(false);
+  }, [gameSequence.length]);
+
+  return {
+    currentWordIndex,
+    gameMode,
+    canContinue,
+    setCanContinue,
+    timerRef,
+    start,
+    setStart,
+    moveToNextWord,
+    isTestMode,
+  };
+};
+
 export const App = () => {
   const gameRef = useRef<GameRef>(null);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const {
+    gameMode,
+    canContinue,
+    setCanContinue,
+    moveToNextWord,
+    currentWordIndex,
+    setStart,
+    start,
+    timerRef,
+    isTestMode,
+  } = useGameState(gameSequence);
 
   const [disableChecking, setDisableChecking] = useState(true);
-  const [canContinue, setCanContinue] = useState(false);
-  const [gameMode, setGameMode] = useState<GameMode>('syllable');
 
-  const timerRef = useRef<TimerRef>(null);
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
     'SOUND_ENABLED',
     true
   );
-  const isTestMode = useIsTestMode();
-  const setTestMode = useSetTestMode();
-  const [start, setStart] = useState(false);
 
   const Component = ComponentMap[gameMode];
   const onCheckAnswer = useCallback((): GameState => {
@@ -59,7 +102,7 @@ export const App = () => {
       setCanContinue(true);
     }
     return answer ?? 'UNANSWERED';
-  }, []);
+  }, [setCanContinue, timerRef]);
 
   useOnTestModeChange(enabled => {
     if (enabled) {
@@ -70,19 +113,6 @@ export const App = () => {
       timerRef.current?.stopTimer();
     }
   });
-
-  const moveToNextWord = useCallback(() => {
-    setCurrentWordIndex(prev => {
-      const nextIndex = prev < gameSequence.length - 1 ? prev + 1 : prev;
-      const nextGame = gameSequence[nextIndex];
-      setGameMode(nextGame.mode);
-      if (nextGame.isTestMode) {
-        setTestMode(true);
-      }
-      return nextIndex;
-    });
-    setCanContinue(false);
-  }, [setTestMode]);
 
   const onTimeUp = useCallback(() => {
     Avatar.show({
