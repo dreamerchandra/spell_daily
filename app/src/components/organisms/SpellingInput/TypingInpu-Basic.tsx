@@ -32,7 +32,7 @@ export const TypingInputBasic = ({
 
   return (
     <div
-      className={`flex justify-center gap-2  px-2 max-w-[100vw]${className} m-auto min-h-12 w-80 border-b-2 border-dashed border-gray-500 pb-1`}
+      className={`flex justify-center gap-2  px-2 max-w-[100vw] ${className} m-auto min-h-12 w-80 border-b-2 border-dashed border-gray-500 pb-1`}
     >
       {userInput.map((letter, index) => (
         <div
