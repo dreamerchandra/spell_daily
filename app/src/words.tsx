@@ -702,7 +702,7 @@ export const gameSequence: GameSequenceType = (() => {
         mode: item.mode,
         def: wordDef,
         testTimerSeconds: wordDef.word.length * 2,
-        isTestMode: Math.random() < 0.5,
+        isTestMode: true,
       });
     } else if (wordUsage) {
       sequence.push({

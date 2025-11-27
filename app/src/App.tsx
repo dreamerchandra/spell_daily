@@ -52,7 +52,7 @@ const useGameState = (gameSequence: GameSequenceType) => {
   const isTestMode = gameSequence[currentWordIndex].isTestMode;
   const testTimerSeconds = gameSequence[currentWordIndex].testTimerSeconds;
   useEffect(() => {
-    if (!gameState) return;
+    if (gameState === 'NOT_STARTED') return;
     if (isTestMode) {
       setTestMode(true);
       timerRef.current?.startTimer(testTimerSeconds);
