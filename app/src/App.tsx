@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameRef, GameState } from './common/game-ref';
-import { type GameComponent, type GameMode } from './common/game-type';
+import { type GameComponent, type GameType } from './common/game-type';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
 import { ProgressWithTimer, type TimerRef } from './components/atoms/Progress';
@@ -20,9 +20,13 @@ import { ContextGame } from './game/context';
 import { CorrectSentenceGame } from './game/correct-sentence';
 import { CheckButton } from './components/atoms/check-button';
 import { useOnTestModeChange } from './context/hint-context/index';
+import { LottiePlayer } from './components/atoms/lottie-player';
+import { useSteak } from './hooks/use-steak';
+import { pubSub } from './util/pub-sub';
+import { useSetTimeout } from './hooks/use-setTimeout';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ComponentMap: Record<GameMode, GameComponent<any>> = {
+const ComponentMap: Record<GameType, GameComponent<any>> = {
   typingWithBox: TypingWithBox,
   syllable: SyllableGame,
   voiceTyping: VoiceTypingGame,
@@ -35,6 +39,7 @@ const ComponentMap: Record<GameMode, GameComponent<any>> = {
 } as const;
 
 const useGameState = (gameSequence: GameSequenceType) => {
+  const [start, setStart] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [canContinue, setCanContinue] = useState(false);
   const gameMode = gameSequence[currentWordIndex].mode;
@@ -43,6 +48,7 @@ const useGameState = (gameSequence: GameSequenceType) => {
   const isTestMode = gameSequence[currentWordIndex].isTestMode;
   const testTimerSeconds = gameSequence[currentWordIndex].testTimerSeconds;
   useEffect(() => {
+    if (!start) return;
     if (isTestMode) {
       setTestMode(true);
       timerRef.current?.startTimer(testTimerSeconds);
@@ -50,8 +56,7 @@ const useGameState = (gameSequence: GameSequenceType) => {
       setTestMode(false);
       timerRef.current?.stopTimer();
     }
-  }, [isTestMode, setTestMode, testTimerSeconds]);
-  const [start, setStart] = useState(false);
+  }, [isTestMode, setTestMode, start, testTimerSeconds]);
   const moveToNextWord = useCallback(() => {
     setCurrentWordIndex(prev => {
       const nextIndex = prev < gameSequence.length - 1 ? prev + 1 : prev;
@@ -88,6 +93,9 @@ export const App = () => {
   } = useGameState(gameSequence);
 
   const [disableChecking, setDisableChecking] = useState(true);
+  const { streak, incrementStreak, resetStreak, stopAnimation } = useSteak();
+  const stopStreakTimer = useSetTimeout();
+  const publishStreakEndTimer = useSetTimeout();
 
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
     'SOUND_ENABLED',
@@ -96,13 +104,16 @@ export const App = () => {
 
   const Component = ComponentMap[gameMode];
   const onCheckAnswer = useCallback((): GameState => {
-    const answer = gameRef.current?.getCorrectState();
-    if (answer === 'CORRECT') {
+    const state = gameRef.current?.getCorrectState();
+    if (state === 'CORRECT') {
       timerRef.current?.stopTimer();
       setCanContinue(true);
+      incrementStreak();
+    } else {
+      resetStreak();
     }
-    return answer ?? 'UNANSWERED';
-  }, [setCanContinue, timerRef]);
+    return state ?? 'UNANSWERED';
+  }, [setCanContinue, timerRef, incrementStreak, resetStreak]);
 
   useOnTestModeChange(enabled => {
     if (enabled) {
@@ -163,7 +174,10 @@ export const App = () => {
       footer={
         <Footer isSuccess={canContinue}>
           {canContinue ? (
-            <Continue disabled={!canContinue} onClick={moveToNextWord} />
+            <Continue
+              disabled={!canContinue || streak.isPlaying}
+              onClick={moveToNextWord}
+            />
           ) : (
             <CheckButton
               onCheckAnswer={onCheckAnswer}
@@ -173,6 +187,19 @@ export const App = () => {
         </Footer>
       }
     >
+      {streak.isPlaying ? (
+        <LottiePlayer
+          streak={streak.counter as 3 | 5 | 10}
+          onDone={() => {
+            stopStreakTimer(() => {
+              stopAnimation();
+              publishStreakEndTimer(() => {
+                pubSub.publish('Streak:End');
+              }, 500);
+            }, 500);
+          }}
+        />
+      ) : null}
       {start ? (
         <Component
           ref={gameRef}

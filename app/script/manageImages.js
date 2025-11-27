@@ -53,8 +53,8 @@ function buildStructure(srcRoot, targetRoot) {
 
   for (const group of topDirs) {
     const groupPath = path.join(srcRoot, group);
-    const allFiles = getAllFiles(groupPath).filter(f =>
-      /\.(png|jpg|jpeg|gif)$/i.test(f)
+    const allFiles = getAllFiles(groupPath).filter(
+      f => !f.includes('.DS_Store')
     );
     const dirMap = new Map();
 

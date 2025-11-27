@@ -1,4 +1,4 @@
-import { type GameMode } from './common/game-type';
+import { type GameType } from './common/game-type';
 export interface WordDef {
   word: string;
   definition: string;
@@ -668,7 +668,7 @@ export const sampleSpellingWords: WordDef[] = [
   },
 ];
 
-export const wordSequence: { mode: GameMode; word: string }[] = [
+export const wordSequence: { mode: GameType; word: string }[] = [
   { mode: 'typingWithoutBox', word: 'CULTURE' },
   { mode: 'typingWithBox', word: 'DEFINITELY' },
   { mode: 'fourOption', word: 'OPINION' },
@@ -686,7 +686,7 @@ export const wordSequence: { mode: GameMode; word: string }[] = [
 ];
 
 export type GameSequenceType = {
-  mode: GameMode;
+  mode: GameType;
   def: WordDef | WordUsage;
   testTimerSeconds: number;
   isTestMode: boolean;

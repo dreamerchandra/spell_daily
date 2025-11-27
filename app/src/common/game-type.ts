@@ -2,7 +2,7 @@ import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 import type { GameRef } from './game-ref';
 import type { WordDef } from '../words';
 
-export type SpellingGameMode =
+export type SpellingGameType =
   | 'typingWithBox'
   | 'syllable'
   | 'voiceTyping'
@@ -11,9 +11,9 @@ export type SpellingGameMode =
   | 'fourOption'
   | 'typingWithoutBox';
 
-export type UsageGameMode = 'context' | 'correctSentence';
+export type UsageGameType = 'context' | 'correctSentence';
 
-export type GameMode = SpellingGameMode | UsageGameMode;
+export type GameType = SpellingGameType | UsageGameType;
 export type GameRefProps<T = WordDef> = {
   wordDef: T;
   setDisableChecking: (disable: boolean) => void;

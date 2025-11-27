@@ -33,6 +33,19 @@ export const Continue = ({
     }
   });
 
+  useSubscribe('Streak:End', () => {
+    if (!disabled) {
+      setIsProgressing(true);
+      setTimer(
+        () => {
+          onClick();
+          setIsProgressing(false);
+        },
+        isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS
+      );
+    }
+  });
+
   return (
     <button
       onClick={onClick}
