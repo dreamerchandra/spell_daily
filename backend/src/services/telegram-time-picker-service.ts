@@ -102,15 +102,17 @@ class TelegramTimePickerService extends TelegramBaseService {
             text: `You selected ${selectedTime}`,
           });
         }
-        const dateTime = new Date();
         const [year, month, day] = selectedDate.split('-').map(Number);
-        dateTime.setFullYear(year, month - 1, day);
+        const formattedDateString = `${year}-${month}-${day}`;
         const [hours, minutes] = selectedTime.split(':').map(Number);
-        dateTime.setHours(hours, minutes, 0, 0);
+        const formattedTimeString = `${hours.toString().padStart(2, '0')}:${minutes
+          .toString()
+          .padStart(2, '0')}:00`;
+        const selectedLocal = `${formattedDateString}T${formattedTimeString}+05:30`;
         const parent = await parentModel.getById(parentId);
 
         await remainderService.scheduleReminders({
-          dateTime: dateTime.toISOString(),
+          dateTime: selectedLocal,
           userId: chatId.toString(),
           message: `You can set a remainder for name: ${parent.name} phoneNumber: ${parent.phoneNumber}`,
         });
