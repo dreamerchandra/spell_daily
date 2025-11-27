@@ -187,19 +187,17 @@ export const App = () => {
         </Footer>
       }
     >
-      {streak.isPlaying ? (
-        <LottiePlayer
-          streak={streak.counter as 3 | 5 | 10}
-          onDone={() => {
-            stopStreakTimer(() => {
-              stopAnimation();
-              publishStreakEndTimer(() => {
-                pubSub.publish('Streak:End');
-              }, 500);
+      <LottiePlayer
+        streak={streak}
+        onDone={() => {
+          stopStreakTimer(() => {
+            stopAnimation();
+            publishStreakEndTimer(() => {
+              pubSub.publish('Streak:End');
             }, 500);
-          }}
-        />
-      ) : null}
+          }, 500);
+        }}
+      />
       {start ? (
         <Component
           ref={gameRef}

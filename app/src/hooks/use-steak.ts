@@ -1,6 +1,6 @@
 import { useCallback, useReducer } from 'react';
 
-type StreakState = {
+export type StreakState = {
   counter: number;
   isPlaying: boolean;
 };
@@ -26,7 +26,8 @@ const streakReducer = (state: StreakState, action: StreakAction) => {
   }
 };
 
-const celebrationStreaks = [3, 5, 10];
+export const celebrationStreaks = [3, 5, 10];
+
 export const useSteak = () => {
   const [streak, dispatch] = useReducer(streakReducer, {
     counter: 0,
