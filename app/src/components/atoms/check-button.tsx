@@ -1,14 +1,14 @@
 import { useCallback, useState, type FC } from 'react';
 import { Button } from './Button';
 import { useSetTimeout } from '../../hooks/use-setTimeout';
-import type { GameState } from '../../common/game-ref';
+import type { AnswerState } from '../../common/game-ref';
 import { useShortcut } from '../../hooks/use-shortcut';
 
 export const CheckButton: FC<{
-  onCheckAnswer: () => GameState;
+  onCheckAnswer: () => AnswerState;
   disableChecking: boolean;
 }> = ({ onCheckAnswer, disableChecking }) => {
-  const [gameState, setGameState] = useState<GameState>('UNANSWERED');
+  const [gameState, setGameState] = useState<AnswerState>('UNANSWERED');
   const timer = useSetTimeout();
 
   const onClick = useCallback(() => {

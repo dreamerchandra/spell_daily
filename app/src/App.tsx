@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { GameRef, GameState } from './common/game-ref';
+import type { GameRef, AnswerState } from './common/game-ref';
 import { type GameComponent, type GameType } from './common/game-type';
 import { Continue } from './components/atoms/continue';
 import { Footer } from './components/atoms/footer';
@@ -20,10 +20,11 @@ import { ContextGame } from './game/context';
 import { CorrectSentenceGame } from './game/correct-sentence';
 import { CheckButton } from './components/atoms/check-button';
 import { useOnTestModeChange } from './context/hint-context/index';
-import { LottiePlayer } from './components/atoms/lottie-player';
+import { StreakAnimation } from './components/atoms/streak-animation';
 import { useSteak } from './hooks/use-steak';
 import { pubSub } from './util/pub-sub';
 import { useSetTimeout } from './hooks/use-setTimeout';
+import { CompletedAnimation } from './components/atoms/completed-animation';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ComponentMap: Record<GameType, GameComponent<any>> = {
@@ -38,8 +39,11 @@ const ComponentMap: Record<GameType, GameComponent<any>> = {
   correctSentence: CorrectSentenceGame,
 } as const;
 
+type GameState = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+
 const useGameState = (gameSequence: GameSequenceType) => {
-  const [start, setStart] = useState(false);
+  const [gameState, setGameState] = useState<GameState>('NOT_STARTED');
+
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [canContinue, setCanContinue] = useState(false);
   const gameMode = gameSequence[currentWordIndex].mode;
@@ -48,7 +52,7 @@ const useGameState = (gameSequence: GameSequenceType) => {
   const isTestMode = gameSequence[currentWordIndex].isTestMode;
   const testTimerSeconds = gameSequence[currentWordIndex].testTimerSeconds;
   useEffect(() => {
-    if (!start) return;
+    if (!gameState) return;
     if (isTestMode) {
       setTestMode(true);
       timerRef.current?.startTimer(testTimerSeconds);
@@ -56,14 +60,20 @@ const useGameState = (gameSequence: GameSequenceType) => {
       setTestMode(false);
       timerRef.current?.stopTimer();
     }
-  }, [isTestMode, setTestMode, start, testTimerSeconds]);
-  const moveToNextWord = useCallback(() => {
-    setCurrentWordIndex(prev => {
-      const nextIndex = prev < gameSequence.length - 1 ? prev + 1 : prev;
-      return nextIndex;
-    });
+  }, [isTestMode, setTestMode, gameState, testTimerSeconds]);
+  const endGame = useCallback(() => {
+    setGameState('COMPLETED');
     setCanContinue(false);
-  }, [gameSequence.length]);
+    timerRef.current?.stopTimer();
+  }, []);
+  const moveToNextWord = useCallback(() => {
+    if (currentWordIndex === gameSequence.length - 1) {
+      endGame();
+      return;
+    }
+    setCurrentWordIndex(prev => prev + 1);
+    setCanContinue(false);
+  }, [currentWordIndex, gameSequence.length, endGame]);
 
   return {
     currentWordIndex,
@@ -71,8 +81,8 @@ const useGameState = (gameSequence: GameSequenceType) => {
     canContinue,
     setCanContinue,
     timerRef,
-    start,
-    setStart,
+    gameState,
+    setGameState,
     moveToNextWord,
     isTestMode,
   };
@@ -86,9 +96,9 @@ export const App = () => {
     setCanContinue,
     moveToNextWord,
     currentWordIndex,
-    setStart,
-    start,
+    gameState,
     timerRef,
+    setGameState,
     isTestMode,
   } = useGameState(gameSequence);
 
@@ -103,7 +113,7 @@ export const App = () => {
   );
 
   const Component = ComponentMap[gameMode];
-  const onCheckAnswer = useCallback((): GameState => {
+  const onCheckAnswer = useCallback((): AnswerState => {
     const state = gameRef.current?.getCorrectState();
     if (state === 'CORRECT') {
       timerRef.current?.stopTimer();
@@ -140,10 +150,10 @@ export const App = () => {
       text: 'Hiii! I can guide you through learning spelling!',
       yesText: "🎉 Let's go!",
       onYes: () => {
-        setStart(true);
+        setGameState('IN_PROGRESS');
       },
     });
-  }, [setStart]);
+  }, [setGameState]);
 
   useEffect(() => {
     if (currentWordIndex === 0) return;
@@ -156,6 +166,7 @@ export const App = () => {
 
   return (
     <Layout
+      removeHeaderFooter={gameState === 'COMPLETED'}
       header={
         <Header
           ProgressComponent={
@@ -187,7 +198,7 @@ export const App = () => {
         </Footer>
       }
     >
-      <LottiePlayer
+      <StreakAnimation
         streak={streak}
         onDone={() => {
           stopStreakTimer(() => {
@@ -198,7 +209,8 @@ export const App = () => {
           }, 500);
         }}
       />
-      {start ? (
+      <CompletedAnimation isCompleted={gameState === 'COMPLETED'} />
+      {gameState === 'IN_PROGRESS' ? (
         <Component
           ref={gameRef}
           wordDef={gameSequence[currentWordIndex].def}

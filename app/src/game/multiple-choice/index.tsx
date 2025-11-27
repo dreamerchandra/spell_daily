@@ -29,7 +29,7 @@ import {
   successSoundManager,
   SuccessAnimationType,
 } from '../../util/soundManager';
-import type { GameState } from '../../common/game-ref';
+import type { AnswerState } from '../../common/game-ref';
 
 interface DroppableSlotProps {
   id: string;
@@ -296,7 +296,7 @@ const MultiOptionGame: FC<MultiOptionGameProps> = forwardRef(
 
 const withOptionHoc = (numberOfOptions: number): GameComponent => {
   return forwardRef<
-    { getCorrectState: () => GameState },
+    { getCorrectState: () => AnswerState },
     Omit<MultiOptionGameProps, 'numberOfOptions'>
   >((props, ref) => (
     <MultiOptionGame {...props} numberOfOptions={numberOfOptions} ref={ref} />

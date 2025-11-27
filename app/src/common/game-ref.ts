@@ -1,13 +1,13 @@
-export type GameState = 'CORRECT' | 'INCORRECT' | 'SO_CLOSE' | 'UNANSWERED';
+export type AnswerState = 'CORRECT' | 'INCORRECT' | 'SO_CLOSE' | 'UNANSWERED';
 
 export type GameRef = {
-  getCorrectState: () => GameState;
+  getCorrectState: () => AnswerState;
 };
 
 export const getGameState = (
   userInput: string[],
   correctLetters: string[]
-): GameState => {
+): AnswerState => {
   if (userInput.includes('')) {
     return 'UNANSWERED';
   }
