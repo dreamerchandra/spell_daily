@@ -6,7 +6,6 @@ import { InlineKeyboardButton, Update } from 'node-telegram-bot-api';
 import { ensure } from '../types/ensure.js';
 import { remainderService } from './remainder-service.js';
 import { parentModel } from '../model/parent-model.js';
-import { getNowIST } from '../utils/date.js';
 
 class TelegramTimePickerService extends TelegramBaseService {
   bot = bot;
@@ -103,7 +102,7 @@ class TelegramTimePickerService extends TelegramBaseService {
             text: `You selected ${selectedTime}`,
           });
         }
-        const dateTime = getNowIST();
+        const dateTime = new Date();
         const [year, month, day] = selectedDate.split('-').map(Number);
         dateTime.setFullYear(year, month - 1, day);
         const [hours, minutes] = selectedTime.split(':').map(Number);
