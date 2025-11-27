@@ -1,33 +1,65 @@
-import { Alignment, Fit, Layout, useRive } from '@rive-app/react-canvas';
-import { type ReactNode } from 'react';
+import {
+  Alignment,
+  EventType,
+  Fit,
+  Layout,
+  useRive,
+} from '@rive-app/react-canvas';
+import { useEffect, type ReactNode } from 'react';
+import { footerAnimation } from '../../util/riveManager';
 
-export const RiveFooter = ({ isSuccess }: { isSuccess: boolean }) => {
-  const { RiveComponent } = useRive({
-    src: '/rive/footer_animation.riv',
-    autoplay: true,
+export const RiveFooter = ({
+  isSuccess,
+  onAnimationComplete,
+}: {
+  isSuccess: boolean;
+  onAnimationComplete: () => void;
+}) => {
+  const { RiveComponent, rive } = useRive({
+    buffer: footerAnimation.getBuffer(),
     autoBind: true,
     layout: new Layout({
       fit: Fit.FitWidth,
       alignment: Alignment.BottomCenter,
     }),
   });
-  if (!isSuccess) {
-    return null;
-  }
-  return <RiveComponent />;
+
+  useEffect(() => {
+    let timerId = 0;
+    const onStop = () => {
+      onAnimationComplete();
+    };
+    if (isSuccess) {
+      rive?.play();
+    } else {
+      rive?.reset();
+    }
+    rive?.on(EventType.Stop, onStop);
+    return () => {
+      clearTimeout(timerId);
+      rive?.off(EventType.Stop, onStop);
+    };
+  }, [isSuccess, onAnimationComplete, rive]);
+
+  return <RiveComponent style={isSuccess ? {} : { display: 'none' }} />;
 };
 export const Footer = ({
   children,
   isSuccess,
+  onAnimationComplete,
 }: {
   children: ReactNode;
   isSuccess: boolean;
+  onAnimationComplete: () => void;
 }) => {
   return (
     <div className="relative w-full pb-6 text-center text-sm text-ui-textMuted">
       <div className="relative z-10">{children}</div>
       <div className="absolute bottom-0 h-[200px] w-full text-center text-sm text-ui-textMuted">
-        <RiveFooter isSuccess={isSuccess} />
+        <RiveFooter
+          isSuccess={isSuccess}
+          onAnimationComplete={onAnimationComplete}
+        />
       </div>
     </div>
   );

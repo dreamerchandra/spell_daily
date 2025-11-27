@@ -29,7 +29,7 @@ export const useGameSequence = () => {
             error: error.message || 'Failed to load game sequence',
           });
         });
-    }, 5000);
+    }, 1000);
   }, []);
 
   return result;

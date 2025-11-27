@@ -5,7 +5,6 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import '@dotlottie/player-component';
 
 type LottieElement = Element & {
   play: () => void;
@@ -82,6 +81,15 @@ export const DotLottiePlayer = ({
         }
       });
     });
+
+    const timerId = setTimeout(() => {
+      if (latestRef.current) {
+        latestRef.current();
+      }
+    }, 7000); // Fallback in case 'complete' event doesn't fire
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [background, speed, blob, style, loop]);
 
   return (

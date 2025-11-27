@@ -23,6 +23,10 @@ export default defineConfig({
           if (id.includes('@dnd-kit')) {
             return 'dndkit';
           }
+          // Separate Lottie player into its own chunk (contains eval warnings)
+          if (id.includes('@dotlottie/player-component')) {
+            return 'lottie';
+          }
           // Automatically split other vendor chunks for node_modules
           if (id.includes('node_modules')) {
             return 'vendor';

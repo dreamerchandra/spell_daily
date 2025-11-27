@@ -18,31 +18,26 @@ export const Continue = ({
   const setTimer = useSetTimeout();
   const isTestMode = useIsTestMode();
   const [isProgressing, setIsProgressing] = useState(false);
+  const delay = isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS;
   useShortcut('Enter', onClick);
 
   useSubscribe('Animation:End', () => {
     if (!disabled) {
       setIsProgressing(true);
-      setTimer(
-        () => {
-          onClick();
-          setIsProgressing(false);
-        },
-        isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS
-      );
+      setTimer(() => {
+        onClick();
+        setIsProgressing(false);
+      }, delay);
     }
   });
 
   useSubscribe('Streak:End', () => {
     if (!disabled) {
       setIsProgressing(true);
-      setTimer(
-        () => {
-          onClick();
-          setIsProgressing(false);
-        },
-        isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS
-      );
+      setTimer(() => {
+        onClick();
+        setIsProgressing(false);
+      }, delay);
     }
   });
 
@@ -58,7 +53,7 @@ export const Continue = ({
         <div
           className="absolute inset-0 bg-ui-primary "
           style={{
-            animation: `progressFill ${DELAY_NEXT_WORD_MS}ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards`,
+            animation: `progressFill ${delay}ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards`,
           }}
         />
       )}

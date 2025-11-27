@@ -103,7 +103,13 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
   } = useGameState(gameSequence);
 
   const [disableChecking, setDisableChecking] = useState(true);
-  const { streak, incrementStreak, resetStreak, stopAnimation } = useSteak();
+  const {
+    streak,
+    incrementStreak,
+    resetStreak,
+    stopAnimation,
+    startAnimation,
+  } = useSteak();
   const stopStreakTimer = useSetTimeout();
   const publishStreakEndTimer = useSetTimeout();
 
@@ -183,7 +189,14 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
         />
       }
       footer={
-        <Footer isSuccess={canContinue}>
+        <Footer
+          isSuccess={canContinue}
+          onAnimationComplete={useCallback(() => {
+            if (streak.isStreakScheduled) {
+              startAnimation();
+            }
+          }, [streak.isStreakScheduled, startAnimation])}
+        >
           {canContinue ? (
             <Continue
               disabled={!canContinue || streak.isPlaying}

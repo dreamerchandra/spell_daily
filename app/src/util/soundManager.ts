@@ -45,65 +45,65 @@ const SOUND_CONFIGS = {
 };
 
 class SuccessSoundManager {
-  private audioCache: Map<SuccessAnimationTypeValue, HTMLAudioElement> =
-    new Map();
-  private volume: number = 0.5; // Default volume (30%)
-  private enabled: boolean = true;
+  private audioCache = new Map();
+  private loaded = new Map();
 
   constructor() {
-    this.preloadSounds();
+    this.preloadAll(); // but now controlled
   }
 
-  private preloadSounds() {
-    Object.entries(SOUND_CONFIGS).forEach(([type, config]) => {
-      const audio = new Audio(config.path);
-      audio.preload = 'auto';
-      audio.volume = this.volume;
+  private createAudio(src: string) {
+    const audio = document.createElement('audio');
+    audio.src = src;
+    audio.preload = 'none';
+    return audio;
+  }
 
-      // Add error handler to fallback to generated tone
-      audio.addEventListener('error', () => {
-        console.warn(
-          `Could not load sound file: ${config.path}, using generated tone`
-        );
-      });
+  private async loadAudio(type: SuccessAnimationTypeValue) {
+    const audio = this.audioCache.get(type);
 
-      this.audioCache.set(type as SuccessAnimationTypeValue, audio);
+    if (this.loaded.get(type)) return; // no double loading
+
+    this.loaded.set(type, true);
+
+    return new Promise<void>(resolve => {
+      const onLoad = () => {
+        audio.removeEventListener('canplaythrough', onLoad);
+        resolve();
+      };
+      const onError = () => resolve();
+
+      audio.preload = 'auto'; // start download now
+      audio.addEventListener('canplaythrough', onLoad);
+      audio.addEventListener('error', onError);
+      audio.load();
     });
   }
 
-  playSuccess(animationType: SuccessAnimationTypeValue, volume?: number) {
-    if (!this.enabled) return;
-
-    const audio = this.audioCache.get(animationType);
-    if (audio) {
-      // Reset audio to beginning in case it's already playing
-      if (volume !== undefined) {
-        audio.volume = Math.max(0, Math.min(1, volume));
-      }
-      audio.currentTime = 0;
-      audio.play().catch(error => {
-        console.warn('Could not play success sound:', error);
-      });
+  private preloadAll() {
+    for (const type of Object.keys(
+      SOUND_CONFIGS
+    ) as SuccessAnimationTypeValue[]) {
+      const config = SOUND_CONFIGS[type];
+      const audio = this.createAudio(config.path);
+      this.audioCache.set(type, audio);
+      this.loadAudio(type); // but now controlled preload
     }
   }
 
-  setVolume(volume: number) {
-    this.volume = Math.max(0, Math.min(1, volume));
-    this.audioCache.forEach(audio => {
-      audio.volume = this.volume;
-    });
-  }
+  playSuccess(type: SuccessAnimationTypeValue, volume?: number) {
+    const audio = this.audioCache.get(type);
+    if (!audio) return;
 
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
-  }
+    if (!this.loaded.get(type)) {
+      // On-demand fallback
+      this.loadAudio(type).then(() => audio.play());
+      return;
+    }
 
-  getVolume() {
-    return this.volume;
-  }
-
-  isEnabled() {
-    return this.enabled;
+    audio.currentTime = 0;
+    if (volume != null) audio.volume = volume;
+    audio.play().catch((e: unknown) => console.warn(e));
   }
 }
 
