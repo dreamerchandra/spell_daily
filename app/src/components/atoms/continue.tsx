@@ -50,7 +50,7 @@ export const Continue = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="relative m-auto w-[80%] transform overflow-hidden rounded-xl border-2 border-ui-primary bg-transparent px-6 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105"
+      className="relative m-auto max-w-[300px] w-[80%] transform overflow-hidden rounded-xl border-2 border-ui-primary bg-transparent px-6 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105"
     >
       <span className="relative z-10">CONTINUE</span>
       {/* Progress overlay */}

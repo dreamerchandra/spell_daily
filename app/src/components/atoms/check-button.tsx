@@ -34,7 +34,7 @@ export const CheckButton: FC<{
       )}
       <Button
         onClick={onClick}
-        className="m-auto w-[80%]"
+        className="m-auto w-[80%] max-w-[300px]"
         disabled={disableChecking}
         variant={
           gameState === 'UNANSWERED'
