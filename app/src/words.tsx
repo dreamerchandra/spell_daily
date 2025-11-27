@@ -692,26 +692,28 @@ export type GameSequenceType = {
   isTestMode: boolean;
 }[];
 
-export const gameSequence: GameSequenceType = (() => {
-  const sequence: GameSequenceType = [];
-  for (const item of wordSequence) {
-    const wordDef = sampleSpellingWords.find(w => w.word === item.word);
-    const wordUsage = sampleWordUsage.find(w => w.word === item.word);
-    if (wordDef && !['context', 'correctSentence'].includes(item.mode)) {
-      sequence.push({
-        mode: item.mode,
-        def: wordDef,
-        testTimerSeconds: wordDef.word.length * 2,
-        isTestMode: true,
-      });
-    } else if (wordUsage) {
-      sequence.push({
-        mode: item.mode,
-        def: wordUsage,
-        testTimerSeconds: 30,
-        isTestMode: false,
-      });
+export const gameSequence: Promise<GameSequenceType> = Promise.resolve(
+  (() => {
+    const sequence: GameSequenceType = [];
+    for (const item of wordSequence) {
+      const wordDef = sampleSpellingWords.find(w => w.word === item.word);
+      const wordUsage = sampleWordUsage.find(w => w.word === item.word);
+      if (wordDef && !['context', 'correctSentence'].includes(item.mode)) {
+        sequence.push({
+          mode: item.mode,
+          def: wordDef,
+          testTimerSeconds: wordDef.word.length * 2,
+          isTestMode: true,
+        });
+      } else if (wordUsage) {
+        sequence.push({
+          mode: item.mode,
+          def: wordUsage,
+          testTimerSeconds: 30,
+          isTestMode: false,
+        });
+      }
     }
-  }
-  return sequence as GameSequenceType;
-})();
+    return sequence as GameSequenceType;
+  })()
+);
