@@ -322,7 +322,6 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
           handleSort={handleSort}
           pinnedColumnsSet={pinnedColumnsSet}
           isFetching={isFetching}
-          key={JSON.stringify(queryFilters)}
         />
       </div>
 

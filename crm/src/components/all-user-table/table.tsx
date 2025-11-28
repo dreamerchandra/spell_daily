@@ -134,7 +134,7 @@ export const InternalTable = ({
         <TableBody>
           {usersData?.data.map(row => (
             <TableRow
-              key={row.testCode}
+              key={`${row.parentId}-${row.testCode}`}
               sx={{
                 backgroundColor: darkTheme.background.secondary,
                 '&:hover': {
