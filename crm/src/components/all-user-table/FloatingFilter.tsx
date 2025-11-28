@@ -42,6 +42,7 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
       search: currentFilters.q || '',
       phoneNumber: currentFilters.phoneNumber || '',
       leadStatus: currentFilters.leadStatus || '',
+      status: currentFilters.status,
       createdAt: 'ALL',
     }
   );
