@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { FilterList, Close, CalendarToday } from '@mui/icons-material';
-import type { AllUsersFilters } from '../../type/all-users';
+import { StudentStatus, type AllUsersFilters } from '../../type/all-users';
+import { getStudentStatusLabel } from './student-status';
 
 interface LeadStatus {
   id: string;
@@ -12,6 +13,7 @@ type InternalFilterOptions = {
   search: string;
   phoneNumber: string;
   leadStatus: string;
+  status?: StudentStatus;
   createdAt:
     | 'ALL'
     | 'TODAY'
@@ -53,6 +55,7 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
       q: internal.search || undefined,
       phoneNumber: internal.phoneNumber || undefined,
       leadStatus: internal.leadStatus || undefined,
+      status: internal.status || undefined,
       page: 0, // Reset to first page when filtering
     };
 
@@ -144,7 +147,7 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
 
   const handleFilterChange = (
     key: keyof InternalFilterOptions,
-    value: string | Date
+    value: string | Date | null
   ) => {
     const newInternalFilters = { ...internalFilters, [key]: value };
     setInternalFilters(newInternalFilters);
@@ -272,6 +275,23 @@ export const FloatingFilter: React.FC<FloatingFilterProps> = ({
             />
           </div>
 
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-app-primary mb-2">
+              Student Status
+            </label>
+            <select
+              value={internalFilters.status}
+              onChange={e => handleFilterChange('status', e.target.value)}
+              className="w-full p-2 bg-app rounded border border-app-hover text-app-primary focus:outline-none focus:border-accent-blue text-sm"
+            >
+              <option value="">All</option>
+              {StudentStatus.map(status => (
+                <option key={status} value={status}>
+                  {getStudentStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* Lead Status Filter */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-app-primary mb-2">

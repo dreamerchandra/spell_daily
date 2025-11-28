@@ -15,6 +15,7 @@ export interface AllUsersFilters {
   offset: number;
   orderBy: string;
   order: 'asc' | 'desc';
+  status?: StudentStatus;
 }
 
 export interface AllUsersData {
@@ -66,6 +67,7 @@ class AllUsersService {
         order: filters.order,
         limit: filters.limit,
         offset: filters.offset,
+        status: filters.status ?? null,
       };
       const createDateBefore = filters.createdAtBefore
         ? new Date(filters.createdAtBefore)
@@ -96,19 +98,21 @@ class AllUsersService {
           $1::text IS NULL
           OR p.name ILIKE '%' || $1 || '%'
           OR p."phoneNumber" ILIKE '%' || $1 || '%'
-          OR s.name ILIKE '%' || $1 || '%'
+          OR s.status::text ILIKE '%' || $1 || '%'
           OR s."testCode" ILIKE '%' || $1 || '%'
         )
         AND ($2::text IS NULL OR p."phoneNumber" = $2)
         AND ($3::text IS NULL OR ll."statusId" = $3)
         AND ($4::timestamptz IS NULL OR p."createdAt" <= $4)
         AND ($5::timestamptz IS NULL OR p."createdAt" >= $5)
+        AND ($6::text IS NULL OR s."status"::text = $6)
       `,
         params.q,
         params.phoneNumber,
         params.leadStatus,
         createDateBefore,
-        createDateAfter
+        createDateAfter,
+        params.status
       );
 
       const total = Number(totalResult[0].count);
@@ -178,21 +182,23 @@ class AllUsersService {
         AND ($3::text IS NULL OR ll."statusId" = $3)
         AND ($4::timestamptz IS NULL OR p."createdAt" <= $4)
         AND ($5::timestamptz IS NULL OR p."createdAt" >= $5)
+        AND ($6::text IS NULL OR ls."status"::text = $6)
 
       ORDER BY
-        CASE WHEN $6 = 'lastFollowupAt' THEN (
+        CASE WHEN $7 = 'lastFollowupAt' THEN (
           SELECT COUNT(*) FROM "Followup" f WHERE f."parentId" = p.id
         ) END DESC,
-        CASE WHEN $6 = 'createdAt' AND $7 = 'asc'  THEN p."createdAt" END ASC,
-        CASE WHEN $6 = 'createdAt' AND $7 = 'desc' THEN p."createdAt" END DESC
+        CASE WHEN $7 = 'createdAt' AND $8 = 'asc'  THEN p."createdAt" END ASC,
+        CASE WHEN $7 = 'createdAt' AND $8 = 'desc' THEN p."createdAt" END DESC
 
-      LIMIT $8 OFFSET $9
+      LIMIT $9 OFFSET $10
       `,
         params.q,
         params.phoneNumber,
         params.leadStatus,
         createDateBefore,
         createDateAfter,
+        params.status,
         params.orderBy,
         params.order,
         params.limit,

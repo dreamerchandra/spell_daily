@@ -30,6 +30,7 @@ export const fetchAllUsers = async (
     if (params.offset !== undefined)
       url.searchParams.set('offset', params.offset.toString());
     if (params.limit) url.searchParams.set('limit', params.limit.toString());
+    if (params.status) url.searchParams.set('status', params.status);
 
     const response = await fetch(url.toString(), {
       method: 'GET',

@@ -1,10 +1,10 @@
 import type { StudentStatus } from '../../type/all-users';
 import { PopoverSelect } from '../PopoverSelect';
 
-const getStatusLabel = (status: StudentStatus) => {
+export const getStudentStatusLabel = (status: StudentStatus) => {
   switch (status) {
     case 'PAID':
-      return 'Paid';
+      return 'Premium';
     case 'FREE_TRIAL':
       return 'Free Trial';
     case 'DICTATION':
@@ -28,7 +28,7 @@ export const StudentStatusEditor = ({
     status?.map(status => ({
       id: status,
       value: status,
-      label: getStatusLabel(status),
+      label: getStudentStatusLabel(status),
     })) || [];
   const handleChange = (value: string) => {
     onChange(row.testCode, value);

@@ -1,4 +1,6 @@
-export type StudentStatus = 'PAID' | 'FREE_TRIAL' | 'DICTATION';
+export const StudentStatus = ['PAID', 'FREE_TRIAL', 'DICTATION'] as const;
+// eslint-disable-next-line no-redeclare
+export type StudentStatus = (typeof StudentStatus)[number];
 
 export interface AllUsersData {
   testCode: string; // rowId
@@ -42,6 +44,7 @@ export interface AllUsersFilters {
   createdAtAfter?: string;
   page?: number;
   limit?: number;
+  status?: StudentStatus;
 }
 
 export interface AllUsersApiParams extends AllUsersFilters {

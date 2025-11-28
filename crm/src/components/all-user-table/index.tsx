@@ -16,7 +16,11 @@ import { FloatingFilter } from './FloatingFilter';
 import { ColumnManager } from './ColumnManager';
 import { useColumnManagement } from './useColumnManagement';
 import { useDebounce } from './useDebounce';
-import type { AllUsersData, AllUsersFilters } from '../../type/all-users';
+import type {
+  AllUsersData,
+  AllUsersFilters,
+  StudentStatus,
+} from '../../type/all-users';
 import { fetchAllUsers, fetchLeadStatuses } from '../../api/all-users';
 import {
   darkTheme,
@@ -165,6 +169,9 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
     const createdAtBefore = searchParams.get('createdAtBefore');
     if (createdAtBefore) filters.createdAtBefore = createdAtBefore;
 
+    const status = searchParams.get('status');
+    if (status) filters.status = status as StudentStatus;
+
     return filters;
   }, [searchParams]);
 
@@ -186,12 +193,14 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
       createdAtBefore: filters.createdAtBefore,
       page: filters.page,
       limit: filters.limit,
+      status: filters.status,
     }),
     [
       filters.leadStatus,
       filters.createdAtAfter,
       filters.createdAtBefore,
       filters.page,
+      filters.status,
       filters.limit,
     ]
   );

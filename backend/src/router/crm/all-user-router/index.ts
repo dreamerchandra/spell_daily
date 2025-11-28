@@ -26,12 +26,14 @@ allUsersRouter.get(
       offset?: string;
       orderBy?: string;
       order?: 'asc' | 'desc';
+      status?: string;
     };
 
     const filters = {
       q: query.q,
       phoneNumber: query.phoneNumber,
       leadStatus: query.leadStatus,
+      status: query.status as StudentStatus,
       createdAtBefore: query.createdAtBefore,
       createdAtAfter: query.createdAtAfter,
       page: query.page ? parseInt(query.page) : 0,

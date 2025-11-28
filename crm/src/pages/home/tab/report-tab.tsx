@@ -133,7 +133,7 @@ const KanbanList = ({
       {/* Paid Users Column */}
       <div className="rounded-lg p-4">
         <h3 className="text-md font-medium mb-3 text-green-600 border-b border-green-200 pb-2 text-nowrap">
-          Paid ({usersResponse.paid?.length || 0})
+          Premium ({usersResponse.paid?.length || 0})
         </h3>
         <UserList
           users={usersResponse.paid || []}
