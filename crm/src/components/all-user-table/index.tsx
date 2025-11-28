@@ -1,15 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  TablePagination,
-} from '@mui/material';
-import { PushPin } from '@mui/icons-material';
+import { TablePagination } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { FloatingFilter } from './FloatingFilter';
@@ -30,6 +20,7 @@ import {
   LeadStatusRender,
   StudentStatusRender,
 } from './cell-render';
+import { InternalTable } from './table';
 
 interface Column {
   id: keyof AllUsersData | 'parentNameDetail' | 'assignedAdmin' | 'grade';
@@ -225,7 +216,7 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
   const page = queryFilters.page || 0;
   const limit = queryFilters.limit || 10;
   const orderBy = searchParams.get('orderBy') || 'createdAt';
-  const order = searchParams.get('order') || 'desc';
+  const order = (searchParams.get('order') || 'desc') as 'asc' | 'desc';
 
   // Update URL with new filters
   const updateFilters = useCallback(
@@ -245,19 +236,17 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
     [searchParams, setSearchParams]
   );
 
+  const queryParams = {
+    ...queryFilters,
+    page,
+    offset: page * limit,
+    limit,
+  };
+
   // Fetch data with debounced filters
   const { data: usersData, isFetching } = useQuery({
     queryKey: ['allUsers', queryFilters, orderBy, order],
-    queryFn: () =>
-      fetchAllUsers(
-        {
-          ...queryFilters,
-          page,
-          offset: page * limit,
-          limit,
-        },
-        apiKey
-      ),
+    queryFn: () => fetchAllUsers(queryParams, apiKey),
     // Keep previous data while fetching new data (React Query v5)
     placeholderData: previousData => previousData,
   });
@@ -325,133 +314,16 @@ export const AllUsersTable: React.FC<AllUsersTableProps> = ({ apiKey }) => {
           </div>
         )}
 
-        <TableContainer
-          sx={{
-            backgroundColor: darkTheme.background.secondary,
-            border: `1px solid ${darkTheme.background.hover}`,
-            borderRadius: 2,
-            overflow: 'hidden',
-            minWidth: '800px',
-            opacity: isFetching ? 0.7 : 1,
-            transition: 'opacity 0.2s ease-in-out',
-          }}
-          style={{
-            width: 'fit-content',
-          }}
-        >
-          <Table stickyHeader size="medium">
-            <TableHead>
-              <TableRow>
-                {columns.map(column => (
-                  <TableCell
-                    key={String(column.id)}
-                    sx={{
-                      minWidth: column.minWidth,
-                      backgroundColor: pinnedColumnsSet.has(String(column.id))
-                        ? darkTheme.background.hover
-                        : darkTheme.background.app,
-                      borderBottom: `1px solid ${darkTheme.background.hover}`,
-                      color: darkTheme.text.primary,
-                      padding: '16px',
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {column.sortable ? (
-                      <TableSortLabel
-                        active={orderBy === column.id}
-                        direction={
-                          orderBy === column.id
-                            ? (order as 'asc' | 'desc')
-                            : 'asc'
-                        }
-                        onClick={() => handleSort(String(column.id))}
-                        sx={{
-                          color: darkTheme.text.primary,
-                          '&:hover': {
-                            color: darkTheme.colors.accent.blue,
-                          },
-                          '&.Mui-active': {
-                            color: darkTheme.colors.accent.blue,
-                            '& .MuiTableSortLabel-icon': {
-                              color: darkTheme.colors.accent.blue,
-                            },
-                          },
-                        }}
-                      >
-                        <span className="font-medium text-sm">
-                          {column.label}
-                        </span>
-                        {pinnedColumnsSet.has(String(column.id)) && (
-                          <PushPin
-                            fontSize="small"
-                            sx={{
-                              ml: 0.5,
-                              color: darkTheme.colors.accent.blue,
-                            }}
-                          />
-                        )}
-                      </TableSortLabel>
-                    ) : (
-                      <div className="flex items-center">
-                        <span className="font-medium text-white-100 text-sm">
-                          {column.label}
-                        </span>
-                        {pinnedColumnsSet.has(String(column.id)) && (
-                          <PushPin
-                            fontSize="small"
-                            className="ml-2 text-accent-blue"
-                          />
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {usersData?.data.map(row => (
-                <TableRow
-                  key={row.testCode}
-                  sx={{
-                    backgroundColor: darkTheme.background.secondary,
-                    '&:hover': {
-                      backgroundColor: darkTheme.background.hover,
-                    },
-                    '&:nth-of-type(odd)': {
-                      backgroundColor: darkTheme.background.app,
-                      '&:hover': {
-                        backgroundColor: darkTheme.background.hover,
-                      },
-                    },
-                  }}
-                >
-                  {columns.map(column => (
-                    <TableCell
-                      key={String(column.id)}
-                      sx={{
-                        backgroundColor: pinnedColumnsSet.has(String(column.id))
-                          ? 'rgba(96, 165, 250, 0.1)'
-                          : 'transparent',
-                        borderBottom: `1px solid ${darkTheme.background.hover}`,
-                        color: darkTheme.text.primary,
-                        padding: '12px 16px',
-                      }}
-                    >
-                      {column.render ? (
-                        column.render(row)
-                      ) : (
-                        <span className="text-white-100 text-sm">
-                          {String(row[column.id as keyof AllUsersData] || '')}
-                        </span>
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <InternalTable
+          columns={columns}
+          usersData={usersData}
+          orderBy={orderBy}
+          order={order}
+          handleSort={handleSort}
+          pinnedColumnsSet={pinnedColumnsSet}
+          isFetching={isFetching}
+          key={JSON.stringify(queryFilters)}
+        />
       </div>
 
       {/* Debounce Status */}

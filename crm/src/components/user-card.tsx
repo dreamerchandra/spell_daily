@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import type { User } from '../type/user';
 import { SelectableItem, SelectionIndicator } from './SelectableCard';
 import { useSelection } from '../hooks/useSelectionContext';
+import { getStudentStatusLabel } from './all-user-table/student-status';
 
 const getRelativeTime = (date: Date) => {
   const now = new Date();
@@ -41,7 +42,9 @@ export const UserCard: FC<{
             {user.name ?? 'Name'} ({user.parentName ?? 'Parent Name'})
           </div>
           <div className="flex flex-col">
-            <div className="text-sm text-app-secondary">{user.status}</div>
+            <div className="text-sm text-app-secondary">
+              {user.status ? getStudentStatusLabel(user.status) : ''}
+            </div>
             <div className="text-sm text-app-secondary">
               {user.lastCompletedDate
                 ? getRelativeTime(new Date(user.lastCompletedDate))
