@@ -703,7 +703,7 @@ export const gameSequence: Promise<GameSequenceType> = Promise.resolve(
           mode: item.mode,
           def: wordDef,
           testTimerSeconds: wordDef.word.length * 2,
-          isTestMode: true,
+          isTestMode: false,
         });
       } else if (wordUsage) {
         sequence.push({

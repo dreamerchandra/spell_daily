@@ -55,6 +55,7 @@ export const DotLottiePlayer = ({
       background=${background}
       speed=${speed}
       id="lottie-player"
+      autoplay
       loop=${loop ? 'true' : 'false'}
       style=${JSON.stringify(style || { width: '100%', height: '100%' })}
     >

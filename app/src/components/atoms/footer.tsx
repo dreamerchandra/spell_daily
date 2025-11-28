@@ -53,9 +53,11 @@ export const Footer = ({
   onAnimationComplete: () => void;
 }) => {
   return (
-    <div className="relative w-full pb-6 text-center text-sm text-ui-textMuted">
+    <div className="fixed bottom-0 w-full pb-6 text-center text-sm text-ui-textMuted">
       <div className="relative z-10">{children}</div>
-      <div className="absolute bottom-0 h-[200px] w-full text-center text-sm text-ui-textMuted">
+      <div
+        className={`absolute bottom-0  ${isSuccess ? 'h-[200px]' : 'h-[140px]'} w-full text-center text-sm text-ui-textMuted`}
+      >
         <RiveFooter
           isSuccess={isSuccess}
           onAnimationComplete={onAnimationComplete}
