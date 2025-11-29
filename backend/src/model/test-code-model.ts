@@ -118,7 +118,7 @@ class TestCodeModel {
   ): Promise<TestCodeResponse> {
     const result = await prismaClient.students.create({
       data: {
-        testCode: params.testCode,
+        testCode: params.testCode.trim(),
         parentId: params.parentId ?? null,
         name: params.name,
         details: params.grade ? { grade: params.grade } : undefined,
@@ -161,10 +161,10 @@ class TestCodeModel {
   ): Promise<TestCodeResponse> {
     const result = await prismaClient.students.update({
       where: {
-        testCode: oldTestCode,
+        testCode: oldTestCode.trim(),
       },
       data: {
-        testCode: params.testCode,
+        testCode: params.testCode.trim(),
         name: params.name,
         details: params.grade ? { grade: params.grade } : undefined,
       },
