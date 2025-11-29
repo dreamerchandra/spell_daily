@@ -13,9 +13,10 @@ import {
   SuccessAnimationType,
   successSoundManager,
 } from '../../util/soundManager';
+import { SpellingInput } from '../../components/organisms/SpellingInput/KeyboardInput';
 
 export const TypingWithoutBox: GameComponent = forwardRef(
-  ({ wordDef, setDisableChecking }, ref) => {
+  ({ wordDef, setDisableChecking, skipToNext }, ref) => {
     const { state, setIsCorrect, setUserInput, setNewWord } = useTypingState();
 
     const hintState = useHintState();
@@ -33,6 +34,9 @@ export const TypingWithoutBox: GameComponent = forwardRef(
             successSoundManager.playSuccess(SuccessAnimationType.GENERIC, 1);
             setIsCorrect(true);
           } else if (gameState === 'INCORRECT' || gameState === 'SO_CLOSE') {
+            if (state.incorrectAttempts + 1 >= state.maxAttempts) {
+              skipToNext();
+            }
             setIsCorrect(false);
           }
           return gameState;
@@ -90,6 +94,19 @@ export const TypingWithoutBox: GameComponent = forwardRef(
             isCorrect={state.isCorrect}
             className="mb-8"
           />
+
+          {state.revealAnswer && (
+            <div className="mb-4 flex flex-col items-center gap-2">
+              <div>
+                <SpellingInput
+                  userInput={wordDef.word.split('')}
+                  isCorrect={false}
+                  wordDef={wordDef}
+                  disableTalkBack={true}
+                />
+              </div>
+            </div>
+          )}
 
           <Keyboard onKeyPress={handleKeyPress} />
         </div>

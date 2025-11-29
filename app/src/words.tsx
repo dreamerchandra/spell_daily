@@ -669,7 +669,7 @@ export const sampleSpellingWords: WordDef[] = [
 ];
 
 export const wordSequence: { mode: GameType; word: string }[] = [
-  { mode: 'jumbled', word: 'OPINION' },
+  { mode: 'typingWithoutBox', word: 'OPINION' },
   { mode: 'typingWithBox', word: 'CULTURE' },
   { mode: 'syllable', word: 'DEFINITELY' },
   { mode: 'jumbled', word: 'OPINION' },

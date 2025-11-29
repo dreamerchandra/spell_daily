@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
-import {
-  useHintState,
-  useResetHint,
-  useNextHint,
-} from '../../context/hint-context/index';
+import { useHintState, useResetHint } from '../../context/hint-context/index';
 import { useSpellingSpeech } from '../../hooks';
 import { Avatar } from '../../components/organisms/avatar/avatar';
 
@@ -14,6 +10,8 @@ type TypingState = {
   isCorrect: boolean | null;
   incorrectAttempts: number;
   wordDef: WordDef | null;
+  maxAttempts: number;
+  revealAnswer: boolean;
 };
 
 type NewWordPayload = ActionPayload<'NEW_WORD', { wordDef: WordDef }>;
@@ -44,6 +42,8 @@ export const typingReducer = (
         userInput: '',
         isCorrect: null,
         incorrectAttempts: 0,
+        maxAttempts: 1,
+        revealAnswer: false,
       };
     case 'SET_USER_INPUT':
       return {
@@ -55,11 +55,14 @@ export const typingReducer = (
         ...state,
         isCorrect: action.action.isCorrect,
       };
-    case 'SET_INCORRECT_ATTEMPTS':
+    case 'SET_INCORRECT_ATTEMPTS': {
+      const updateIncorrectAttempts = state.incorrectAttempts + 1;
       return {
         ...state,
-        incorrectAttempts: state.incorrectAttempts + 1,
+        incorrectAttempts: updateIncorrectAttempts,
+        revealAnswer: updateIncorrectAttempts >= state.maxAttempts,
       };
+    }
     default:
       return state;
   }
@@ -71,6 +74,8 @@ export const useTypingState = () => {
     isCorrect: null,
     incorrectAttempts: 0,
     wordDef: null,
+    maxAttempts: 1,
+    revealAnswer: false,
   });
   const ref = useRef(state);
   useEffect(() => {
@@ -78,7 +83,6 @@ export const useTypingState = () => {
   }, [state]);
   const resetHint = useResetHint();
   const hintState = useHintState();
-  const nextHint = useNextHint();
   const { speak } = useSpellingSpeech();
 
   const setUserInput = useCallback((userInput: string) => {
@@ -88,34 +92,18 @@ export const useTypingState = () => {
     });
   }, []);
 
-  const setIsCorrect = useCallback(
-    (isCorrect: boolean | null) => {
+  const setIsCorrect = useCallback((isCorrect: boolean | null) => {
+    dispatch({
+      type: 'SET_IS_CORRECT',
+      action: { isCorrect },
+    });
+    if (isCorrect === false) {
       dispatch({
-        type: 'SET_IS_CORRECT',
-        action: { isCorrect },
+        type: 'SET_INCORRECT_ATTEMPTS',
       });
-      if (isCorrect === false) {
-        dispatch({
-          type: 'SET_INCORRECT_ATTEMPTS',
-        });
-        const incorrectAttempts = ref.current.incorrectAttempts + 1;
-        if (incorrectAttempts === 0) return;
-        if (incorrectAttempts === 1) {
-          Avatar.hint({
-            text: 'Want some hint?',
-            yesText: 'Yes, please!',
-            noText: 'No, I got this!',
-            onYes: () => {
-              nextHint();
-            },
-          });
-        } else {
-          Avatar.changeCharacter('by_rating/1');
-        }
-      }
-    },
-    [nextHint]
-  );
+      Avatar.changeCharacter('by_rating/1');
+    }
+  }, []);
 
   const setNewWord = useCallback(
     (wordDef: WordDef) => {
