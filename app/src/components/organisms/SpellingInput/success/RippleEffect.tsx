@@ -37,7 +37,10 @@ export const RippleEffect = ({
       setAnimationStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.RIPPLE_EFFECT, 1);
+      const stop = successSoundManager.playSuccess(
+        SuccessAnimationType.RIPPLE_EFFECT,
+        1
+      );
 
       // Start ripple from center
       const centerIndex = Math.floor(userInput.length / 2);
@@ -89,6 +92,7 @@ export const RippleEffect = ({
       );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

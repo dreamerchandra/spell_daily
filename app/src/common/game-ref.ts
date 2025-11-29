@@ -18,18 +18,5 @@ export const getGameState = (
     return 'CORRECT';
   }
 
-  let correctCount = 0;
-  userInput.forEach((letter, index) => {
-    if (letter === correctLetters[index]) {
-      correctCount += 1;
-    }
-  });
-
-  const accuracy = correctLetters.length - correctCount <= 2;
-
-  if (accuracy) {
-    return 'SO_CLOSE';
-  }
-
   return 'INCORRECT';
 };

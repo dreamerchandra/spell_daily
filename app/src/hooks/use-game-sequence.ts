@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { gameSequence, type GameSequenceType } from '../words';
+import { isDev } from '../env';
+
+const MOCK_DELAY_MS = isDev ? 0 : 1000;
 
 export const useGameSequence = () => {
   const [result, setResult] = useState<{
@@ -13,7 +16,7 @@ export const useGameSequence = () => {
   });
 
   useEffect(() => {
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       gameSequence
         .then(gameSequence => {
           setResult({
@@ -29,7 +32,8 @@ export const useGameSequence = () => {
             error: error.message || 'Failed to load game sequence',
           });
         });
-    }, 1000);
+    }, MOCK_DELAY_MS);
+    return () => clearTimeout(timerId);
   }, []);
 
   return result;

@@ -39,7 +39,10 @@ export const ColorFlow = ({
       setGlowStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.COLOR_FLOW, 1);
+      const stop = successSoundManager.playSuccess(
+        SuccessAnimationType.COLOR_FLOW,
+        1
+      );
 
       let timerIds: number[] = [];
 
@@ -87,6 +90,7 @@ export const ColorFlow = ({
       );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

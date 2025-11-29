@@ -1,72 +1,46 @@
-import { useState } from 'react';
-import { useSubscribe } from '../../hooks/usePubSub';
-import { useSetTimeout } from '../../hooks/use-setTimeout';
-import {
-  DELAY_NEXT_WORD_MS,
-  DELAY_NEXT_WORD_MS_FAST,
-} from '../../config/animation-knobs';
-import { useIsTestMode } from '../../context/hint-context';
+import type { AnswerState } from '../../common/game-ref';
 import { useShortcut } from '../../hooks/use-shortcut';
+import { Button } from './Button';
+import type { FC } from 'react';
+
+const IncorrectButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick }) => (
+  <Button onClick={onClick} variant="error" size="lg">
+    💪 YOU GOT IT!
+  </Button>
+);
+
+const ContinueButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick, disabled }) => {
+  return (
+    <Button onClick={onClick} disabled={disabled} variant={'success'} size="lg">
+      CONTINUE
+    </Button>
+  );
+};
 
 export const Continue = ({
   onClick,
   disabled,
+  answerState,
 }: {
   onClick: () => void;
   disabled: boolean;
+  answerState: AnswerState;
 }) => {
-  const setTimer = useSetTimeout();
-  const isTestMode = useIsTestMode();
-  const [isProgressing, setIsProgressing] = useState(false);
-  const delay = isTestMode ? DELAY_NEXT_WORD_MS_FAST : DELAY_NEXT_WORD_MS;
   useShortcut('Enter', onClick);
 
-  useSubscribe('Animation:End', () => {
-    if (!disabled) {
-      setIsProgressing(true);
-      setTimer(() => {
-        onClick();
-        setIsProgressing(false);
-      }, delay);
-    }
-  });
-
-  useSubscribe('Streak:End', () => {
-    if (!disabled) {
-      setIsProgressing(true);
-      setTimer(() => {
-        onClick();
-        setIsProgressing(false);
-      }, delay);
-    }
-  });
-
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="relative m-auto max-w-[300px] w-[80%] transform overflow-hidden rounded-xl border-2 border-ui-primary bg-transparent px-6 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105"
-    >
-      <span className="relative z-10">CONTINUE</span>
-      {/* Progress overlay */}
-      {isProgressing && (
-        <div
-          className="absolute inset-0 bg-ui-primary "
-          style={{
-            animation: `progressFill ${delay}ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards`,
-          }}
-        />
+    <div className="flex flex-col justify-center">
+      {answerState === 'INCORRECT' ? (
+        <IncorrectButton onClick={onClick} disabled={disabled} />
+      ) : (
+        <ContinueButton onClick={onClick} disabled={disabled} />
       )}
-      <style>{`
-        @keyframes progressFill {
-          from {
-            width: 0%;
-          }
-          to {
-            width: 100%;
-          }
-        }
-      `}</style>
-    </button>
+    </div>
   );
 };

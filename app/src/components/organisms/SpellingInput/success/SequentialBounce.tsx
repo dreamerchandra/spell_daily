@@ -37,7 +37,7 @@ export const SequentialBounce = ({
       setAnimationStates(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(
+      const stop = successSoundManager.playSuccess(
         SuccessAnimationType.SEQUENTIAL_BOUNCE,
         1
       );
@@ -70,6 +70,7 @@ export const SequentialBounce = ({
 
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

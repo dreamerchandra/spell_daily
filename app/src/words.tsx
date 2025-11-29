@@ -371,7 +371,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['ture', 'chur', 'tour'],
     ],
     option: {
-      easy: ['culture', 'kulture'],
+      easy: ['culcher', 'kulture'],
       medium: ['cultuer', 'cultre'],
       hard: ['culter', 'cultare'],
     },
@@ -394,7 +394,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['ly', 'li', 'lee'],
     ],
     option: {
-      easy: ['definitely', 'definately'],
+      easy: ['defenetly', 'definately'],
       medium: ['definetly', 'defintely'],
       hard: ['definitly', 'definatley'],
     },
@@ -417,7 +417,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['ion', 'eon', 'yon'],
     ],
     option: {
-      easy: ['opinion', 'opinnion'],
+      easy: ['opinon', 'opinnion'],
       medium: ['opinyon', 'opineon'],
       hard: ['opinyun', 'opeenion'],
     },
@@ -439,7 +439,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['in', 'en', 'inn'],
     ],
     option: {
-      easy: ['cousin', 'cousen'],
+      easy: ['cosin', 'cousen'],
       medium: ['kousin', 'couzin'],
       hard: ['cowsin', 'coussn'],
     },
@@ -460,7 +460,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['press', 'pres', 'pross'],
     ],
     option: {
-      easy: ['impress', 'impres'],
+      easy: ['impres', 'imprес'],
       medium: ['empress', 'impross'],
       hard: ['umpress', 'imprss'],
     },
@@ -483,7 +483,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['ment', 'mant', 'mint'],
     ],
     option: {
-      easy: ['arrangement', 'arangement'],
+      easy: ['arangment', 'arangement'],
       medium: ['arranjement', 'arrangment'],
       hard: ['arangmant', 'arrangmint'],
     },
@@ -504,7 +504,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['haust', 'host', 'hawst'],
     ],
     option: {
-      easy: ['exhaust', 'exaust'],
+      easy: ['exhust', 'exaust'],
       medium: ['eksaust', 'exhawst'],
       hard: ['axhaust', 'exhost'],
     },
@@ -527,7 +527,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['ble', 'bel', 'bal'],
     ],
     option: {
-      easy: ['memorable', 'memorible'],
+      easy: ['memorabel', 'memorible'],
       medium: ['mamerable', 'memorahble'],
       hard: ['momarable', 'memoraybel'],
     },
@@ -549,7 +549,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['cial', 'shial', 'shal'],
     ],
     option: {
-      easy: ['special', 'spesial'],
+      easy: ['specal', 'spesial'],
       medium: ['spashial', 'spycial'],
       hard: ['spashel', 'spyshal'],
     },
@@ -570,7 +570,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['tem', 'tam', 'tim'],
     ],
     option: {
-      easy: ['system', 'sistem'],
+      easy: ['systm', 'sistem'],
       medium: ['cystem', 'systam'],
       hard: ['cystam', 'systim'],
     },
@@ -591,7 +591,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['bow', 'bou', 'bo'],
     ],
     option: {
-      easy: ['rainbow', 'rainbo'],
+      easy: ['raenbow', 'rainbo'],
       medium: ['ranebow', 'reinbow'],
       hard: ['ranebou', 'reinbo'],
     },
@@ -613,7 +613,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['fly', 'fli', 'flai'],
     ],
     option: {
-      easy: ['butterfly', 'buterfly'],
+      easy: ['buterfly', 'butterfl'],
       medium: ['butterfli', 'butterflai'],
       hard: ['botterfly', 'buttarfli'],
     },
@@ -635,7 +635,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['phant', 'fant', 'pant'],
     ],
     option: {
-      easy: ['elephant', 'elefant'],
+      easy: ['elefant', 'eliphant'],
       medium: ['ellephant', 'aleephant'],
       hard: ['ellefant', 'alepant'],
     },
@@ -656,7 +656,7 @@ export const sampleSpellingWords: WordDef[] = [
       ['sure', 'shur', 'sur'],
     ],
     option: {
-      easy: ['treasure', 'treasur'],
+      easy: ['treasur', 'tresure'],
       medium: ['treeshure', 'treasher'],
       hard: ['trashur', 'treesur'],
     },
@@ -669,18 +669,13 @@ export const sampleSpellingWords: WordDef[] = [
 ];
 
 export const wordSequence: { mode: GameType; word: string }[] = [
-  { mode: 'typingWithoutBox', word: 'CULTURE' },
-  { mode: 'typingWithBox', word: 'DEFINITELY' },
-  { mode: 'fourOption', word: 'OPINION' },
-  { mode: 'jumbled', word: 'COUSIN' },
-  { mode: 'typingWithoutBox', word: 'IMPRESS' },
-  { mode: 'typingWithBox', word: 'ARRANGEMENT' },
-  { mode: 'syllable', word: 'EXHAUST' },
-  { mode: 'twoOption', word: 'MEMORABLE' },
-  { mode: 'fourOption', word: 'SPECIAL' },
-  { mode: 'jumbled', word: 'SYSTEM' },
-  { mode: 'typingWithoutBox', word: 'RAINBOW' },
-  { mode: 'typingWithBox', word: 'BUTTERFLY' },
+  { mode: 'jumbled', word: 'OPINION' },
+  { mode: 'typingWithBox', word: 'CULTURE' },
+  { mode: 'syllable', word: 'DEFINITELY' },
+  { mode: 'jumbled', word: 'OPINION' },
+  { mode: 'fourOption', word: 'COUSIN' },
+  { mode: 'twoOption', word: 'IMPRESS' },
+  { mode: 'typingWithoutBox', word: 'ARRANGEMENT' },
   { mode: 'context', word: 'ELEPHANT' },
   { mode: 'correctSentence', word: 'TREASURE' },
 ];

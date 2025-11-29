@@ -145,7 +145,7 @@ const DroppableSlot = ({
   };
 
   return (
-    <div className={letter ? 'group relative flex-1' : ''}>
+    <div className={letter ? 'group relative w-12' : ''}>
       {showHint && <TapAnimation isShown={showHint} />}
       <div
         ref={setNodeRef}
@@ -289,6 +289,7 @@ export const SpellingInputDragDrop = ({
     index,
   }));
 
+  console.log({ inputItems });
   // Create available items with syllable index for proper color mapping
   const availableItems = availableLetters.map((letter, availableIndex) => {
     // Create a mapping of letter positions to syllable indices in the original word

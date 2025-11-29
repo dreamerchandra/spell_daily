@@ -185,12 +185,12 @@ export const useJumbledWordState = () => {
       let newUserInput = [];
       for (let i = 0; i < ref.current.userInput.length; i++) {
         if (
-          ref.current.userInput[i].letter ===
-          ref.current.wordDef.actualSyllable[i]
+          ref.current.userInput[i].letter.toLocaleLowerCase() ===
+          ref.current.wordDef.word[i].toLocaleLowerCase()
         ) {
           newUserInput.push(ref.current.userInput[i]);
         } else {
-          break;
+          newUserInput.push({ letter: '', pos: i });
         }
       }
       updateInputAndAvailable(newUserInput);

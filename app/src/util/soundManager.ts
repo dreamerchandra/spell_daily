@@ -45,7 +45,8 @@ const SOUND_CONFIGS = {
 };
 
 class SuccessSoundManager {
-  private audioCache = new Map();
+  private audioCache: Map<SuccessAnimationTypeValue, HTMLAudioElement> =
+    new Map();
   private loaded = new Map();
 
   constructor() {
@@ -68,11 +69,15 @@ class SuccessSoundManager {
 
     return new Promise<void>(resolve => {
       const onLoad = () => {
-        audio.removeEventListener('canplaythrough', onLoad);
+        audio?.removeEventListener('canplaythrough', onLoad);
         resolve();
       };
       const onError = () => resolve();
 
+      if (!audio) {
+        resolve();
+        return;
+      }
       audio.preload = 'auto'; // start download now
       audio.addEventListener('canplaythrough', onLoad);
       audio.addEventListener('error', onError);
@@ -91,19 +96,24 @@ class SuccessSoundManager {
     }
   }
 
-  playSuccess(type: SuccessAnimationTypeValue, volume?: number) {
+  playSuccess(type: SuccessAnimationTypeValue, volume?: number): () => void {
     const audio = this.audioCache.get(type);
-    if (!audio) return;
+    if (!audio) return () => {};
 
     if (!this.loaded.get(type)) {
       // On-demand fallback
       this.loadAudio(type).then(() => audio.play());
-      return;
+      return () => {
+        audio.pause();
+      };
     }
 
     audio.currentTime = 0;
     if (volume != null) audio.volume = volume;
     audio.play().catch((e: unknown) => console.warn(e));
+    return () => {
+      audio.pause();
+    };
   }
 }
 
