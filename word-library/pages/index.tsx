@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { WordData } from '../types';
-import ReactMarkdown from 'react-markdown';
 import { WordsForm } from '@/components/words-form';
 import { useSpeech } from '@/components/use-speech';
+import { JsonEditor } from '@/components/json-editor';
 
 export default function WordProcessorPage() {
   const [loading, setLoading] = useState(false);
@@ -15,9 +15,7 @@ export default function WordProcessorPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState('');
   const [activeWordIndex, setActiveWordIndex] = useState(0);
-  const [editedJson, setEditedJson] = useState('');
-  const codeRef = useRef<HTMLDivElement>(null);
-  const isEditingRef = useRef(false);
+  const [loadingField, setLoadingField] = useState<string | null>(null);
   const { speak } = useSpeech();
 
   const handleSubmit = async (words: string) => {
@@ -39,7 +37,6 @@ export default function WordProcessorPage() {
         setWordDataList(data.data || []);
         setOriginalWordDataList(data.data || []);
         setActiveWordIndex(0);
-        setEditedJson(JSON.stringify(data.data[0] || {}, null, 2));
         setShowConfirmation(true);
       }
     } catch (err) {
@@ -51,52 +48,71 @@ export default function WordProcessorPage() {
 
   const handlePrevious = () => {
     if (activeWordIndex > 0) {
-      saveCurrentEdit();
-      const newIndex = activeWordIndex - 1;
-      setActiveWordIndex(newIndex);
-      setEditedJson(JSON.stringify(wordDataList[newIndex], null, 2));
+      setActiveWordIndex(activeWordIndex - 1);
     }
   };
 
   const handleNext = () => {
     if (activeWordIndex < wordDataList.length - 1) {
-      saveCurrentEdit();
-      const newIndex = activeWordIndex + 1;
-      setActiveWordIndex(newIndex);
-      setEditedJson(JSON.stringify(wordDataList[newIndex], null, 2));
+      setActiveWordIndex(activeWordIndex + 1);
     }
   };
 
   const handleReset = () => {
     const originalData = originalWordDataList[activeWordIndex];
-    const updated = [...originalWordDataList];
+    const updated = [...wordDataList];
     updated[activeWordIndex] = JSON.parse(JSON.stringify(originalData));
     setWordDataList(updated);
-    setEditedJson(JSON.stringify(originalData, null, 2));
   };
 
-  const saveCurrentEdit = () => {
+  const handleUpdateWord = (newData: WordData) => {
+    const updated = [...wordDataList];
+    updated[activeWordIndex] = newData;
+    setWordDataList(updated);
+  };
+
+  const handleRegenerate = async (field: keyof WordData) => {
+    const currentWord = wordDataList[activeWordIndex];
+    if (!currentWord) return;
+
+    setLoadingField(field);
     try {
-      const parsed = JSON.parse(editedJson);
+      const response = await fetch('/api/regenerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          word: currentWord.word,
+          field,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to regenerate field');
+
+      const data = await response.json();
+
       const updated = [...wordDataList];
-      updated[activeWordIndex] = parsed;
+      updated[activeWordIndex] = {
+        ...updated[activeWordIndex],
+        [field]: data.data
+      };
       setWordDataList(updated);
-      return updated;
+
     } catch (err) {
-      // Keep original if JSON is invalid
+      console.error(err);
+      alert('Failed to regenerate field');
+    } finally {
+      setLoadingField(null);
     }
   };
 
   const handleSave = async () => {
-    const updatedList = saveCurrentEdit();
-
     try {
       setLoading(true);
       setError('');
       const response = await fetch('/api/save-words', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ words: updatedList }),
+        body: JSON.stringify({ words: wordDataList }),
       });
 
       if (!response.ok) throw new Error('Failed to save words');
@@ -112,8 +128,7 @@ export default function WordProcessorPage() {
   };
 
   const onSpeak = (text: 'syllable' | 'word') => {
-    const updated = saveCurrentEdit() || [];
-    const currentWord = updated[activeWordIndex];
+    const currentWord = wordDataList[activeWordIndex];
     if (text === 'word') {
       speak(currentWord?.word || '');
       return;
@@ -126,27 +141,6 @@ export default function WordProcessorPage() {
       return;
     }
   };
-
-  useEffect(() => {
-    if (codeRef.current && !isEditingRef.current) {
-      codeRef.current.innerText = editedJson;
-    }
-  }, [editedJson]);
-
-  const handleInput = () => {
-    isEditingRef.current = true;
-  };
-
-  const handleBlur = () => {
-    isEditingRef.current = false;
-    if (codeRef.current) {
-      setEditedJson(codeRef.current.innerText);
-    }
-  };
-
-  const getMarkdownContent = () => `\`\`\`json
-${editedJson}
-\`\`\``;
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8 text-gray-900">
@@ -201,31 +195,15 @@ ${editedJson}
                   Reset to Original
                 </button>
               </div>
-              <ReactMarkdown
-                components={{
-                  code: ({ className, children, ...props }) => {
-                    const match = /language-(\w+)/.exec(className || '');
-                    return match ? (
-                      <div
-                        ref={codeRef}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onInput={handleInput}
-                        onBlur={handleBlur}
-                        className="rounded-md bg-[#282a36] p-4 font-mono whitespace-pre text-white focus:ring-2 focus:ring-blue-500"
-                      >
-                        {children}
-                      </div>
-                    ) : (
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    );
-                  },
-                }}
-              >
-                {getMarkdownContent()}
-              </ReactMarkdown>
+
+              {wordDataList[activeWordIndex] && (
+                <JsonEditor
+                  data={wordDataList[activeWordIndex]}
+                  onUpdate={handleUpdateWord}
+                  onRegenerate={handleRegenerate}
+                  loadingField={loadingField}
+                />
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">

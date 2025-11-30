@@ -1,58 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { WordData } from '../../types';
 import { generateText } from 'ai';
-import { google } from '@ai-sdk/google';
-
-const model = google('gemini-2.5-flash');
-
-const getPrompt = (word: string) => {
-  return `
-Provide structured information about the word "${word}". Return ONLY a JSON object with this exact structure:
-{
-  "word": string,
-  "ipa": string[],
-  "syllable": string[],
-  "actualSyllable": string[],
-  "definition": string,
-  "syllableOptions": string[][],
-  "option": Record<'easy' | 'medium' | 'hard', string[]>,
-  "usage": string[]
-}
-Here's an example
-{
-    word: 'CULTURE',
-    ipa: ['ˈkʌl', 'tʃər'],
-    syllable: ['cul', 'tur'],
-    actualSyllable: ['cul', 'ture'],
-    definition: 'The ideas, customs, and social behavior of a particular people or society',
-    syllableOptions: [
-      ['cul', 'kul', 'col'],
-      ['ture', 'chur', 'tour'],
-    ],
-    option: {
-      easy: ['culture', 'kulture'],
-      medium: ['cultuer', 'cultre'],
-      hard: ['culter', 'cultare'],
-    },
-    usage: [
-      "The museum showcases the rich ___ of the indigenous people.",
-      "Learning about different ___ helps us understand the world better.",
-      "Pop ___ has influenced many aspects of modern society.",
-    ],
-}
-
-Here the syllable is used for audio hints, and the actualSyllable is the correct breakdown of the word.
-syllable should never be the same as actualSyllable.
-syllable is fed to const utterance = new SpeechSynthesisUtterance(syllable[number].toLocaleLowerCase()); and used for syllable audio hints.
-So for example, for the word "CULTURE", syllable could be ['cul', 'tur'] while actualSyllable is ['cul', 'ture'].
-This way, when the syllables are spoken individually, they feel natural and correct, instead of awkward or incorrect pronunciations. (e.g., 'ture' pronounced as 'tur' instead of 'ture').
-
-Make sure the JSON is properly formatted.
-Do not include any other text or any other format.
-Do not respond in markdown format.
-Just give the JSON object.
-`;
-};
+import { initializeConversation } from '../../lib/conversation-store';
+import { getSystemPrompt } from './llm/prompt';
+import { MODEL } from './llm/config';
 
 export default async function handler(
   req: NextApiRequest,
@@ -88,8 +39,8 @@ export default async function handler(
 
     for (const word of wordList) {
       const { content } = await generateText({
-        model,
-        prompt: getPrompt(word),
+        model: MODEL,
+        prompt: getSystemPrompt(word),
       });
 
       // Parse the AI response
@@ -97,6 +48,9 @@ export default async function handler(
         try {
           const parsed = JSON.parse(content[0].text);
           results.push(parsed);
+
+          // Initialize conversation history for this word
+          initializeConversation(parsed.word, parsed);
         } catch (parseError) {
           console.log(parseError);
         }
