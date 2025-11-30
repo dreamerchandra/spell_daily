@@ -39,7 +39,9 @@ export const Typewriter = ({
       setShowCursor(-1);
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.TYPEWRITER);
+      const stop = successSoundManager.playSuccess(
+        SuccessAnimationType.TYPEWRITER
+      );
 
       let timerIds: number[] = [];
 
@@ -80,6 +82,7 @@ export const Typewriter = ({
       );
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

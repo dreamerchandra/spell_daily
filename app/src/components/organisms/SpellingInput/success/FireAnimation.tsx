@@ -116,7 +116,10 @@ export const FireAnimation = ({
       setFlameStates(new Array(userInput.length).fill(false));
 
       // Play success sound for fire animation
-      successSoundManager.playSuccess(SuccessAnimationType.FIRE_ANIMATION, 1);
+      const stop = successSoundManager.playSuccess(
+        SuccessAnimationType.FIRE_ANIMATION,
+        1
+      );
 
       let timerIds: number[] = [];
 
@@ -160,6 +163,7 @@ export const FireAnimation = ({
 
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

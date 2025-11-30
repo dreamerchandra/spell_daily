@@ -39,7 +39,9 @@ export const ConfettiBurst = ({
       setShowConfetti(new Array(userInput.length).fill(false));
 
       // Play success sound
-      successSoundManager.playSuccess(SuccessAnimationType.CONFETTI_BURST);
+      const stop = successSoundManager.playSuccess(
+        SuccessAnimationType.CONFETTI_BURST
+      );
 
       let timerIds: number[] = [];
 
@@ -84,6 +86,7 @@ export const ConfettiBurst = ({
 
       return () => {
         timerIds.forEach(id => clearTimeout(id));
+        stop();
       };
     }
   }, [isCorrect, onAnimationEnd, userInput]);

@@ -143,7 +143,7 @@ export const LoadingComponent = ({
                 y="15"
                 width="12"
                 height="90"
-                rx="8 0 0 8"
+                rx="8"
                 fill="#1e40af"
               />
               {/* Book pages */}

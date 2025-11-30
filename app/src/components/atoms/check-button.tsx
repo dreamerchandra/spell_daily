@@ -1,58 +1,98 @@
-import { useCallback, useState, type FC } from 'react';
+import { type FC } from 'react';
 import { Button } from './Button';
-import { useSetTimeout } from '../../hooks/use-setTimeout';
 import type { AnswerState } from '../../common/game-ref';
 import { useShortcut } from '../../hooks/use-shortcut';
 
+// Individual button components for each state
+const CheckStateButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick, disabled }) => (
+  <Button onClick={onClick} disabled={disabled} variant="primary" size="lg">
+    CHECK
+  </Button>
+);
+
+const CorrectButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick, disabled }) => (
+  <Button
+    onClick={() => {
+      if (disabled) {
+        return;
+      }
+      onClick();
+    }}
+    variant="success"
+    size="lg"
+  >
+    CORRECT
+  </Button>
+);
+
+const IncorrectButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick, disabled }) => (
+  <Button
+    onClick={() => {
+      if (disabled) {
+        return;
+      }
+      onClick();
+    }}
+    variant="error"
+    size="lg"
+  >
+    WRONG
+  </Button>
+);
+
+const SoCloseButton: FC<{
+  onClick: () => void;
+  disabled: boolean;
+}> = ({ onClick, disabled }) => (
+  <Button
+    onClick={() => {
+      if (disabled) {
+        return;
+      }
+      onClick();
+    }}
+    variant="error"
+    size="lg"
+  >
+    SO CLOSE
+  </Button>
+);
+
 export const CheckButton: FC<{
-  onCheckAnswer: () => AnswerState;
+  onClick: () => void;
   disableChecking: boolean;
-}> = ({ onCheckAnswer, disableChecking }) => {
-  const [gameState, setGameState] = useState<AnswerState>('UNANSWERED');
-  const timer = useSetTimeout();
-
-  const onClick = useCallback(() => {
-    if (disableChecking) return;
-    const gameState = onCheckAnswer();
-    setGameState(gameState);
-    if (gameState === 'SO_CLOSE') {
-      return;
-    }
-    timer(() => {
-      setGameState('UNANSWERED');
-    }, 2000);
-  }, [disableChecking, onCheckAnswer, timer]);
-
+  answerState: AnswerState;
+}> = ({ onClick, disableChecking, answerState }) => {
   useShortcut('Enter', onClick);
 
   return (
-    <div className="m-auto flex w-[80%] flex-col justify-center">
-      {gameState === 'SO_CLOSE' && (
+    <div className="flex flex-col justify-center">
+      {answerState === 'SO_CLOSE' && (
         <p className="mb-2 text-center text-lg text-yellow-600">
           So close! Try again.
         </p>
       )}
-      <Button
-        onClick={onClick}
-        className="m-auto w-[80%] max-w-[300px]"
-        disabled={disableChecking}
-        variant={
-          gameState === 'UNANSWERED'
-            ? 'primary'
-            : gameState === 'CORRECT'
-              ? 'success'
-              : 'error'
-        }
-        size="lg"
-      >
-        {gameState === 'UNANSWERED'
-          ? 'CHECK'
-          : gameState === 'CORRECT'
-            ? 'CORRECT'
-            : gameState === 'SO_CLOSE'
-              ? 'SO CLOSE'
-              : 'WRONG'}
-      </Button>
+      {answerState === 'UNANSWERED' && (
+        <CheckStateButton onClick={onClick} disabled={disableChecking} />
+      )}
+      {answerState === 'CORRECT' && (
+        <CorrectButton onClick={onClick} disabled={disableChecking} />
+      )}
+      {answerState === 'SO_CLOSE' && (
+        <SoCloseButton onClick={onClick} disabled={disableChecking} />
+      )}
+      {answerState === 'INCORRECT' && (
+        <IncorrectButton onClick={onClick} disabled={disableChecking} />
+      )}
     </div>
   );
 };

@@ -1,30 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { GameRef, AnswerState } from './common/game-ref';
+import type { AnswerState, GameRef } from './common/game-ref';
 import { type GameComponent, type GameType } from './common/game-type';
-import { Continue } from './components/atoms/continue';
+import { CompletedAnimation } from './components/atoms/completed-animation';
 import { Footer } from './components/atoms/footer';
+import { FooterButton } from './components/atoms/footer-button';
 import { ProgressWithTimer, type TimerRef } from './components/atoms/Progress';
+import { StreakAnimation } from './components/atoms/streak-animation';
 import { Avatar } from './components/organisms/avatar/avatar';
 import { Header } from './components/organisms/header';
 import { Layout } from './components/organisms/layout';
-import { TypingWithBox } from './game/typing-with-box';
+import { useSetTestMode } from './context/hint-context';
+import { useOnTestModeChange } from './context/hint-context/index';
+import { ContextGame } from './game/context';
+import { CorrectSentenceGame } from './game/correct-sentence';
 import { JumbledWordGame } from './game/jumbled-word/index';
+import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
 import { SyllableGame } from './game/syllabi';
+import { TypingWithBox } from './game/typing-with-box';
 import { TypingWithoutBox } from './game/typing-withou-box';
 import { VoiceTypingGame } from './game/voice-typing';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import { type GameSequenceType } from './words';
-import { FourOptionGame, TwoOptionGame } from './game/multiple-choice';
-import { useSetTestMode } from './context/hint-context';
-import { ContextGame } from './game/context';
-import { CorrectSentenceGame } from './game/correct-sentence';
-import { CheckButton } from './components/atoms/check-button';
-import { useOnTestModeChange } from './context/hint-context/index';
-import { StreakAnimation } from './components/atoms/streak-animation';
-import { useSteak } from './hooks/use-steak';
-import { pubSub } from './util/pub-sub';
 import { useSetTimeout } from './hooks/use-setTimeout';
-import { CompletedAnimation } from './components/atoms/completed-animation';
+import { useSteak } from './hooks/use-steak';
+import { type GameSequenceType } from './words';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ComponentMap: Record<GameType, GameComponent<any>> = {
@@ -43,6 +41,7 @@ type GameState = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
 const useGameState = (gameSequence: GameSequenceType) => {
   const [gameState, setGameState] = useState<GameState>('NOT_STARTED');
+  const [answerState, setAnswerState] = useState<AnswerState>('UNANSWERED');
 
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [canContinue, setCanContinue] = useState(false);
@@ -67,6 +66,7 @@ const useGameState = (gameSequence: GameSequenceType) => {
     timerRef.current?.stopTimer();
   }, []);
   const moveToNextWord = useCallback(() => {
+    setAnswerState('UNANSWERED');
     if (currentWordIndex === gameSequence.length - 1) {
       endGame();
       return;
@@ -85,6 +85,8 @@ const useGameState = (gameSequence: GameSequenceType) => {
     setGameState,
     moveToNextWord,
     isTestMode,
+    answerState,
+    setAnswerState,
   };
 };
 
@@ -100,6 +102,8 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
     timerRef,
     setGameState,
     isTestMode,
+    answerState,
+    setAnswerState,
   } = useGameState(gameSequence);
 
   const [disableChecking, setDisableChecking] = useState(true);
@@ -111,7 +115,6 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
     startAnimation,
   } = useSteak();
   const stopStreakTimer = useSetTimeout();
-  const publishStreakEndTimer = useSetTimeout();
 
   const [soundEnabled, setSoundEnabled] = useLocalStorageState<boolean>(
     'SOUND_ENABLED',
@@ -119,17 +122,21 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
   );
 
   const Component = ComponentMap[gameMode];
+  const setContinueState = useCallback(() => {
+    timerRef.current?.stopTimer();
+    setCanContinue(true);
+  }, [setCanContinue, timerRef]);
   const onCheckAnswer = useCallback((): AnswerState => {
     const state = gameRef.current?.getCorrectState();
+    setAnswerState(state ?? 'UNANSWERED');
     if (state === 'CORRECT') {
-      timerRef.current?.stopTimer();
-      setCanContinue(true);
+      setContinueState();
       incrementStreak();
     } else {
       resetStreak();
     }
     return state ?? 'UNANSWERED';
-  }, [setCanContinue, timerRef, incrementStreak, resetStreak]);
+  }, [setAnswerState, setContinueState, incrementStreak, resetStreak]);
 
   useOnTestModeChange(enabled => {
     if (enabled) {
@@ -190,24 +197,26 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
       }
       footer={
         <Footer
-          isSuccess={canContinue}
+          isSuccess={answerState === 'CORRECT'}
           onAnimationComplete={useCallback(() => {
             if (streak.isStreakScheduled) {
               startAnimation();
             }
           }, [streak.isStreakScheduled, startAnimation])}
         >
-          {canContinue ? (
-            <Continue
-              disabled={!canContinue || streak.isPlaying}
-              onClick={moveToNextWord}
-            />
-          ) : (
-            <CheckButton
-              onCheckAnswer={onCheckAnswer}
-              disableChecking={disableChecking}
-            />
-          )}
+          <FooterButton
+            answerState={answerState}
+            onClickContinue={() => {
+              if (streak.isStreakScheduled) {
+                return startAnimation();
+              }
+              moveToNextWord();
+            }}
+            canContinue={canContinue}
+            disableContinue={!canContinue || streak.isPlaying}
+            onCheckAnswer={onCheckAnswer}
+            disableChecking={disableChecking}
+          />
         </Footer>
       }
     >
@@ -216,9 +225,7 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
         onDone={() => {
           stopStreakTimer(() => {
             stopAnimation();
-            publishStreakEndTimer(() => {
-              pubSub.publish('Streak:End');
-            }, 500);
+            moveToNextWord();
           }, 500);
         }}
       />
@@ -228,6 +235,7 @@ export const Game = ({ gameSequence }: { gameSequence: GameSequenceType }) => {
           ref={gameRef}
           wordDef={gameSequence[currentWordIndex].def}
           setDisableChecking={setDisableChecking}
+          skipToNext={setContinueState}
         />
       ) : null}
     </Layout>

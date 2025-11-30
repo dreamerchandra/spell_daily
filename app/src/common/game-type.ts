@@ -17,6 +17,7 @@ export type GameType = SpellingGameType | UsageGameType;
 export type GameRefProps<T = WordDef> = {
   wordDef: T;
   setDisableChecking: (disable: boolean) => void;
+  skipToNext: () => void;
 } & RefAttributes<GameRef>;
 
 export type GameComponent<T = WordDef> = ForwardRefExoticComponent<

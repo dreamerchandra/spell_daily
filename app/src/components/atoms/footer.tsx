@@ -17,7 +17,6 @@ export const RiveFooter = ({
 }) => {
   const { RiveComponent, rive } = useRive({
     buffer: footerAnimation.getBuffer(),
-    autoBind: true,
     layout: new Layout({
       fit: Fit.FitWidth,
       alignment: Alignment.BottomCenter,
@@ -56,7 +55,7 @@ export const Footer = ({
     <div className="fixed bottom-0 w-full pb-6 text-center text-sm text-ui-textMuted">
       <div className="relative z-10">{children}</div>
       <div
-        className={`absolute bottom-0  ${isSuccess ? 'h-[200px]' : 'h-[140px]'} w-full text-center text-sm text-ui-textMuted`}
+        className={`absolute bottom-0  ${isSuccess ? 'h-[200px]' : 'h-[100px]'} border-t-2 w-full text-center text-sm text-ui-textMuted`}
       >
         <RiveFooter
           isSuccess={isSuccess}

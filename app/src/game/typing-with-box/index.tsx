@@ -11,7 +11,7 @@ import type { GameComponent } from '../../common/game-type';
 import { getGameState } from '../../common/game-ref';
 
 export const TypingWithBox: GameComponent = forwardRef(
-  ({ wordDef, setDisableChecking }, ref) => {
+  ({ wordDef, setDisableChecking, skipToNext }, ref) => {
     const { state, setIsCorrect, setUserInput, setNewWord } =
       useFullWordState();
 
@@ -32,6 +32,9 @@ export const TypingWithBox: GameComponent = forwardRef(
           if (gameState === 'CORRECT') {
             setIsCorrect(true);
           } else if (gameState === 'INCORRECT') {
+            if (state.incorrectAttempts + 1 >= state.maxAttempts) {
+              skipToNext();
+            }
             setIsCorrect(false);
           }
           return gameState;
@@ -98,6 +101,18 @@ export const TypingWithBox: GameComponent = forwardRef(
                 />
               </div>
             ))}
+            {state.revealAnswer && (
+              <div className="mb-4 flex flex-col items-center gap-2">
+                <div>
+                  <SpellingInput
+                    userInput={wordDef.word.split('')}
+                    isCorrect={false}
+                    wordDef={wordDef}
+                    disableTalkBack={true}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <Keyboard onKeyPress={handleKeyPress} />
         </div>

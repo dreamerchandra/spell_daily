@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import type { ActionPayload } from '../../common/payload-creeator';
 import type { WordDef } from '../../words';
-import {
-  useHintState,
-  useResetHint,
-  useNextHint,
-} from '../../context/hint-context/index';
+import { useHintState, useResetHint } from '../../context/hint-context/index';
 import { showSyllable } from '../../components/organisms/SpellingInput/utils';
 import { useSpellingSpeech } from '../../hooks';
 import { Avatar } from '../../components/organisms/avatar/avatar';
@@ -17,6 +13,8 @@ export type FullWordState = {
   }[];
   incorrectAttempts: number;
   wordDef: WordDef | null;
+  maxAttempts: number;
+  revealAnswer: boolean;
 };
 
 type NewWordPayload = ActionPayload<'NEW_WORD', { wordDef: WordDef }>;
@@ -59,6 +57,8 @@ export const fullWordReducer = (
           },
         ],
         incorrectAttempts: 0,
+        maxAttempts: 2,
+        revealAnswer: false,
       };
     case 'SET_USER_INPUT': {
       const lastAttempt = state.attempts[state.attempts.length - 1];
@@ -86,18 +86,25 @@ export const fullWordReducer = (
         ],
       };
     }
-    case 'SET_INCORRECT_ATTEMPTS':
+    case 'SET_INCORRECT_ATTEMPTS': {
+      const updateIncorrectAttempts = state.incorrectAttempts + 1;
+      const updateAttempts =
+        updateIncorrectAttempts >= state.maxAttempts
+          ? state.attempts
+          : [
+              ...state.attempts,
+              {
+                userInput: new Array(state.wordDef?.word.length ?? 0).fill(''),
+                isCorrect: null,
+              },
+            ];
       return {
         ...state,
-        attempts: [
-          ...state.attempts,
-          {
-            userInput: new Array(state.wordDef?.word.length ?? 0).fill(''),
-            isCorrect: null,
-          },
-        ],
-        incorrectAttempts: state.incorrectAttempts + 1,
+        attempts: updateAttempts,
+        incorrectAttempts: updateIncorrectAttempts,
+        revealAnswer: updateIncorrectAttempts >= state.maxAttempts,
       };
+    }
     default:
       return state;
   }
@@ -113,6 +120,8 @@ export const useFullWordState = () => {
     ],
     incorrectAttempts: 0,
     wordDef: null,
+    maxAttempts: 2,
+    revealAnswer: false,
   });
   const ref = useRef(state);
   useEffect(() => {
@@ -120,7 +129,6 @@ export const useFullWordState = () => {
   }, [state]);
   const resetHint = useResetHint();
   const hintState = useHintState();
-  const nextHint = useNextHint();
   const { speak } = useSpellingSpeech();
 
   const setUserInput = useCallback((userInput: string[]) => {
@@ -130,35 +138,18 @@ export const useFullWordState = () => {
     });
   }, []);
 
-  const setIsCorrect = useCallback(
-    (isCorrect: boolean | null) => {
+  const setIsCorrect = useCallback((isCorrect: boolean | null) => {
+    dispatch({
+      type: 'SET_IS_CORRECT',
+      action: { isCorrect },
+    });
+    if (isCorrect === false) {
       dispatch({
-        type: 'SET_IS_CORRECT',
-        action: { isCorrect },
+        type: 'SET_INCORRECT_ATTEMPTS',
       });
-      if (isCorrect === false) {
-        dispatch({
-          type: 'SET_INCORRECT_ATTEMPTS',
-        });
-        const incorrectAttempts = ref.current.incorrectAttempts + 1;
-        if (incorrectAttempts === 0) return;
-        const isEvenAttempt = incorrectAttempts % 2 === 0;
-        if (isEvenAttempt) {
-          Avatar.hint({
-            text: 'Want some hint?',
-            yesText: 'Yes, please!',
-            noText: 'No, I got this!',
-            onYes: () => {
-              nextHint();
-            },
-          });
-        } else {
-          Avatar.changeCharacter('by_rating/1');
-        }
-      }
-    },
-    [nextHint]
-  );
+      Avatar.changeCharacter('by_rating/1');
+    }
+  }, []);
 
   const setNewWord = useCallback(
     (wordDef: WordDef) => {

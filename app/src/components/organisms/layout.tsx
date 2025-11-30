@@ -16,7 +16,7 @@ export const Layout = ({
       {!removeHeaderFooter && (
         <div className="sticky top-0 z-[1000]">{header}</div>
       )}
-      <main className="flex h-[calc(100vh-237.4px)] items-center justify-center">
+      <main className="flex h-[calc(100dvh-237.4px)] items-center justify-center">
         {children}
       </main>
       {!removeHeaderFooter && <div className="sticky bottom-0">{footer}</div>}
